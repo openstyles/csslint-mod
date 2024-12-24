@@ -9,8 +9,8 @@ import chalk from 'chalk';
 
 const DIR = import.meta.dirname;
 const TEST_FILE = DIR + '/test.css';
-const REPORT_FILE = DIR + '/test.css.txt';
-const FAILED_FILE = DIR + '/test.css.tmp';
+const REPORT_FILE = TEST_FILE + '.txt';
+const FAILED_FILE = TEST_FILE + '.error.tmp';
 
 (async () => {
   let res;

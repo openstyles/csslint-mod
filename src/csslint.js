@@ -1,4 +1,4 @@
-import parserlib from './parserlib';
+import parserlib from './parserlib.js';
 import {Reporter} from './rules/-util';
 import ruleBoxModel from './rules/box-model';
 import ruleCompatibleVendorPrefixes from './rules/compatible-vendor-prefixes';

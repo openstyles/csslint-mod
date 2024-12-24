@@ -1,6 +1,6 @@
 {
   "name": "csslint-mod",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A CSSLint fork supporting modern CSS, primarily used in the Stylus extension",
   "author": "Stylus Team",
   "license": "MIT",
@@ -10,26 +10,25 @@
     "CSS",
     "linter"
   ],
-  "files": [
-    "dist/csslint.iife.js",
-    "dist/parserlib.iife.js"
-  ],
+  "files": ["dist"],
+  "main": "dist/csslint.js",
   "type": "module",
   "scripts": {
     "build": "rollup -c",
     "watch": "run-p \"rollup -c -w --environment BUILD:c\"",
     "watch-DEV": "rollup -c -w --environment DEV",
     "lint": "eslint \"**/*.js\" --cache",
-    "test": "npm run lint && node --import=extensionless/register test/test.js"
+    "test": "npm run lint && node --import=extensionless/register test/test.js",
+    "pre-version": "test",
+    "bump": "npm version patch",
+    "bump2": "npm version minor"
   },
   "devDependencies": {
-    "@rollup/plugin-terser": "^0.4.4",
     "chalk": "^5.4.1",
     "eslint": "^9.17.0",
     "extensionless": "^1.9.9",
     "fs-extra": "^11.2.0",
     "globals": "^15.14.0",
-    "lodash.merge": "^4.6.2",
     "rollup": "^4.29.1"
   }
 }
