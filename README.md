@@ -1,4 +1,4 @@
-A fork of the original CSSLint Build v0.10.0 15-August-2013 01:07:22, heavily modified since then as a part of [Stylus extension](https://github.com/openstyles/stylus), now extracted to a separate repo.
+A fork of the original [CSSLint](https://github.com/CSSLint/csslint) Build v0.10.0 15-August-2013 01:07:22, heavily modified since then as a part of [Stylus extension](https://github.com/openstyles/stylus), now extracted to a separate repo.
 
 * Supports modern CSS syntax including nesting, grids, complex selectors in pseudo selectors like `:has()`.
 * Verifies function arguments including the modern `color-mix()`, `hwb()`, etc.
