@@ -136,20 +136,18 @@ export default class Matcher {
    * @return {!boolean|number|void}
    */
   static funcTest(expr, p) {
-    const pn = p.name;
-    if (!pn) return;
-    const pnv = (p.prefix || '') + pn;
-    const {name, body, list} = this.arg;
-    const m = list ? list[pn] || list[pnv]
-      : name === pn || name === pnv ? (body || '')
-        : null;
-    if (m == null) return;
-    const e = p.expr;
-    if (!e && m) return m.arg.min === 0;
-    const vi = m && !e.isVar && new PropValueIterator(e);
-    const mm = !vi || m.matchFunc ? m :
-      list[pn] = (m.call ? m(Matcher) : Matcher.cache[m] || Matcher.parse(m));
-    return !vi || mm.match(vi) && vi.i >= vi.parts.length || !(expr.badFunc = [e, mm]);
+    const name = p.name; if (!name) return;
+    let e, m, vi;
+    const {arg} = this;
+    const {list} = arg;
+    if (list) m = list[name]; // VTFunctions doesn't have vendor-prefixed names
+    else if (name === (e = arg.name)
+      || (vi = p.prefix) && vi + name === e) m = arg.body;
+    if (!m) return m != null; // true = no check if `body` is false i.e. no specs for params
+    if ((e = p.expr)) if (e.isVar) return true; else vi = new PropValueIterator(e);
+    if (!m.matchFunc) m = list[name] = (m.call ? m(Matcher) : Matcher.cache[m] || Matcher.parse(m));
+    if (!e) return m.arg.min === 0;
+    return m.match(vi) && vi.i >= vi.parts.length || !(expr.badFunc = [e, m]);
   }
 
   /** @this {Matcher} */

@@ -1,8 +1,6 @@
 import fse from 'fs-extra';
-import * as path from 'path';
 
-const PKG = fse.readJsonSync('./package.json');
-const DST = path.dirname(PKG.files[0]) + path.sep;
+const DST = 'dist/';
 const OUTPUT = {
   dir: DST,
   entryFileNames: `[name].js`,
