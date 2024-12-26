@@ -82,3 +82,4 @@ error	584	12	Unexpected " ".
 warning	584	42	Expected <named-or-hex-color> | color-mix() | color() | hsl() | hwb() | lab() | lch() | light-dark() | rgb() | hsla() | rgba() | oklab() | oklch() but found "bad".
 warning	585	1	Empty rule.
 error	585	10	Expected ":" but found "}".
+warning	587	19	Expected end of value but found "wr".

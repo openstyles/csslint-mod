@@ -583,3 +583,5 @@ a { bad: }
 a { bad:/*parser recovery*/}
 a { a {bad: /*parser recovery*/ } color: bad }
 a { --bad}
+
+a {flex-flow: row wr/*incomplete*/}

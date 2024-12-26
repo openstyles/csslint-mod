@@ -1352,7 +1352,7 @@ class PropValueIterator {
   }
 
   get hasNext() {
-    return this.i + 1 < this.parts.length;
+    return this.i < this.parts.length;
   }
 
   /** @returns {?Token} */
