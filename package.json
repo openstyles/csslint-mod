@@ -1,6 +1,6 @@
 {
   "name": "csslint-mod",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A CSSLint fork supporting modern CSS, primarily used in the Stylus extension",
   "author": "Stylus Team",
   "license": "MIT",
@@ -10,7 +10,9 @@
     "CSS",
     "linter"
   ],
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "main": "dist/csslint.js",
   "type": "module",
   "scripts": {
