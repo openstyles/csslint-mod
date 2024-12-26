@@ -575,3 +575,11 @@ a { offset-path: ray(180deg closest-side) }
 a { color: light-dark(lime, green); }
 a { color: light-dark(red); }
 a { not-declaration:and(#not-hex) { color: red } }
+
+a { --valid:}
+a { --valid: }
+a { --valid:/*foo*/}
+a { bad: }
+a { bad:/*parser recovery*/}
+a { a {bad: /*parser recovery*/ } color: bad }
+a { --bad}

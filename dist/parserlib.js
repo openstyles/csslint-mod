@@ -3600,10 +3600,11 @@ class Parser extends EventDispatcher {
     }
     if (t2.id !== COLON || (ti3 = stream.get(UVAR).id) === COLON) {
       while (stream.token !== tok) stream.unget();
-      if (!inParens && (ti3 || isOwn(TT.nestSelBlock, t2.id))) return;
+      if (!inParens && (ti3 || !isCust || isOwn(TT.nestSelBlock, t2.id))) return;
       if (tok.isVar) return true;
-      if (inParens || isCust) stream._failure('":"', t2raw);
-      return;
+      stream.source.reset(t2mark);
+      stream._resetBuf();
+      stream._failure('":"', t2raw);
     }
     if (ti3 !== WS) stream.unget();
     // This may be a selector, so we can't report errors upstream yet
@@ -3628,7 +3629,10 @@ class Parser extends EventDispatcher {
       throw new ParseError(`Unexpected "{" in "${tok}" declaration`, t);
       // TODO: if not as rare as alleged, make a flat array in _expr() and reuse it
     }
-    if (!value) stream._failure('');
+    if (!value) {
+      if (t.id === RBRACE) stream.unget();
+      stream._failure('');
+    }
     const invalid = !isCust && !tok.isVar && !opts.noValidation &&
       validateProperty(tok, value, stream, scope);
     const important = t.id === DELIM &&
