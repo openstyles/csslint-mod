@@ -17,8 +17,7 @@
   "type": "module",
   "scripts": {
     "build": "rollup -c",
-    "watch": "run-p \"rollup -c -w --environment BUILD:c\"",
-    "watch-DEV": "rollup -c -w --environment DEV",
+    "watch": "rollup -c -w",
     "lint": "eslint \"**/*.js\" --cache",
     "test": "npm run lint && node --import=extensionless/register test/test.js",
     "pre-version": "test",
