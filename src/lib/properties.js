@@ -264,6 +264,7 @@ const Properties = {
   'inset-inline': '<top>{1,2}',
   'inset-inline-end': '<top>',
   'inset-inline-start': '<top>',
+  'interpolate-size': 'numeric-only | allow-keywords',
   'isolation': 'auto | isolate',
 
   'justify-content': 'normal | <content-distribution> | ' +
