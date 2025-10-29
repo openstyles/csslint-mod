@@ -70,6 +70,11 @@ const ScopedProperties = {
     'initial-value': 1,
     'syntax': '<string>',
   },
+  'view-transition': {
+    '<all>': true,
+    'navigation': 'auto | none',
+    'types': 'none | <ident-not-none>+',
+  },
 };
 
 export default ScopedProperties;

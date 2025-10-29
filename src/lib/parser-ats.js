@@ -272,6 +272,15 @@ const ATS = {
     this._condition(stream, undefined, this._supportsCondition);
     this._block(stream, start, {event: ['supports']});
   },
+
+  /**
+   * @this {Parser}
+   * @param {TokenStream} stream
+   * @param {Token} start
+   */
+  'view-transition'(stream, start) {
+    this._block(stream, start, {decl: true, event: ['view-transition'], scoped: true});
+  },
 };
 
 /** topDocOnly mode */

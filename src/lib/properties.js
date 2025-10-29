@@ -151,7 +151,7 @@ const Properties = {
   'contain': 'none | strict | content | [ size || layout || style || paint ]',
   'contain-intrinsic-size': '<contain-intrinsic>{1,2}',
   'container': '<container-name> [ / <container-type> ]?',
-  'container-name': 'none | <custom-ident>+',
+  'container-name': 'none | <ident-not-none>+',
   'container-type': 'normal || [ size | inline-size ]',
   'content': 'normal | none | <content-list> [ / <string> ]?',
   'content-visibility': 'auto | <vis-hid>',
@@ -522,6 +522,8 @@ const Properties = {
 
   'vertical-align': 'auto | use-script | baseline | sub | super | top | text-top | ' +
     'central | middle | bottom | text-bottom | <len-pct>',
+  'view-transition-class': 'none | <ident-not-none>+',
+  'view-transition-name': 'none | auto | match-element | <custom-ident>',
   'visibility': '<vis-hid> | collapse',
 
   'white-space': 'normal | pre | pre-wrap | pre-line | <white-space-collapse> || <text-wrap-mode>',

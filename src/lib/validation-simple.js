@@ -5,6 +5,7 @@ import {ANGLE, IDENT, LENGTH, NUMBER, PCT, RESOLUTION, STRING, TIME, URANGE} fro
 const buAlpha = new Bucket('alpha');
 export const buGlobalKeywords = new Bucket(GlobalKeywords);
 
+/** @type {{[id: string]: (p: import('./token').default) => boolean}} */
 const VTSimple = {
   __proto__: null,
   '<animateable-feature-name>': customIdentChecker('will-change,auto,scroll-position,contents'),
@@ -20,6 +21,7 @@ const VTSimple = {
   '<ident>': p => p.id === IDENT,
   '<ident-for-grid>': customIdentChecker('span,auto'),
   '<ident-not-none>': p => p.id === IDENT && !p.isNone,
+  '<ident-not-auto-none>': p => p.id === IDENT && !p.isNone && !p.isAuto,
   '<ie-function>': p => p.ie,
   '<int>': p => p.isCalc || p.isInt,
   '<int0-1>': p => p.isCalc || p.is0 || p.isInt && p.number === 1,
