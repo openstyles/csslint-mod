@@ -4,7 +4,7 @@ import {OrDie, OrDieReusing, TT} from './token-stream';
 import {
   COLON, COMMA, IDENT, LBRACE, LPAREN, PCT, RBRACE, RPAREN, SEMICOLON, STRING,
 } from './tokens';
-import {pick} from './util';
+import {ParseError, pick} from './util';
 
 /** Functions for @ symbols */
 const ATS = {
@@ -27,10 +27,20 @@ const ATS = {
    * @param {Token} start
    */
   container(stream, start) {
-    const tok = stream.matchSmart(IDENT);
-    const name = B.not.has(tok) ? stream.unget() : tok;
-    this._condition(stream, undefined, this._containerCondition);
-    this._block(stream, start, {event: ['container', {name}]});
+    let name, next;
+    do {
+      // <container-name>? <container-query>?
+      name = stream.matchSmart(IDENT);
+      if (B.andNoneNotOr.has(name))
+        name = stream.unget();
+      next = stream.grab(); // TODO: collect conditions array instead
+      this._condition(stream, next, this._containerCondition);
+      if (next !== stream.token)
+        next = null;
+      else if (!name)
+        throw new ParseError('Expecting name or condition', next);
+    } while (next?.id === COMMA || stream.match(COMMA));
+    this._block(stream, start, {event: ['container']});
   },
 
   /**

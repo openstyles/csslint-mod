@@ -585,3 +585,6 @@ a { a {bad: /*parser recovery*/ } color: bad }
 a { --bad}
 
 a {flex-flow: row wr/*incomplete*/}
+
+@container card (inline-size > 30em) and style(--responsive: true) {}
+@container card (inline-size > 30em), style(--large: true) {}

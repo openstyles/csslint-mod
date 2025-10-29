@@ -168,7 +168,7 @@ class Parser extends EventDispatcher {
     if (paren && tok.id === IDENT) {
       stream.unget();
       this._mediaExpression(stream, paren);
-    } else if (!paren && tok.name === 'style') {
+    } else if (!paren && B.containerFn.has(tok)) {
       this._condition(stream, {id: LPAREN});
     } else {
       return;
