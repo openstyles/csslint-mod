@@ -34,7 +34,7 @@ export default [
       'computed-property-spacing': [2, 'never'],
       'consistent-return': [0],
       'constructor-super': [2],
-      'curly': [2, 'multi-line'],
+      'curly': [0, 'multi-line'],
       'default-case': [0],
       'dot-location': [2, 'property'],
       'dot-notation': [0],

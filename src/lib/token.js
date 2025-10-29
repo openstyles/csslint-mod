@@ -24,6 +24,7 @@ import {assign, define, isOwn, parseString, PDESC, toLowAscii} from './util';
  */
 export default class Token {
   constructor(id, col, line, offset, input, code) {
+    /** @type {number} */
     this.id = id;
     this.col = col;
     this.line = line;

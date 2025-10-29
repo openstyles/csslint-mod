@@ -6,7 +6,7 @@ import Tokens, {
   AMP, AT, ATTR_EQ, CDCO, CHAR, COLON, COMBINATOR, COMMENT, DELIM, DIMENSION, DOT, EOF, EQ_CMP,
   EQUALS, FUNCTION, GT, HASH, IDENT, INVALID, LBRACE, LBRACKET, LENGTH, LPAREN, MINUS, NUMBER, PCT,
   PIPE, PLUS, RBRACE, RBRACKET, RPAREN, SEMICOLON, STAR, STRING, TokenIdByCode, URANGE, URI, UVAR,
-  WS,
+  LT, WS, DIV,
 } from './tokens';
 import Units, {UnitTypeIds} from './units';
 import {
@@ -18,7 +18,6 @@ export const TT = {
   attrEqEnd: [ATTR_EQ, EQUALS, RBRACKET],
   attrStart: [PIPE, IDENT, STAR],
   attrNameEnd: [RBRACKET, UVAR, WS],
-  colonLParen: [COLON, LPAREN],
   combinator: [PLUS, GT, COMBINATOR],
   condition: [FUNCTION, IDENT, LPAREN],
   declEnd: [SEMICOLON, RBRACE],
@@ -26,6 +25,7 @@ export const TT = {
   identStar: [IDENT, STAR],
   identString: [IDENT, STRING],
   mediaList: [IDENT, LPAREN],
+  mediaOp: [COLON, EQUALS, EQ_CMP, LT, GT, LPAREN],
   mediaValue: [IDENT, NUMBER, DIMENSION, LENGTH],
   propCustomEnd: [DELIM, SEMICOLON, RBRACE, RBRACKET, RPAREN, INVALID],
   propValEnd: [DELIM, SEMICOLON, RBRACE],
@@ -96,6 +96,7 @@ for (const k in TT) {
 
 /**
  * @property {()=>Token|false} grab - gets the next token skipping WS and UVAR
+ * @property {Token} token - Last consumed token object
  */
 export default class TokenStream {
 
@@ -112,7 +113,6 @@ export default class TokenStream {
   }
 
   _resetBuf() {
-    /** @type {Token} Last consumed token object */
     this.token = null;
     /** Lookahead token buffer */
     this._buf = [];
@@ -232,7 +232,8 @@ export default class TokenStream {
       if (a === 9/*\t*/ || a === 10/*\n*/ || a === 32/* " " */) {
         if (isSpace(b)) src.readMatch(rxSpace);
         if (ws) { c = WS; break; }
-      } else if (a === 47/*/*/ && b === 42/* * */) {
+      } else if (a === 47/* / */) {
+        if (b !== 42/* * */) { c = DIV; break; }
         a = src.readMatch(rxCommentUso, true);
         if (uvar && a[1]) { c = UVAR; break; }
       } else break;
@@ -332,11 +333,12 @@ export default class TokenStream {
         tok.atName = a.toLowerCase();
         tok.id = AT;
       }
+    // >
+    } else if (a === 62) {
+      tok.id = GT;
     // <
     } else if (a === 60) {
-      if (b === 33/*!*/ && src.readMatchStr('!--')) {
-        tok.id = CDCO;
-      }
+      tok.id = b === 33/*!*/ && src.readMatchStr('!--') ? CDCO : LT;
     } else if (a == null) {
       tok.id = EOF;
     }

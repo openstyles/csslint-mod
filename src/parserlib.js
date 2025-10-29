@@ -18,7 +18,7 @@ import Tokens, {TokenIdByCode} from './lib/tokens';
 
 //#region Types
 
-const parserlib = {
+export default {
   css: {
     Combinators,
     GlobalKeywords,
@@ -48,5 +48,3 @@ const parserlib = {
     validateProperty,
   },
 };
-
-export default parserlib;

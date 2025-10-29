@@ -7,8 +7,8 @@ import SELECTORS from './parser-selector';
 import Token, {TokenFunc, TokenValue} from './token';
 import TokenStream, {OrDie, OrDieReusing, TT} from './token-stream';
 import {
-  AMP, AT, CDCO, COLON, COMMA, DELIM, DOT, FUNCTION, HASH, IDENT, LBRACE, LBRACKET, LPAREN, PIPE,
-  RBRACE, RBRACKET, RPAREN, SEMICOLON, STAR, UVAR, WS,
+  AMP, AT, CDCO, COLON, COMMA, DELIM, DIV, DOT, FUNCTION, HASH, IDENT, LBRACE, LBRACKET, LPAREN,
+  NUMBER, PIPE, RBRACE, RBRACKET, RPAREN, SEMICOLON, STAR, UVAR, WS,
 } from './tokens';
 import {assign, clipString, define, EventDispatcher, isOwn, ParseError, PDESC} from './util';
 import {validateProperty} from './validation';
@@ -36,6 +36,7 @@ class Parser extends EventDispatcher {
   constructor(options) {
     super();
     this.options = options || {};
+    /** @type {TokenStream} */
     this.stream = null;
     /** @type {number} @scope rule nesting depth: when > 0 relative and &-selectors are allowed */
     this._inScope = 0;
@@ -142,9 +143,13 @@ class Parser extends EventDispatcher {
         this._condition(stream, tok);
       } else if (B.not.has(tok)) {
         this._conditionInParens(stream);
-      } else if ((x = stream.matchSmart(TT.colonLParen)).id === COLON) {
-        this._declaration(stream, tok, {colon: x, inParens: true});
-        return; // ")" was consumed
+      } else if ((x = stream.matchSmart(TT.mediaOp)).id !== LPAREN) { // a definition/comparison
+        if (x.id === COLON) {
+          this._declaration(stream, tok, {colon: x, inParens: true});
+          reuse = 0;
+        } else if (stream.matchSmart(TT.mediaValue).id === NUMBER && stream.matchSmart(DIV)) {
+          stream.matchOrDie(NUMBER, '', stream.grab());
+        }
       } else if (x) { // (
         this._expr(stream, RPAREN, true);
         reuse = true; // )

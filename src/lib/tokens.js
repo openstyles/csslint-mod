@@ -14,12 +14,14 @@ export const ATTR_EQ = (Tokens[++i] = {name: 'ATTR_EQ', text: ['|=', '~=', '^=',
 /** CDO and CDC */
 export const CDCO = (Tokens[++i] = {name: 'CDCO'}, i);
 export const CHAR = (Tokens[++i] = {name: 'CHAR'}, i);
+export const LT = (Tokens[++i] = {name: 'LT', text: '<'}, i);
 export const COLON = (Tokens[++i] = {name: 'COLON', text: ':'}, i);
 /** Not using "+" and ">" which can be math ops */
 export const COMBINATOR = (Tokens[++i] = {name: 'COMBINATOR', text: ['~', '||']}, i);
 export const COMMA = (Tokens[++i] = {name: 'COMMA', text: ','}, i);
 export const COMMENT = (Tokens[++i] = {name: 'COMMENT'}, i);
 export const DELIM = (Tokens[++i] = {name: 'DELIM', text: '!'}, i);
+export const DIV = (Tokens[++i] = {name: 'DIV', text: '/'}, i);
 export const DOT = (Tokens[++i] = {name: 'DOT', text: '.'}, i);
 export const EQUALS = (Tokens[++i] = {name: 'EQUALS', text: '='}, i);
 export const EQ_CMP = (Tokens[++i] = {name: 'EQ_CMP', text: ['>=', '<=']}, i);
