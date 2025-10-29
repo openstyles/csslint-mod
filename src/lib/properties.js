@@ -469,6 +469,7 @@ const Properties = {
   'text-align': '<text-align> | justify-all',
   'text-align-last': '<text-align> | auto',
   'text-anchor': 'start | middle | end',
+  'text-autospace': 'normal | <autospace> | auto',
   'text-combine-upright': 'none | all | [ digits <int2-4>? ]',
   'text-decoration': '<text-decoration-line> || <text-decoration-style> || <color>',
   'text-decoration-color': '<color>',
@@ -489,10 +490,14 @@ const Properties = {
   'text-rendering': 'auto | optimizeSpeed | optimizeLegibility | geometricPrecision',
   'text-shadow': 'none | [ <color>? && <len>{2,3} ]#',
   'text-size-adjust': 'auto | none | <pct0+>',
-  'text-transform': 'none | [ capitalize|uppercase|lowercase ] || full-width || full-size-kana',
+  'text-spacing-trim': 'auto|space-all|normal|space-first|trim-start|trim-both|trim-all',
+  'text-transform': 'none | math-auto | ' +
+    '[ capitalize|uppercase|lowercase ] || full-width || full-size-kana',
   'text-underline-offset': '<len-pct> | auto',
   'text-underline-position': 'auto | [ under || [ left | right ] ]',
   'text-wrap': 'wrap | nowrap | balance | stable | pretty',
+  'text-wrap-mode': 'wrap | nowrap',
+  'text-wrap-style': 'auto | balance | stable | pretty',
   'top': 'auto | <len-pct>',
   'touch-action':
     'auto | none | pan-x | pan-y | pan-left | pan-right | pan-up | pan-down | manipulation',
@@ -519,7 +524,8 @@ const Properties = {
     'central | middle | bottom | text-bottom | <len-pct>',
   'visibility': '<vis-hid> | collapse',
 
-  'white-space': 'normal | pre | nowrap | pre-wrap | break-spaces | pre-line',
+  'white-space': 'normal | pre | pre-wrap | pre-line | <white-space-collapse> || <text-wrap-mode>',
+  'white-space-collapse': 'collapse|discard|preserve|preserve-breaks|preserve-spaces|break-spaces',
   'widows': '<int>',
   'width': '<width>',
   'will-change': 'auto | <animateable-feature>#',
