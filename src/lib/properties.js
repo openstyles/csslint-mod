@@ -123,7 +123,10 @@ const Properties = {
   'break-before': '<break-after>',
   'break-inside': 'auto | avoid | avoid-page | avoid-column',
 
+  'caret': '<caret-color> || <caret-animation> || <caret-shape>',
+  'caret-animation': 'auto | manual',
   'caret-color': 'auto | <color>',
+  'caret-shape': 'auto | bar | block | underscore',
   'caption-side': 'top | bottom | inline-start | inline-end',
   'clear': 'none | right | left | both | inline-start | inline-end',
   'clip': '<rect> | auto',
@@ -436,6 +439,7 @@ const Properties = {
   'scroll-snap-align': '[ none | start | end | center ]{1,2}',
   'scroll-snap-stop': 'normal | always',
   'scroll-snap-type': 'none | [ x | y | block | inline | both ] [ mandatory | proximity ]?',
+  'scroll-target-group': 'none | auto',
   'scroll-timeline': '[ <scroll-timeline-name> ' +
     '[ <scroll-timeline-axis> || <scroll-timeline-attachment> ]? ]#',
   'scroll-timeline-attachment': '[ local | defer | ancestor ]#',
