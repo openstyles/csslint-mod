@@ -596,3 +596,58 @@ a {flex-flow: row wr/*incomplete*/}
   border-top-radius: 4em / 0.5em;
   corner-shape: scoop superellipse(2) superellipse(infinity) squircle;
 }
+
+@function --mypi() {}
+@function --outer(--outer-arg) {
+  --outer-local: 2;
+  result: --inner();
+}
+@function --inner() returns <number> {
+  result: calc(var(--outer-arg) + var(--outer-local));
+  @media (width > 1000px) {
+    result: 20px;
+  }
+}
+@function --add-a-b-c(--b, --c) {
+  --c: 300;
+  result: calc(var(--a) + var(--b) + var(--c));
+}
+.function {
+  order: --add-a-b-c(20, 30); /* 321 */
+  width: --max-plus-x({ 1px, 7px, 2px }, 3px); /* 10px */
+  z-index: --outer(1); /* 3 */
+}
+
+.mixins {
+  @mixin --nested(--color2: green) {
+    @env --color3: blue;
+    background: linear-gradient(env(--color1), env(--color2), env(--color3));
+  }
+  .nested {
+    @env --color1: red;
+    @apply --nested();
+  }
+  @mixin --z-index-a-b-c(--b, --c) {
+    @env --c: 300;
+    z-index: calc(env(--a) + env(--b) + env(--c));
+  }
+  div {
+    @env --a: 1;
+    @env --b: 2;
+    @env --c: 3;
+    @apply --add-a-b-c(20, 30); /* 321 */
+  }
+  @mixin --one-column(@contents) {
+    @media (width <= 800px) { @contents; }
+  }
+  @mixin --two-column(@contents) {
+    @media (width > 800px) { @contents { display: block }; }
+  }
+  body {
+    @apply --one-column;
+    @apply --two-column { display: grid }
+  }
+}
+
+@env --top: 1;
+@-moz-document domain("env") { @env --doc: 1 }

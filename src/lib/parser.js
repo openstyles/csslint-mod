@@ -4,10 +4,11 @@ import Combinators from './combinators';
 import ATS, {ATS_GLOBAL, ATS_TDO} from './parser-ats';
 import * as parserCache from './parser-cache';
 import SELECTORS from './parser-selector';
+import ScopedProperties from './scoped-properties.js';
 import Token, {TokenFunc, TokenValue} from './token';
 import TokenStream, {OrDie, OrDieReusing, TT} from './token-stream';
 import {
-  AMP, AT, CDCO, COLON, COMMA, DELIM, DIV, DOT, FUNCTION, HASH, IDENT, LBRACE, LBRACKET, LPAREN,
+  AMP, AT, CDCO, COLON, COMMA, DASHED_FUNCTION, DELIM, DIV, DOT, FUNCTION, HASH, IDENT, LBRACE, LBRACKET, LPAREN,
   NUMBER, PIPE, RBRACE, RBRACKET, RPAREN, SEMICOLON, STAR, UVAR, WS,
 } from './tokens';
 import {assign, clipString, define, EventDispatcher, isOwn, ParseError, PDESC} from './util';
@@ -42,7 +43,7 @@ class Parser extends EventDispatcher {
     this._inScope = 0;
     /** @type {number} style rule nesting depth: when > 0 &-selectors are allowed */
     this._inStyle = 0;
-    /** @type {Token[]} stack of currently processed nested blocks or rules */
+    /** @type {(RuleBlockOpts & {start: Token})[]} ancestor {} blocks */
     this._stack = [];
     this._events = null;
   }
@@ -504,15 +505,16 @@ class Parser extends EventDispatcher {
     const isEndMap = typeof end === 'object';
     let /** @type {Token} */ tok, ti, isVar, endParen;
     while ((ti = (tok = stream.get(UVAR, 0)).id) && !(isEndMap ? end[ti] : end === ti)) {
+      let dumb2;
       if ((endParen = Parens[ti])) {
         if (!dumb && ti === LBRACE && parts.length) break;
         tok.expr = this._expr(stream, endParen, dumb);
         if (stream.token.id !== endParen) stream._failure(endParen);
         tok.offset2 = stream.token.offset2;
         tok.type = 'block';
-      } else if (ti === FUNCTION) {
-        if (!tok.ie || this.options.ieFilters) {
-          tok = this._function(stream, tok, dumb);
+      } else if (ti === FUNCTION || (dumb2 = ti === DASHED_FUNCTION)) {
+        if (tok.type !== 'ie' || this.options.ieFilters && (dumb2 = true)) {
+          tok = this._function(stream, tok, dumb || dumb2);
           isVar = isVar || tok.isVar;
         }
       } else if (ti === UVAR) {
@@ -521,13 +523,8 @@ class Parser extends EventDispatcher {
         // No smart processing of tokens in dumb mode, we'll just accumulate the values
       } else if (ti === HASH) {
         this._hexcolor(stream, tok);
-      } else if (ti === IDENT && !tok.type) {
-        if (B.autoNone.has(tok)) {
-          tok[tok.code === 97/*a*/ ? 'isAuto' : 'isNone'] = true;
-          tok.type = 'ident';
-        } else {
-          tok.type = B.colors.has(tok) ? 'color' : 'ident';
-        }
+      } else if (ti === IDENT && !tok.type && B.colors.has(tok)) {
+        tok.type = 'color';
       }
       parts.push(tok);
     }
@@ -623,14 +620,19 @@ class Parser extends EventDispatcher {
    * @param {RuleBlockOpts} [opts]
    */
   _block(stream, start, opts = {}) {
-    const {margins, scoped, decl, event = []} = opts;
-    const {brace = stream.matchSmart(LBRACE, OrDie)} = opts;
+    const env = /** @type {RuleBlockOpts} */ {...this._stack[this._stack.length - 1], start};
+    const {brace = stream.matchSmart(LBRACE, OrDie), event = []} = opts;
+    const decl = env.decl || opts.decl;
+    const margins = env.margins || opts.margins;
+    const sNew = opts.scoped && ScopedProperties[start.atName];
+    const sOld = env.scope;
+    const scope = env.scope = sNew ? {...sOld, ...sNew} : sOld;
     const [type, msg = event[1] = {}] = event || [];
     if (type) this.fire(assign({type: 'start' + type, brace}, msg), start);
-    const declOpts = scoped ? {scope: start.atName} : {};
+    const declOpts = {scope};
     const inStyle = (this._inStyle += decl ? 1 : 0);
     const star = inStyle && this.options.starHack && STAR;
-    this._stack.push(start);
+    this._stack.push(env);
     let ex, child;
     for (let prevTok, tok, ti, fn; (ti = (tok = stream.get(UVAR, false)).id) !== RBRACE;) {
       if (!ti) stream._failure('}');
@@ -652,7 +654,7 @@ class Parser extends EventDispatcher {
         } else if (inStyle && (ti === IDENT || ti === star && tok.hack)
             && this._declaration(stream, tok, declOpts)) {
           child = 1;
-        } else if (!scoped && tok.type !== '--' && (!inStyle || isOwn(TT.nestSel, ti))) {
+        } else if (!scope && tok.type !== '--' && (!inStyle || isOwn(TT.nestSel, ti))) {
           child = this._styleRule(stream, tok, opts);
         } else {
           ex = stream._failure('', tok, false);

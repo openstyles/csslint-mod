@@ -160,7 +160,7 @@ const CSSLint = Object.assign(new parserlib.util.EventDispatcher(), {
       if (rule) rule.init(rule, parser, reporter);
     }
     try {
-      if (ruleset.doc) parser._stack.push(true);
+      if (ruleset.doc) parser._stack.push({});
       parser.parse(text, {reuseCache});
     } catch (ex) {
       reporter.error('Fatal error, cannot continue!\n' + ex.stack, ex, {});

@@ -5,13 +5,10 @@ import {assign, define, isOwn, parseString, PDESC, toLowAscii} from './util';
  * @property {[]} [args] added in selectors
  * @property {string} [atName] lowercase name of @-rule without -vendor- prefix
  * @property {TokenValue} [expr] body of function or block
- * @property {boolean} [ie] ie function
  * @property {boolean} [is0] number is an integer 0 without units
  * @property {boolean} [isAttr] = attr()
- * @property {boolean} [isAuto] = auto
  * @property {boolean} [isCalc] = calc()
  * @property {boolean} [isInt] = integer without units
- * @property {boolean} [isNone] = none
  * @property {boolean} [isVar] = var(), env(), /*[[var]]* /
  * @property {'*'|'_'} [hack] for property name in IE mode
  * @property {string} [lowText] text.toLowerCase() added on demand
@@ -78,7 +75,6 @@ export class TokenFunc extends Token {
   /** @return {TokenFunc} */
   static from(tok, expr, end) {
     tok = super.from(tok);
-    tok.type = 'fn';
     if (isOwn(tok, 'text')) tok.offsetBody = tok.offset2;
     if (end) tok.offset2 = end.offset2;
     if (expr) {
@@ -88,7 +84,7 @@ export class TokenFunc extends Token {
           n === 'sin' || n === 'cos' || n === 'tan' || n === 'asin' ||
           n === 'acos' || n === 'atan' || n === 'atan2') {
         tok.isCalc = true;
-      } else if (n === 'var' || n === 'env') {
+      } else if (n === 'var' || n === 'env' || tok.type === '--') {
         tok.isVar = true;
       } else if (n === 'attr' && (n = expr.parts[0]) && (n.id === IDENT || n.id === UVAR)) {
         tok.isAttr = true;

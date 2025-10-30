@@ -20,6 +20,7 @@ export const COLON = (Tokens[++i] = {name: 'COLON', text: ':'}, i);
 export const COMBINATOR = (Tokens[++i] = {name: 'COMBINATOR', text: ['~', '||']}, i);
 export const COMMA = (Tokens[++i] = {name: 'COMMA', text: ','}, i);
 export const COMMENT = (Tokens[++i] = {name: 'COMMENT'}, i);
+export const DASHED_FUNCTION = (Tokens[++i] = {name: 'DASHED_FUNCTION'}, i);
 export const DELIM = (Tokens[++i] = {name: 'DELIM', text: '!'}, i);
 export const DIV = (Tokens[++i] = {name: 'DIV', text: '/'}, i);
 export const DOT = (Tokens[++i] = {name: 'DOT', text: '.'}, i);

@@ -4,6 +4,7 @@ import ScopedProperties from './scoped-properties';
 import {clipString} from './util';
 import VTComplex from './validation-complex';
 import {buGlobalKeywords} from './validation-simple';
+import {IDENT} from './tokens.js';
 
 const validationCache = new Map();
 
@@ -62,7 +63,7 @@ export function validateProperty(tok, value, stream, Props) {
   if (value.isVar) {
     return;
   }
-  if (p0.type === 'ident' && buGlobalKeywords.has(p0)) {
+  if (p0.id === IDENT && buGlobalKeywords.has(p0)) {
     return pp[1] && vtFailure(pp[1], true);
   }
   const valueSrc = value.text.trim();

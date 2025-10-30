@@ -63,7 +63,6 @@ export const B = /** @type {{[key:string]: Bucket}} */ {
   andNoneNotOr: null,
   andOr: null,
   auto: null,
-  autoNone: null,
   evenOdd: null,
   fromTo: null,
   important: null,
@@ -74,6 +73,7 @@ export const B = /** @type {{[key:string]: Bucket}} */ {
   notOnly: null,
   of: null,
   or: null,
+  returns: null,
   to: null,
 };
 for (const k in B)

@@ -37,6 +37,9 @@ const ScopedProperties = {
     'base-palette': 'light | dark | <int0+>',
     'override-colors': '[ <int0+> <color> ]#',
   }),
+  'function': {
+    'result': 1,
+  },
   'media': {
     '<all>': true,
     'any-hover': 'none | hover',

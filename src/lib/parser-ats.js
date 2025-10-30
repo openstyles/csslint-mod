@@ -1,14 +1,45 @@
 import {B} from './bucket';
-import {TokenFunc} from './token';
+import {TokenFunc, TokenValue} from './token';
 import {OrDie, OrDieReusing, TT} from './token-stream';
 import {
-  COLON, COMMA, IDENT, LBRACE, LPAREN, PCT, RBRACE, RPAREN, SEMICOLON, STRING,
+  COLON, COMMA, DASHED_FUNCTION, IDENT, LBRACE, LPAREN, PCT, RBRACE, RPAREN, SEMICOLON, STRING,
 } from './tokens';
 import {ParseError, pick} from './util';
 
 /** Functions for @ symbols */
 const ATS = {
   __proto__: null,
+
+  /**
+   * @this {Parser}
+   * @param {TokenStream} stream
+   * @param {Token} start
+   */
+  apply(stream, start) {
+    const at = start.atName;
+    let brace, ret, retType;
+    let name = stream.grab();
+    if (name.id === DASHED_FUNCTION)
+      name = this._function(stream, name, true);
+    else if (!(at === 'apply' && name.id === IDENT && name.type === '--'))
+      stream._failure('Expecting "--name(" or "--name"', name);
+    if (at === 'function' && (ret = stream.matchSmart(IDENT, B.returns))) {
+      if ((retType = this._expr(stream, LBRACE, true, true))) {
+        name.returns = TokenValue.from(retType, ret);
+        stream.unget();
+      } else {
+        this.alarm(2, 'Expecting <css-type>');
+      }
+    }
+    if ((brace = stream.matchSmart(LBRACE, at !== 'apply' && OrDie))) {
+      this._block(stream, start, {
+        brace,
+        decl: true,
+        event: [at, {name}],
+        scoped: true,
+      });
+    }
+  },
 
   /**
    * @this {Parser}
@@ -67,6 +98,22 @@ const ATS = {
       this._block(stream, start, {brace});
     }
     this.fire({type: 'enddocument', start, functions});
+  },
+
+  /**
+   * @this {Parser}
+   * @param {TokenStream} stream
+   * @param {Token} start
+   */
+  env(stream, start) {
+    if (this._inStyle < 2 && this._stack.some(({start: s}) => s && s.atName !== 'document'))
+      this.alarm(1, 'Ignoring @env outside of nested style/group', start);
+    const name = stream.matchSmart(IDENT, OrDie);
+    const expr = this._expr(stream, COLON);
+    const value = this._expr(stream, TT.propCustomEnd);
+    if (stream.token.id !== SEMICOLON)
+      stream.unget();
+    this.fire({type: 'env', start, name, expr, value});
   },
 
   /**
@@ -282,6 +329,8 @@ const ATS = {
     this._block(stream, start, {decl: true, event: ['view-transition'], scoped: true});
   },
 };
+
+ATS.function = ATS.mixin = ATS.apply;
 
 /** topDocOnly mode */
 export const ATS_TDO = pick(ATS, ['document']);

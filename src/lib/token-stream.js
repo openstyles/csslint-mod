@@ -6,7 +6,7 @@ import Tokens, {
   AMP, AT, ATTR_EQ, CDCO, CHAR, COLON, COMBINATOR, COMMENT, DELIM, DIMENSION, DOT, EOF, EQ_CMP,
   EQUALS, FUNCTION, GT, HASH, IDENT, INVALID, LBRACE, LBRACKET, LENGTH, LPAREN, MINUS, NUMBER, PCT,
   PIPE, PLUS, RBRACE, RBRACKET, RPAREN, SEMICOLON, STAR, STRING, TokenIdByCode, URANGE, URI, UVAR,
-  LT, WS, DIV,
+  LT, WS, DIV, DASHED_FUNCTION,
 } from './tokens';
 import Units, {UnitTypeIds} from './units';
 import {
@@ -257,7 +257,6 @@ export default class TokenStream {
       if (b === 45/* -- */) {
         if (isIdentChar(c || (c = src.peek(2)), b)) {
           text = this._ident(src, tok, a, b, 1, c, 1);
-          tok.type = '--';
         } else if (c === 62/* --> */) {
           src.read(2, '->');
           tok.id = CDCO;
@@ -280,7 +279,6 @@ export default class TokenStream {
       } else {
         if (c) { src.col -= (c = c[0].length); src.offset -= c; }
         tok.id = IDENT;
-        tok.type = 'ident';
       }
     // a-z A-Z \ _ unicode ("-" was handled above)
     } else if (isIdentStart(a, b)) {
@@ -360,6 +358,8 @@ export default class TokenStream {
     if (a === 92) tok.code = toLowAscii(name.charCodeAt(0));
     const vp = a === 45/*-*/ && b !== 45 && name.indexOf('-', 2) + 1;
     const next = cYes || esc && isSpace(c) ? src.peek() : bYes ? c : b;
+    const dashed = a === 45/*-*/ && b === 45;
+    if (dashed) tok.type = '--';
     let ovrValue = esc ? name : null;
     if (next === 40/*(*/) {
       src.read();
@@ -370,8 +370,7 @@ export default class TokenStream {
         tok.type = 'uri';
         tok.uri = b;
       } else {
-        tok.id = FUNCTION;
-        tok.type = 'fn';
+        tok.id = dashed ? DASHED_FUNCTION : FUNCTION;
       }
       tok.name = vp ? c.slice(vp) : c;
       if (vp) tok.prefix = c.slice(0, vp);
@@ -379,12 +378,15 @@ export default class TokenStream {
       ovrValue = name + src.readMatch(/.*?\(/y);
       tok.id = FUNCTION;
       tok.name = ovrValue.slice(0, -1).toLowerCase();
-      tok.type = 'fn';
-      tok.ie = true;
+      tok.type = 'ie';
     } else {
       tok.id = IDENT;
-      if (a === 45/*-*/ || (b = name.length) < 3 || b > 20) {
-        tok.type = 'ident'; // named color min length is 3 (red), max is 20 (lightgoldenrodyellow)
+      if (!dashed) {
+        if (a === 45/*-*/ || (b = name.length) < 3 || b > 20) {
+          tok.type = 'ident'; // named color min length is 3 (red), max is 20 (lightgoldenrodyellow)
+        } else if (a === 110/*n*/ && name.length === 4 && name.toLowerCase() === 'none') {
+          tok.type = 'none';
+        }
       }
     }
     if (vp) {

@@ -39,21 +39,12 @@ async function testCsslint() {
     .verify(fs.readFileSync(TEST_FILE, 'utf8'), rules)
     .messages.map(m => `${m.type}\t${m.line}\t${m.col}\t${m.message}`);
   const expected = fs.readFileSync(REPORT_FILE, 'utf8').trim().split(/\r?\n/);
-  let a, b, i, err;
-  for (i = 0; (a = report[i]) && (b = expected[i]); i++) {
-    if (a !== b) {
-      err = chalk.red(`\n* RECEIVED: ${a}\n`) + `  EXPECTED: ${b}\n`;
-      break;
-    }
-  }
-  i = report.length - expected.length;
-  if (i) {
-    a = Math.abs(i);
-    err = (err || '') + '\n' +
-      (i > 0 ? `Found ${a} extra un` : `Did not find ${a} `) +
-      `expected problem${a === 1 ? '' : 's'}:\n  * ` +
-      (i > 0 ? report : expected).slice(-a).join('\n  * ');
-  }
+  const extra = report.filter(s => !expected.includes(s));
+  const missing = expected.filter(s => !report.includes(s));
+  const err = [
+    extra[0] ? chalk.red(`\nUNEXPECTED ${extra.length} PROBLEMS:\n`) + extra.join('\n') : '',
+    missing[0] ? chalk.red(`\nMISSING ${missing.length} PROBLEMS:\n`) + missing.join('\n') : '',
+  ].filter(Boolean).join('\n\n');
   if (err) {
     fs.writeFileSync(FAILED_FILE, report.join('\n'), 'utf8');
     fail('csslint', err);
