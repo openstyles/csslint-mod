@@ -7,6 +7,7 @@ const VTFunctions = {
     path: '[ <fill-rule> , ]? <string>',
     polygon: '[ <fill-rule> , ]? [ <len-pct> <len-pct> ]#',
     rect: '<rect-arg>',
+    shape: '[ [from|move|line|hline|vline|curve|smooth|arc] [to|by]? [<ident>|<len-pct>]+ ]#',
     xywh: '<xywh-arg>',
   },
   color: {
