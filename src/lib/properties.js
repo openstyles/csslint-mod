@@ -377,6 +377,7 @@ const Properties = {
   'inset-inline': '<top>{1,2}',
   'inset-inline-end': '<top>',
   'inset-inline-start': '<top>',
+  'interactivity': 'auto | inert',
   'interpolate-size': 'numeric-only | allow-keywords',
   'isolation': 'auto | isolate',
 
