@@ -146,7 +146,7 @@ class Parser extends EventDispatcher {
         this._conditionInParens(stream);
       } else if ((x = stream.matchSmart(TT.mediaOp)).id !== LPAREN) { // a definition/comparison
         if (x.id === COLON) {
-          this._declaration(stream, tok, {colon: x, inParens: true});
+          this._declaration(stream, tok, {colon: x, inParens: true, scope: this._at});
           reuse = 0;
         } else if (stream.matchSmart(TT.mediaValue).id === NUMBER && stream.matchSmart(DIV)) {
           stream.matchOrDie(NUMBER, '', stream.grab());

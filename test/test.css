@@ -658,3 +658,5 @@ a {flex-flow: row wr/*incomplete*/}
   dynamic-range-limit: dynamic-range-limit-mix(constrained 20%, no-limit 10%);
   width: attr(length em, 0px);
 }
+
+@container scroll-state(stuck: top) {}

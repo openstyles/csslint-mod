@@ -65,7 +65,9 @@ const ATS = {
       if (B.andNoneNotOr.has(name))
         name = stream.unget();
       next = stream.grab(); // TODO: collect conditions array instead
+      this._at = start.atName;
       this._condition(stream, next, this._containerCondition);
+      this._at = undefined;
       if (next !== stream.token)
         next = null;
       else if (!name)
