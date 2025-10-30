@@ -150,9 +150,8 @@ const VTComplex = {
   '<txbhv>': 'normal | allow-discrete',
   '<url>': '<uri> | src( <string> [ <ident> | <func> ]* )',
   '<vis-hid>': 'visible | hidden',
-  '<width>': 'auto | <width-base>',
-  '<width-base>': '<len-pct> | min-content | max-content | ' +
-    '-moz-available | -webkit-fill-available | fit-content',
+  '<width-base>': '<len-pct> | min-content | max-content | fit-content | stretch | contain | ' +
+    '-moz-available | -webkit-fill-available',
   '<width-max>': 'none | <width-base>',
   '<xywh>': 'xywh( <xywh-arg> )',
   '<xywh-arg>': '<len-pct>{2} <len-pct0+>{2} <border-radius-round>?',
