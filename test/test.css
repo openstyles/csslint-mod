@@ -653,5 +653,7 @@ a {flex-flow: row wr/*incomplete*/}
 @-moz-document domain("env") { @env --doc: 1 }
 
 .bubble {
+  --foo: if(style(--foo: bar): baz);
   clip-path: shape(from 5px 0%, hline to calc(100% - 5px), curve to 100% 5px with 100% 0%);
+  width: attr(length em, 0px);
 }

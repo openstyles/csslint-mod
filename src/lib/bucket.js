@@ -50,6 +50,8 @@ export default class Bucket {
 
 export const B = /** @type {{[key:string]: Bucket}} */ {
   attrIS: ['i', 's', ']'], // "]" is to improve the error message,
+  calc: ['abs', 'calc', 'calc-size', 'clamp', 'if', 'min', 'max', 'mod',
+    'progress', 'rem', 'round', 'sign'],
   colors: NamedColors,
   containerFn: ['scroll-state(', 'style('],
   marginSyms: [

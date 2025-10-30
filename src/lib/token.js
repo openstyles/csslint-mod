@@ -1,3 +1,4 @@
+import {B} from './bucket.js';
 import {IDENT, UVAR, WS} from './tokens';
 import {assign, define, isOwn, parseString, PDESC, toLowAscii} from './util';
 
@@ -79,10 +80,8 @@ export class TokenFunc extends Token {
     if (end) tok.offset2 = end.offset2;
     if (expr) {
       tok.expr = expr;
-      let n = tok.name; // these functions are valid only if not empty
-      if (n === 'calc' || n === 'clamp' || n === 'min' || n === 'max' ||
-          n === 'sin' || n === 'cos' || n === 'tan' || n === 'asin' ||
-          n === 'acos' || n === 'atan' || n === 'atan2') {
+      let n = tok.name;
+      if (B.calc.has(tok, tok.code, n)) {
         tok.isCalc = true;
       } else if (n === 'var' || n === 'env' || tok.type === '--') {
         tok.isVar = true;
