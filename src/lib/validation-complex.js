@@ -66,6 +66,7 @@ const VTComplex = {
   '<display-legacy>': 'inline-block | inline-table | inline-flex | inline-grid',
   '<display-listitem>': '<display-outside>? && [ flow | flow-root ]? && list-item',
   '<display-outside>': 'block | inline | run-in',
+  '<dynamic-range>': 'standard | no-limit | constrained',
   '<explicit-track-list>': '[ <line-names>? <track-size> ]+ <line-names>?',
   '<family-name>': '<string> | <custom-ident>+',
   // https://drafts.fxtf.org/filter-effects/#supported-filter-functions

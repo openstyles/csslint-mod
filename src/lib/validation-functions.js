@@ -38,6 +38,10 @@ const VTFunctions = {
     __proto__: null,
     superellipse: '<num> | infinity | -infinity',
   },
+  dynaRange: {
+    __proto__: null,
+    'dynamic-range-limit-mix': '[ <dynamic-range> && <pct0-100> ]#{2,}',
+  },
   filter: {
     __proto__: null,
     'blur': '<len>?',

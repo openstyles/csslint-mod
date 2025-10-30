@@ -284,6 +284,7 @@ const Properties = {
     '-webkit-box | -webkit-inline-box | -ms-flexbox', // deprecated and nonstandard
   'dominant-baseline': 'auto | text-bottom | alphabetic | ideographic | middle | central | ' +
     'mathematical | hanging | text-top',
+  'dynamic-range-limit': '<dynamic-range> | <fn:dynaRange>',
 
   'empty-cells': 'show | hide',
 

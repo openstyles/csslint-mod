@@ -655,5 +655,6 @@ a {flex-flow: row wr/*incomplete*/}
 .bubble {
   --foo: if(style(--foo: bar): baz);
   clip-path: shape(from 5px 0%, hline to calc(100% - 5px), curve to 100% 5px with 100% 0%);
+  dynamic-range-limit: dynamic-range-limit-mix(constrained 20%, no-limit 10%);
   width: attr(length em, 0px);
 }
