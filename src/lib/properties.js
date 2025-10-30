@@ -77,6 +77,7 @@ const Properties = {
     'menubar | pull-down-menu | pop-up-menu | list-menu | radio-group | checkbox-group | ' +
     'outline-tree | range | field | combo-box | signature | password | normal',
   'aspect-ratio': 'auto || <ratio>',
+
   'backdrop-filter': '<filter-function-list> | none',
   'backface-visibility': '<vis-hid>',
   'background': '[ <bg-layer> , ]* <final-bg-layer>',
@@ -95,26 +96,88 @@ const Properties = {
   'baseline-source': 'auto | first | last',
   'block-size': '<width>',
   'border-collapse': 'collapse | separate',
-  'border-image': '[ none | <image> ] || <border-image-slice> ' +
+  'border-image': '<border-image-source> || <border-image-slice> ' +
     '[ / <border-image-width> | / <border-image-width>? / <border-image-outset> ]? || ' +
     '<border-image-repeat>',
-  'border-image-outset': '[ <len> | <num> ]{1,4}',
+  'border-image-outset': '[ <len0+> | <num0+> ]{1,4}',
   'border-image-repeat': '[ stretch | repeat | round | space ]{1,2}',
   'border-image-slice': '<border-image-slice>',
   'border-image-source': '<image> | none',
-  'border-image-width': '[ <len-pct> | <num> | auto ]{1,4}',
+  'border-image-width': '[ <len-pct0+> | <num0+> | auto ]{1,4}',
   'border-spacing': '<len>{1,2}',
-
+  //#region border shorthand
+  'border': '<border-shorthand>',
+  'border-block': '<border-shorthand>',
+  'border-block-end': '<border-shorthand>',
+  'border-block-start': '<border-shorthand>',
+  'border-bottom': '<border-shorthand>',
+  'border-inline': '<border-shorthand>',
+  'border-inline-end': '<border-shorthand>',
+  'border-inline-start': '<border-shorthand>',
+  'border-left': '<border-shorthand>',
+  'border-right': '<border-shorthand>',
+  'border-top': '<border-shorthand>',
+  //#endregion
+  //#region border color
+  'border-color': '<color>{1,4}',
+  'border-block-color': '<color>{1,2}',
+  'border-block-end-color': '<color>',
+  'border-block-start-color': '<color>',
+  'border-bottom-color': '<color>',
+  'border-inline-color': '<color>{1,2}',
+  'border-inline-end-color': '<color>',
+  'border-inline-start-color': '<color>',
+  'border-left-color': '<color>',
+  'border-right-color': '<color>',
+  'border-top-color': '<color>',
+  //#endregion
+  //#region border style
+  'border-block-end-style': '<border-style>',
+  'border-block-start-style': '<border-style>',
+  'border-block-style': '<border-style>{1,2}',
+  'border-bottom-style': '<border-style>',
+  'border-inline-end-style': '<border-style>',
+  'border-inline-start-style': '<border-style>',
+  'border-inline-style': '<border-style>{1,2}',
+  'border-left-style': '<border-style>',
+  'border-right-style': '<border-style>',
+  'border-style': '<border-style>{1,4}',
+  'border-top-style': '<border-style>',
+  //#endregion
+  //#region border width
+  'border-width': '<border-width>{1,4}',
+  'border-block-end-width': '<border-width>',
+  'border-block-start-width': '<border-width>',
+  'border-block-width': '<border-width>{1,2}',
+  'border-bottom-width': '<border-width>',
+  'border-inline-end-width': '<border-width>',
+  'border-inline-start-width': '<border-width>',
+  'border-inline-width': '<border-width>{1,2}',
+  'border-left-width': '<border-width>',
+  'border-right-width': '<border-width>',
+  'border-top-width': '<border-width>',
+  //#endregion
+  //#region border radius (shorthands)
+  'border-radius': '<len-pct0+>{1,4} [ / <len-pct0+>{1,4} ]?',
+  'border-block-end-radius': '<border-top-radius>',
+  'border-block-start-radius': '<border-top-radius>',
+  'border-bottom-radius': '<border-top-radius>',
+  'border-inline-end-radius': '<border-top-radius>',
+  'border-inline-start-radius': '<border-top-radius>',
+  'border-left-radius': '<border-top-radius>',
+  'border-right-radius': '<border-top-radius>',
+  'border-top-radius': '<len-pct0+>{1,2} [ / <len-pct0+>{1,2} ]?',
+  //#endregion
+  //#region border radius (single)
   'border-bottom-left-radius': '<len-pct>{1,2}',
   'border-bottom-right-radius': '<len-pct>{1,2}',
   'border-end-end-radius': '<len-pct>{1,2}',
   'border-end-start-radius': '<len-pct>{1,2}',
-  'border-radius': '<len-pct0+>{1,4} [ / <len-pct0+>{1,4} ]?',
   'border-start-end-radius': '<len-pct>{1,2}',
   'border-start-start-radius': '<len-pct>{1,2}',
   'border-top-left-radius': '<len-pct>{1,2}',
   'border-top-right-radius': '<len-pct>{1,2}',
-
+  //#endregion
   'bottom': '<top>',
   'box-decoration-break': 'slice | clone',
   'box-shadow': 'none | <shadow>#',
@@ -149,12 +212,58 @@ const Properties = {
   'column-width': '<len> | auto',
   'columns': 1,
   'contain': 'none | strict | content | [ size || layout || style || paint ]',
+  'contain-intrinsic-block-size': '<contain-intrinsic>',
+  'contain-intrinsic-height': '<contain-intrinsic>',
+  'contain-intrinsic-inline-size': '<contain-intrinsic>',
   'contain-intrinsic-size': '<contain-intrinsic>{1,2}',
+  'contain-intrinsic-width': '<contain-intrinsic>',
   'container': '<container-name> [ / <container-type> ]?',
   'container-name': 'none | <ident-not-none>+',
   'container-type': 'normal || [ size | inline-size ]',
   'content': 'normal | none | <content-list> [ / <string> ]?',
   'content-visibility': 'auto | <vis-hid>',
+  //#region corner (shorthands)
+  'corner': '<border-radius> || <corner-shape>',
+  'corner-top': '<border-top-radius> || <corner-top-shape>',
+  'corner-bottom': '<corner-top>',
+  'corner-left': '<corner-top>',
+  'corner-right': '<corner-top>',
+  'corner-block-start': '<corner-top>',
+  'corner-block-end': '<corner-top>',
+  'corner-inline-start': '<corner-top>',
+  'corner-inline-end': '<corner-top>',
+  //#endregion
+  //#region corner (single)
+  'corner-top-left': '<border-top-left-radius> || <corner-top-left-shape>',
+  'corner-top-right': '<corner-top-left>',
+  'corner-bottom-left': '<corner-top-left>',
+  'corner-bottom-right': '<corner-top-left>',
+  'corner-end-end': '<corner-top-left>',
+  'corner-end-start': '<corner-top-left>',
+  'corner-start-end': '<corner-top-left>',
+  'corner-start-start': '<corner-top-left>',
+  //#endregion
+  //#region corner shape (shorthands)
+  'corner-shape': '<corner-shape-value>{1,4}',
+  'corner-top-shape': '<corner-shape-value>{1,2}',
+  'corner-block-end-shape': '<corner-top-shape>',
+  'corner-block-start-shape': '<corner-top-shape>',
+  'corner-bottom-shape': '<corner-top-shape>',
+  'corner-inline-end-shape': '<corner-top-shape>',
+  'corner-inline-start-shape': '<corner-top-shape>',
+  'corner-left-shape': '<corner-top-shape>',
+  'corner-right-shape': '<corner-top-shape>',
+  //#endregion
+  //#region corner shape (single)
+  'corner-bottom-left-shape': '<corner-shape-value>',
+  'corner-bottom-right-shape': '<corner-shape-value>',
+  'corner-end-end-shape': '<corner-shape-value>',
+  'corner-end-start-shape': '<corner-shape-value>',
+  'corner-start-end-shape': '<corner-shape-value>',
+  'corner-start-start-shape': '<corner-shape-value>',
+  'corner-top-left-shape': '<corner-shape-value>',
+  'corner-top-right-shape': '<corner-shape-value>',
+  //#endregion
   'counter-increment': '<counter>',
   'counter-reset': '<counter>',
   'counter-set': '<counter>',
@@ -550,27 +659,5 @@ const Properties = {
   '-webkit-text-stroke-width': '<border-width>',
   '-webkit-user-modify': 'read-only | read-write | write-only',
 };
-
-for (const [k, reps] of Object.entries({
-  'border': '{1,4}',
-  'border-bottom': '',
-  'border-left': '',
-  'border-right': '',
-  'border-top': '',
-  'border-block': '{1,2}',
-  'border-block-end': '',
-  'border-block-start': '',
-  'border-inline': '{1,2}',
-  'border-inline-end': '',
-  'border-inline-start': '',
-})) {
-  Properties[k] = '<border-shorthand>';
-  Properties[`${k}-color`] = '<color>' + reps;
-  Properties[`${k}-style`] = '<border-style>' + reps;
-  Properties[`${k}-width`] = '<border-width>' + reps;
-}
-for (const k of ['width', 'height', 'block-size', 'inline-size']) {
-  Properties[`contain-intrinsic-${k}`] = '<contain-intrinsic>';
-}
 
 export default Properties;

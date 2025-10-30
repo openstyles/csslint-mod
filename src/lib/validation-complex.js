@@ -54,6 +54,7 @@ const VTComplex = {
     'target-counter() | target-counters() | target-text() ]+',
   '<content-position>': 'center | start | end | flex-start | flex-end',
   '<coord-box>': '<box> | <box-fsv>',
+  '<corner-shape-value>': 'round|scoop|bevel|notch|square|squircle|<fn:cornerShape>',
   '<counter>': '[ <ident-not-none> <int>? ]+ | none',
   '<dasharray>': M => M.alt([M.term('<len-pct0+>'), M.term('<num0+>')])
     .braces(1, Infinity, '#', M.term(',').braces(0, 1, '?')),

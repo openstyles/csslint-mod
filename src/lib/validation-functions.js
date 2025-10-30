@@ -1,4 +1,14 @@
 const VTFunctions = {
+  basicShape: {
+    __proto__: null,
+    circle: '<shape-radius> [ at <position> ]?',
+    ellipse: '[ <shape-radius>{2} ]? [ at <position> ]?',
+    inset: '<inset-arg>',
+    path: '[ <fill-rule> , ]? <string>',
+    polygon: '[ <fill-rule> , ]? [ <len-pct> <len-pct> ]#',
+    rect: '<rect-arg>',
+    xywh: '<xywh-arg>',
+  },
   color: {
     __proto__: null,
     'color-mix': 'in [ srgb | srgb-linear | lab | oklab | xyz | xyz-d50 | xyz-d65 ' +
@@ -23,6 +33,10 @@ const VTFunctions = {
       '<num-pct-none>{3} <alpha>? | ' +
       'from <color> <rel-rgb-num-pct>{3} [ / <rel-rgb-num-pct> ]?',
   },
+  cornerShape: {
+    __proto__: null,
+    superellipse: '<num> | infinity | -infinity',
+  },
   filter: {
     __proto__: null,
     'blur': '<len>?',
@@ -35,15 +49,6 @@ const VTFunctions = {
     'opacity': '<num-pct>?',
     'saturate': '<num-pct>?',
     'sepia': '<num-pct>?',
-  },
-  basicShape: {
-    'circle': '<shape-radius> [ at <position> ]?',
-    'ellipse': '[ <shape-radius>{2} ]? [ at <position> ]?',
-    'inset': '<inset-arg>',
-    'path': '[ <fill-rule> , ]? <string>',
-    'polygon': '[ <fill-rule> , ]? [ <len-pct> <len-pct> ]#',
-    'rect': '<rect-arg>',
-    'xywh': '<xywh-arg>',
   },
   transform: {
     __proto__: null,
