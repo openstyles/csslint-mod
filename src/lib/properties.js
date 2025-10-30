@@ -513,6 +513,8 @@ const Properties = {
   'r': 1, // SVG
   'rx': '<x> | auto', // SVG
   'ry': '<rx>', // SVG
+  'reading-flow': 'normal|source-order|flex-visual|flex-flow|grid-rows|grid-columns|grid-order',
+  'reading-order': '<int>',
   'rendering-intent': 1, // SVG
   'resize': 'none | both | horizontal | vertical | block | inline',
   'right': '<top>',
