@@ -333,6 +333,7 @@ const ATS = {
 };
 
 ATS.function = ATS.mixin = ATS.apply;
+ATS['position-try'] = stream => stream.skipDeclBlock();
 
 /** topDocOnly mode */
 export const ATS_TDO = pick(ATS, ['document']);

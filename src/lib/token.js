@@ -1,5 +1,5 @@
 import {B} from './bucket.js';
-import {IDENT, UVAR, WS} from './tokens';
+import {DASHED_FUNCTION, IDENT, UVAR, WS} from './tokens';
 import {assign, define, isOwn, parseString, PDESC, toLowAscii} from './util';
 
 /**
@@ -73,7 +73,12 @@ export default class Token {
 }
 
 export class TokenFunc extends Token {
-  /** @return {TokenFunc} */
+  /**
+   * @param {Token} tok
+   * @param {TokenValue} [expr]
+   * @param {Token} [end]
+   * @return {Token}
+   */
   static from(tok, expr, end) {
     tok = super.from(tok);
     if (isOwn(tok, 'text')) tok.offsetBody = tok.offset2;
@@ -83,7 +88,7 @@ export class TokenFunc extends Token {
       let n = tok.name;
       if (B.calc.has(tok, tok.code, n)) {
         tok.isCalc = true;
-      } else if (n === 'var' || n === 'env' || tok.type === '--') {
+      } else if (n === 'var' || n === 'env' || tok.id === DASHED_FUNCTION) {
         tok.isVar = true;
       } else if (n === 'attr' && (n = expr.parts[0]) && (n.id === IDENT || n.id === UVAR)) {
         tok.isAttr = true;

@@ -1,4 +1,10 @@
+/* eslint-disable max-len */
 const VTFunctions = {
+  _: {
+    __proto__: null,
+    'anchor': '<custom-prop>? && [inside|outside|top|left|right|bottom|start|end|self-start|self-end|center|<pct>] [, <len-pct>]?',
+    'anchor-size': '[<custom-prop> || [width|height|block|inline|self-block|self-inline] ]? [, <len-pct>]?',
+  },
   basicShape: {
     __proto__: null,
     circle: '<shape-radius> [ at <position> ]?',

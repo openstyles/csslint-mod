@@ -126,6 +126,7 @@ const VTComplex = {
     '[ left | center | right | <len-pct> ] ' +
     '[ top | center | bottom | <len-pct> ]? | ' +
     '[ left | center | right ] || [ top | center | bottom ]',
+  '<position-area>': '[left|center|right|span-left|span-right|x-start|x-end|span-x-start|span-x-end|self-x-start|self-x-end|span-self-x-start|span-self-x-end|span-all] || [top|center|bottom|span-top|span-bottom|y-start|y-end|span-y-start|span-y-end|self-y-start|self-y-end|span-self-y-start|span-self-y-end|span-all] | [block-start|center|block-end|span-block-start|span-block-end|span-all] || [inline-start|center|inline-end|span-inline-start|span-inline-end|span-all] | [self-block-start|center|self-block-end|span-self-block-start|span-self-block-end|span-all] || [self-inline-start|center|self-inline-end|span-self-inline-start|span-self-inline-end|span-all] | [start|center|end|span-start|span-end|span-all]{1,2} | [self-start|center|self-end|span-self-start|span-self-end|span-all]{1,2}',
   '<ratio>': '<num0+> [ / <num0+> ]?',
   '<ray>': 'ray( <angle> && [closest-side | closest-corner | farthest-side | farthest-corner | sides]?' +
     ' && contain? && [at <position>]? )',
@@ -152,8 +153,7 @@ const VTComplex = {
   '<url>': '<uri> | src( <string> [ <ident> | <func> ]* )',
   '<vis-hid>': 'visible | hidden',
   '<width-base>': '<len-pct> | min-content | max-content | fit-content | stretch | contain | ' +
-    '-moz-available | -webkit-fill-available',
-  '<width-max>': 'none | <width-base>',
+    '-moz-available | -webkit-fill-available | anchor-size() | calc-size()',
   '<xywh>': 'xywh( <xywh-arg> )',
   '<xywh-arg>': '<len-pct>{2} <len-pct0+>{2} <border-radius-round>?',
 };

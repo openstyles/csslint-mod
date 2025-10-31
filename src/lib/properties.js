@@ -4,16 +4,15 @@ import {GlobalKeywords} from './util';
 const Properties = {
   __proto__: null,
   'accent-color': 'auto | <color>',
-  'align-items':
-    'normal | stretch | <baseline-position> | [ <overflow-position>? <self-position> ]',
-  'align-content': 'normal | <baseline-position> | <content-distribution> | ' +
-        '<overflow-position>? <content-position>',
-  'align-self':
-    'auto | normal | stretch | <baseline-position> | <overflow-position>? <self-position>',
-  'all': GlobalKeywords.join(' | '),
+  'align-items': 'normal | stretch | anchor-center | <baseline-position> | <overflow-position>? <self-position>',
+  'align-content': 'normal | <baseline-position> | <content-distribution> | <overflow-position>? <content-position>',
+  'align-self': 'auto | <align-items>',
+  'all': GlobalKeywords.join('|'),
   'alignment-baseline': 'auto | baseline | use-script | before-edge | text-before-edge | ' +
     'after-edge | text-after-edge | central | middle | ideographic | alphabetic | ' +
     'hanging | mathematical',
+  'anchor-name': 'none | <custom-prop>#',
+  'anchor-scope': 'none | all | <custom-prop>#',
   'animation': '[ <time0+> || <timing-function> || <time> || [ infinite | <num0+> ] || ' +
     '<animation-direction> || <animation-fill-mode> || ' +
     '[ running | paused ] || [ none | <custom-ident> | <string> ] || <animation-timeline> ]#',
@@ -293,8 +292,8 @@ const Properties = {
   'fill-opacity': '<num0-1>',
   'fill-rule': 'nonzero | evenodd',
   'filter': '<filter-function-list> | <ie-function> | none',
-  'flex': 'none | [ <num>{1,2} || <width> ]',
-  'flex-basis': '<width>',
+  'flex': 'none | [ <num>{1,2} || <flex-basis> ]',
+  'flex-basis': 'content | <width>',
   'flex-direction': 'row | row-reverse | column | column-reverse',
   'flex-flow': '<flex-direction> || <flex-wrap>',
   'flex-grow': '<num>',
@@ -383,11 +382,8 @@ const Properties = {
 
   'justify-content': 'normal | <content-distribution> | ' +
     '<overflow-position>? [ <content-position> | left | right ]',
-  'justify-items': 'normal | stretch | <baseline-position> | ' +
-    '[ <overflow-position>? <self-position> ] | ' +
-    '[ legacy || [ left | right | center ] ]',
-  'justify-self': 'auto | normal | stretch | <baseline-position> | ' +
-    '<overflow-position>? [ <self-position> | left | right ]',
+  'justify-items': 'normal | stretch | anchor-center | <baseline-position> | [ <overflow-position>? <self-position> ] | [ legacy || [ left | right | center ] ]',
+  'justify-self': 'auto | normal | stretch | anchor-center | <baseline-position> | <overflow-position>? [ <self-position> | left | right ]',
 
   'left': '<top>',
   'letter-spacing': '<len> | normal',
@@ -404,17 +400,17 @@ const Properties = {
   'math-depth': 'auto-add | add(<int>) | <int>',
   'math-shift': '<math-style>',
   'math-style': 'normal | compact',
-  'margin': '<margin-top>{1,4}',
-  'margin-top': 'auto | <len-pct>',
-  'margin-bottom': '<margin-top>',
-  'margin-left': '<margin-top>',
-  'margin-right': '<margin-top>',
-  'margin-block': '<margin-top>{1,2}',
-  'margin-block-end': '<margin-top>',
-  'margin-block-start': '<margin-top>',
-  'margin-inline': '<margin-top>{1,2}',
-  'margin-inline-end': '<margin-top>',
-  'margin-inline-start': '<margin-top>',
+  'margin': '<top>{1,4}',
+  'margin-top': '<top>',
+  'margin-bottom': '<top>',
+  'margin-left': '<top>',
+  'margin-right': '<top>',
+  'margin-block': '<top>{1,2}',
+  'margin-block-end': '<top>',
+  'margin-block-start': '<top>',
+  'margin-inline': '<top>{1,2}',
+  'margin-inline-end': '<top>',
+  'margin-inline-start': '<top>',
   'marker': -1,
   'marker-end': 1,
   'marker-mid': 1,
@@ -440,12 +436,12 @@ const Properties = {
   'mask-repeat': '<repeat-style>#',
   'mask-size': '<bg-size>#',
   'mask-type': 'luminance | alpha',
-  'max-height': '<width-max>',
-  'max-width': '<width-max>',
+  'max-height': '<max-width>',
+  'max-width': 'none | <width-base>',
   'min-height': '<width>',
   'min-width': '<width>',
-  'max-block-size': '<width-max>',
-  'max-inline-size': '<width-max>',
+  'max-block-size': '<max-width>',
+  'max-inline-size': '<max-width>',
   'min-block-size': '<width>',
   'min-inline-size': '<width>',
   'mix-blend-mode': '<blend-mode>',
@@ -508,6 +504,12 @@ const Properties = {
   'pointer-events': 'auto | none | visiblePainted | visibleFill | visibleStroke | visible | ' +
     'painted | fill | stroke | all',
   'position': 'static | relative | absolute | fixed | sticky',
+  'position-anchor': 'auto | <custom-prop>',
+  'position-area': 'auto | <position-area>',
+  'position-try': '<position-try-order>? <position-try-fallbacks>',
+  'position-try-order': 'normal | most-width | most-height | most-block-size | most-inline-size',
+  'position-try-fallbacks': 'none | [<custom-prop> || flip-block || flip-inline || flip-start | <position-area> ]#',
+  'position-visibility': 'always | [ anchors-valid || anchors-visible || no-overflow ]',
   'print-color-adjust': 'economy | exact',
 
   'quotes': 1,
@@ -614,9 +616,8 @@ const Properties = {
   'text-wrap': 'wrap | nowrap | balance | stable | pretty',
   'text-wrap-mode': 'wrap | nowrap',
   'text-wrap-style': 'auto | balance | stable | pretty',
-  'top': 'auto | <len-pct>',
-  'touch-action':
-    'auto | none | pan-x | pan-y | pan-left | pan-right | pan-up | pan-down | manipulation',
+  'top': 'auto | <len-pct> | anchor() | anchor-size()',
+  'touch-action': 'auto|none|pan-x|pan-y|pan-left|pan-right|pan-up|pan-down|manipulation',
   'transform': 'none | <fn:transform>+',
   'transform-box': 'content-box | border-box | fill-box | stroke-box | view-box',
   'transform-origin': '[ left | center | right | <len-pct> ] ' +
