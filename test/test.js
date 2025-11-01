@@ -15,8 +15,8 @@ const FAILED_FILE = REPORT_FILE + '.tmp';
 (async () => {
   let res;
   for (const [fn, msg] of [
-    [testCsslint, 'Testing csslint...'],
     [testParserlib, 'Testing parserlib internals...'],
+    [testCsslint, 'Testing csslint...'],
   ]) {
     if (msg) process.stdout.write(msg);
     res = fn(res);
@@ -59,9 +59,15 @@ async function testParserlib() {
     parserlib.util.VTComplex,
     ...Object.values(parserlib.util.VTFunctions),
   ]) {
-    for (const spec of Object.values(obj)) {
+    for (const [name, spec] of Object.entries(obj)) {
       if (typeof spec === 'string' && !Matcher.cache[spec]) {
-        Matcher.parse(spec);
+        try {
+          Matcher.parse(spec);
+        } catch (e) {
+          console.error(chalk.red('\n' + e.message),
+            chalk.bold(`\n  ${name}: ${spec}\n`) + e.stack.replace(/^.+\r?\n/, ''));
+          process.exit(1);
+        }
       }
     }
   }

@@ -28,14 +28,15 @@ export default class Matcher {
   /**
    * @param {(this: Matcher, expr: PropValueIterator, p?: Token) => boolean} matchFunc
    * @param {string|function} toString
-   * @param {?} [arg]
+   * @param {Matcher.Arg.Braces | Matcher.Arg.Func | Bucket | ((p: Token) => boolean) | Matcher[]} [arg]
    * @param {boolean} [isMeta] - true for alt/seq/many/braces that control matchers
    */
   constructor(matchFunc, toString, arg, isMeta) {
     this.matchFunc = matchFunc;
-    if (arg != null) this.arg = arg;
-    if (isMeta) this.isMeta = isMeta;
-    if (toString.call) this.toString = toString; else this._string = toString;
+    this.arg = arg;
+    this.isMeta = isMeta;
+    if (toString.call) this.toString = toString;
+    else this._string = toString;
   }
 
   /**
@@ -60,19 +61,11 @@ export default class Matcher {
     return this._string;
   }
 
-  /** Matcher for one or more juxtaposed words, which all must occur, in the given order. */
+  /** Matcher for one or more juxtaposed words, which all must occur, in the given order.
+   * @param {Matcher[]} ms
+   * @return {Matcher}
+   */
   static alt(ms) {
-    let str; // Merging stringArray hubs
-    for (let SAT = Matcher.stringArrTest,
-      i = 0; i < ms.length;) {
-      if (ms[i].matchFunc === SAT) {
-        str = (str ? str + ' | ' : '') + ms[i]._string;
-        ms.splice(i, 1);
-      } else {
-        i++;
-      }
-    }
-    if (str) ms.unshift(Matcher.term(str));
     return !ms[1] ? ms[0] : new Matcher(Matcher.altTest, Matcher.altToStr, ms, true);
   }
 
@@ -83,20 +76,21 @@ export default class Matcher {
    * @return {!boolean|void}
    */
   static altTest(expr, p) {
-    for (let ms = this.arg,
-      i = 0; i < ms.length; i++) {
-      if (ms[i].match(expr, p)) return true;
-    }
+    const ms = this.arg;
+    for (const m of ms)
+      if (m.match(expr, p))
+        return true;
   }
 
   /** @this {Matcher} */
   static altToStr(prec) {
-    return (prec = prec > Matcher.ALT ? '[ ' : '') +
-      this.arg.map(m => m.toString(Matcher.ALT)).join(' | ') +
+    return (prec = prec > ALT ? '[ ' : '') +
+      this.arg.map(m => m.toString(ALT)).join(' | ') +
       (prec ? ' ]' : '');
   }
 
   braces(min, max, marker, sep) {
+    /** @namespace Matcher.Arg.Braces */
     return new Matcher(Matcher.bracesTest, Matcher.bracesToStr, {
       m: this,
       min, max, marker,
@@ -123,7 +117,7 @@ export default class Matcher {
   /** @this {Matcher} */
   static bracesToStr() {
     const {marker, min, max, m} = this.arg;
-    return m.toString(Matcher.MOD) + (marker || '') + (
+    return m.toString(MOD) + (marker || '') + (
       !marker || marker === '#' && !(min === 1 || max === Infinity)
         ? `{${min}${min === max ? '' : `,${max === Infinity ? '' : max}`}}`
         : '');
@@ -140,27 +134,43 @@ export default class Matcher {
     let e, m, vi;
     const {arg} = this;
     const {list} = arg;
-    if (list) m = list[name]; // VTFunctions doesn't have vendor-prefixed names
-    else if (name === (e = arg.name)
-      || (vi = p.prefix) && vi + name === e) m = arg.body;
-    if (!m) return m != null; // true = no check if `body` is false i.e. no specs for params
-    if ((e = p.expr)) if (e.isVar) return true; else vi = new PropValueIterator(e);
-    if (!m.matchFunc) m = list[name] = (m.call ? m(Matcher) : Matcher.cache[m] || Matcher.parse(m));
-    if (!e) return m.arg.min === 0;
-    return m.match(vi) && vi.i >= vi.parts.length || !(expr.badFunc = [e, m]);
+    if (list)
+      m = list[name]; // VTFunctions doesn't have vendor-prefixed names
+    else if (name === (e = arg.name) || (vi = p.prefix) && vi + name === e)
+      m = arg.body;
+    if (!m)
+      return m != null; // true = no check if `body` is false i.e. no specs for params
+    if ((e = p.expr)) {
+      if (e.isVar) return true;
+      else vi = new PropValueIterator(e);
+    }
+    if (!m.matchFunc) {
+      m = (m.call ? m(Matcher) : cache[m] || Matcher.parse(m));
+      if (list) list[name] = m;
+    }
+    if (!e)
+      return m.arg.min === 0;
+    return m.match(vi) && vi.i >= vi.parts.length
+      || !(expr.badFunc = [e, m]);
   }
 
   /** @this {Matcher} */
   static funcToStr(prec) {
     const {name, body, list} = this.arg;
-    return name ? `${name}(${body ? ` ${body} ` : ''})` :
-      (prec = prec > Matcher.ALT ? '[ ' : '') +
+    return name ? `${name}(${body && !prec ? ` ${body} ` : ''})` :
+      (prec = prec > ALT ? '[ ' : '') +
       Object.keys(list).join('() | ') +
       (prec ? '() ]' : '()');
   }
 
+  /**
+   * @param {boolean?} req
+   * @param {Matcher[]} ms
+   * @return {Matcher | Matcher & {req: false | boolean[]}}
+   */
   static many(req, ms) {
-    if (!ms[1]) return ms[0];
+    if (!ms[1])
+      return ms[0];
     const res = new Matcher(Matcher.manyTest, Matcher.manyToStr, ms, true);
     res.req = req === true ? Array(ms.length).fill(true) :
       req == null ? ms.map(m => !m.arg || m.arg.marker !== '?')
@@ -193,10 +203,7 @@ export default class Matcher {
   }
 
   manyTestRun(state, count, retry) {
-    for (let i = 0, {expr} = state,
-      ms = this.arg,
-      ei,
-      x; i < ms.length; i++) {
+    for (let i = 0, {expr} = state, ms = this.arg, ei, x; i < ms.length; i++) {
       if (!state[i] && (
         (ei = expr.i) + 1 > expr.parts.length ||
         (x = ms[i].match(expr)) && (x > 1 || x === 1 || ms[i].arg.min !== 0)
@@ -219,11 +226,11 @@ export default class Matcher {
   /** @this {Matcher} */
   static manyToStr(prec) {
     const {req} = this;
-    const p = Matcher[req ? 'ANDAND' : 'OROR'];
+    const p = req ? ANDAND : OROR;
     const s = this.arg.map((m, i) =>
       !req || req[i]
         ? m.toString(p)
-        : m.toString(Matcher.MOD).replace(/[^?]$/, '$&?'),
+        : m.toString(MOD).replace(/[^?]$/, '$&?'),
     ).join(req ? ' && ' : ' || ');
     return prec > p ? `[ ${s} ]` : s;
   }
@@ -237,7 +244,7 @@ export default class Matcher {
       throw new Error(`Internal grammar error. Unexpected "${
         clipString(string.slice(i, 31), 30)}" at position ${i} in "${string}".`);
     }
-    Matcher.cache[str] = res;
+    cache[str] = res;
     return res;
   }
 
@@ -254,10 +261,14 @@ export default class Matcher {
    */
   static parseAlt(src) {
     const alts = [];
+    let literals = '';
+    let litIndex;
     do {
-      const pt = src.readMatch(rxPlainTextAlt);
-      if (pt) {
-        alts.push(Matcher.term(pt));
+      let s = src.peek();
+      if ((/* a-z - */ s >= 97 && s <= 122 || s === 45) && (s = src.readMatch(rxPlainTextAlt))) {
+        if (literals) literals += ' | ';
+        else litIndex = alts.length;
+        literals += s;
       } else {
         const ors = [];
         do {
@@ -274,6 +285,8 @@ export default class Matcher {
         alts.push(Matcher.many(false, ors));
       }
     } while (src.readMatch(rxOrSep));
+    if (literals)
+      alts.splice(litIndex, 0, Matcher.term(literals));
     return Matcher.alt(alts);
   }
 
@@ -282,12 +295,17 @@ export default class Matcher {
    * @return {Matcher}
    */
   static parseTerm(src) {
-    let m,
-      fn;
-    if (src.readMatch(rxGroupBegin)) {
+    let m, fn;
+    fn = src.peek();
+    if (/* [ */ fn === 91 && src.readMatch(rxGroupBegin)) {
       m = Matcher.parseAlt(src);
-      if (!src.readMatch(rxGroupEnd)) Matcher.parsingFailed(src, rxGroupEnd);
-    } else if ((fn = src.readMatch(rxFuncBegin, true))) {
+      if (!src.readMatch(rxGroupEnd))
+        Matcher.parsingFailed(src, rxGroupEnd);
+    } else if (/* a-z - */
+      (fn >= 97 && fn <= 122 || fn === 45) &&
+      (fn = src.readMatch(rxFuncBegin, true))
+    ) {
+      /** @namespace Matcher.Arg.Func */
       m = new Matcher(Matcher.funcTest, Matcher.funcToStr, {
         name: fn[1].toLowerCase(),
         body: fn[2] // if there's no inline body grammar in `src`
@@ -302,19 +320,26 @@ export default class Matcher {
     if (fn === 123/* { */ || fn === 35/* # */ && src.peek(2) === 123) {
       const hash = fn === 35 ? src.read() : '';
       const [, a, comma, b = comma ? Infinity : a] = src.readMatch(rxBraces, true)
-      || Matcher.parsingFailed(src, rxBraces);
-      return m.braces(+a, +b, hash, hash && ',');
+        || Matcher.parsingFailed(src, rxBraces);
+      m = m.braces(+a, +b, hash, hash && ',');
+      if (src.peek() === 63 /* ? */) {
+        src.read();
+        if (+a === 1) m.arg.min = 0; // modify 1->0 inplace
+        else m = m.braces(0, 1, '?');
+      }
+      return m;
     }
-    switch (fn) {
-      case 63: /* ? */
-        return m.braces(0, 1, src.read());
-      case 42: /* * */
-        return m.braces(0, Infinity, src.read());
-      case 43: /* + */
-        return m.braces(1, Infinity, src.read());
-      case 35: /* # */
-        return m.braces(1, Infinity, src.read(), ',');
-    }
+    if (fn === 63 /* ? */) {
+      m = m.braces(0, 1, '?');
+    } else if (fn === 42 /* * */) {
+      m = m.braces(0, Infinity, '*');
+    } else if (fn === 43 /* + */) {
+      m = m.braces(1, Infinity, '+');
+    } else if (fn === 35 /* # */) {
+      fn = src.peek(2) !== 63 /* ? */ ? 1 : (src.read(2), 0);
+      m = m.braces(fn, Infinity, '#', ',');
+    } else fn = 0;
+    if (fn) src.read();
     return m;
   }
 
@@ -339,10 +364,7 @@ export default class Matcher {
    * @return {!boolean|void}
    */
   static seqTest(expr, p) {
-    let min1,
-      i,
-      m,
-      res;
+    let min1, i, m, res;
     for (i = 0; (m = this.arg[i++]); p = undefined) {
       if (!(res = m.match(expr, p))) return;
       if (!min1 && (m.arg.min !== 0 || res === 1 || res > 1)) min1 = true;
@@ -353,8 +375,8 @@ export default class Matcher {
 
   /** @this {Matcher} */
   static seqToStr(prec) {
-    return (prec = prec > Matcher.SEQ ? '[ ' : '') +
-      this.arg.map(m => m.toString(Matcher.SEQ)).join(' ') +
+    return (prec = prec > SEQ ? '[ ' : '') +
+      this.arg.map(m => m.toString(SEQ)).join(' ') +
       (prec ? ' ]' : '');
   }
 
@@ -384,42 +406,44 @@ export default class Matcher {
 
   /** @this {Matcher} */
   static stringArrToStr(prec) {
-    return (prec = prec > Matcher.ALT && this._string.includes(' ') ? '[ ' : '') +
+    return (prec = prec > ALT && this._string.includes('|') ? '[ ' : '') +
       this._string + (prec ? ' ]' : '');
   }
 
   /** Matcher for a single type */
   static term(str) {
     const origStr = str;
-    let m = Matcher.cache[str = str.toLowerCase()];
+    let m = cache[str = str.toLowerCase()];
     if (m) return m;
     if (str[0] !== '<') {
       m = new Matcher(Matcher.stringArrTest, Matcher.stringArrToStr,
         new Bucket(str.split(rxAltSep)));
       m._string = str;
     } else if (str.startsWith('<fn:')) {
+      /** @namespace Matcher.Arg.FuncList */
       m = new Matcher(Matcher.funcTest, Matcher.funcToStr,
         {list: VTFunctions[origStr.slice(4, -1)]});
     } else if ((m = VTSimple[str])) {
       m = new Matcher(Matcher.simpleTest, str, m);
     } else {
       m = VTComplex[str] || Properties[str.slice(1, -1)];
-      m = m.matchFunc ? m : m.call ? m(Matcher) : Matcher.cache[m] || Matcher.parse(m);
+      if (!m) throw new Error(`Unknown grammar term ${str}`);
+      m = m.matchFunc ? m : m.call ? m(Matcher) : cache[m] || Matcher.parse(m);
       if (str === '<url>') {
         m._string = str;
         delete m.toString;
       }
     }
-    Matcher.cache[str] = m;
+    cache[str] = m;
     return m;
   }
 }
 
 /** @type {{[key:string]: Matcher}} */
-Matcher.cache = {__proto__: null};
+const cache = Matcher.cache = {__proto__: null};
 // Precedence of combinators.
-Matcher.MOD = 5;
-Matcher.SEQ = 4;
-Matcher.ANDAND = 3;
-Matcher.OROR = 2;
-Matcher.ALT = 1;
+const MOD = Matcher.MOD = 5;
+const SEQ = Matcher.SEQ = 4;
+const ANDAND = Matcher.ANDAND = 3;
+const OROR = Matcher.OROR = 2;
+const ALT = Matcher.ALT = 1;
