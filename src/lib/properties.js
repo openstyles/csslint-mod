@@ -27,54 +27,8 @@ const Properties = {
   'animation-timeline': '<animation-timeline>#',
   'animation-timing-function': '<timing-function>#',
   'appearance': 'none | auto',
-  '-moz-appearance':
-    'none | button | button-arrow-down | button-arrow-next | button-arrow-previous | ' +
-    'button-arrow-up | button-bevel | button-focus | caret | checkbox | checkbox-container | ' +
-    'checkbox-label | checkmenuitem | dualbutton | groupbox | listbox | listitem | ' +
-    'menuarrow | menubar | menucheckbox | menuimage | menuitem | menuitemtext | menulist | ' +
-    'menulist-button | menulist-text | menulist-textfield | menupopup | menuradio | ' +
-    'menuseparator | meterbar | meterchunk | progressbar | progressbar-vertical | ' +
-    'progresschunk | progresschunk-vertical | radio | radio-container | radio-label | ' +
-    'radiomenuitem | range | range-thumb | resizer | resizerpanel | scale-horizontal | ' +
-    'scalethumbend | scalethumb-horizontal | scalethumbstart | scalethumbtick | ' +
-    'scalethumb-vertical | scale-vertical | scrollbarbutton-down | scrollbarbutton-left | ' +
-    'scrollbarbutton-right | scrollbarbutton-up | scrollbarthumb-horizontal | ' +
-    'scrollbarthumb-vertical | scrollbartrack-horizontal | scrollbartrack-vertical | ' +
-    'searchfield | separator | sheet | spinner | spinner-downbutton | spinner-textfield | ' +
-    'spinner-upbutton | splitter | statusbar | statusbarpanel | tab | tabpanel | tabpanels | ' +
-    'tab-scroll-arrow-back | tab-scroll-arrow-forward | textfield | textfield-multiline | ' +
-    'toolbar | toolbarbutton | toolbarbutton-dropdown | toolbargripper | toolbox | tooltip | ' +
-    'treeheader | treeheadercell | treeheadersortarrow | treeitem | treeline | treetwisty | ' +
-    'treetwistyopen | treeview | -moz-mac-unified-toolbar | -moz-win-borderless-glass | ' +
-    '-moz-win-browsertabbar-toolbox | -moz-win-communicationstext | ' +
-    '-moz-win-communications-toolbox | -moz-win-exclude-glass | -moz-win-glass | ' +
-    '-moz-win-mediatext | -moz-win-media-toolbox | -moz-window-button-box | ' +
-    '-moz-window-button-box-maximized | -moz-window-button-close | ' +
-    '-moz-window-button-maximize | -moz-window-button-minimize | -moz-window-button-restore | ' +
-    '-moz-window-frame-bottom | -moz-window-frame-left | -moz-window-frame-right | ' +
-    '-moz-window-titlebar | -moz-window-titlebar-maximized',
-  '-ms-appearance':
-    'none | icon | window | desktop | workspace | document | tooltip | dialog | button | ' +
-    'push-button | hyperlink | radio | radio-button | checkbox | menu-item | tab | menu | ' +
-    'menubar | pull-down-menu | pop-up-menu | list-menu | radio-group | checkbox-group | ' +
-    'outline-tree | range | field | combo-box | signature | password | normal',
-  '-webkit-appearance':
-    'auto | none | button | button-bevel | caps-lock-indicator | caret | checkbox | ' +
-    'default-button | listbox | listitem | media-fullscreen-button | media-mute-button | ' +
-    'media-play-button | media-seek-back-button | media-seek-forward-button | media-slider | ' +
-    'media-sliderthumb | menulist | menulist-button | menulist-text | menulist-textfield | ' +
-    'push-button | radio | searchfield | searchfield-cancel-button | searchfield-decoration | ' +
-    'searchfield-results-button | searchfield-results-decoration | slider-horizontal | ' +
-    'slider-vertical | sliderthumb-horizontal | sliderthumb-vertical | square-button | ' +
-    'textarea | textfield | scrollbarbutton-down | scrollbarbutton-left | ' +
-    'scrollbarbutton-right | scrollbarbutton-up | scrollbargripper-horizontal | ' +
-    'scrollbargripper-vertical | scrollbarthumb-horizontal | scrollbarthumb-vertical | ' +
-    'scrollbartrack-horizontal | scrollbartrack-vertical',
-  '-o-appearance':
-    'none | window | desktop | workspace | document | tooltip | dialog | button | ' +
-    'push-button | hyperlink | radio | radio-button | checkbox | menu-item | tab | menu | ' +
-    'menubar | pull-down-menu | pop-up-menu | list-menu | radio-group | checkbox-group | ' +
-    'outline-tree | range | field | combo-box | signature | password | normal',
+  '-moz-appearance': 'none | button | button-arrow-down | button-arrow-next | button-arrow-previous | button-arrow-up | button-bevel | button-focus | caret | checkbox | checkbox-container | checkbox-label | checkmenuitem | dualbutton | groupbox | listbox | listitem | menuarrow | menubar | menucheckbox | menuimage | menuitem | menuitemtext | menulist | menulist-button | menulist-text | menulist-textfield | menupopup | menuradio | menuseparator | meterbar | meterchunk | progressbar | progressbar-vertical | progresschunk | progresschunk-vertical | radio | radio-container | radio-label | radiomenuitem | range | range-thumb | resizer | resizerpanel | scale-horizontal | scalethumbend | scalethumb-horizontal | scalethumbstart | scalethumbtick | scalethumb-vertical | scale-vertical | scrollbarbutton-down | scrollbarbutton-left | scrollbarbutton-right | scrollbarbutton-up | scrollbarthumb-horizontal | scrollbarthumb-vertical | scrollbartrack-horizontal | scrollbartrack-vertical | searchfield | separator | sheet | spinner | spinner-downbutton | spinner-textfield | spinner-upbutton | splitter | statusbar | statusbarpanel | tab | tabpanel | tabpanels | tab-scroll-arrow-back | tab-scroll-arrow-forward | textfield | textfield-multiline | toolbar | toolbarbutton | toolbarbutton-dropdown | toolbargripper | toolbox | tooltip | treeheader | treeheadercell | treeheadersortarrow | treeitem | treeline | treetwisty | treetwistyopen | treeview | -moz-mac-unified-toolbar | -moz-win-borderless-glass | -moz-win-browsertabbar-toolbox | -moz-win-communicationstext | -moz-win-communications-toolbox | -moz-win-exclude-glass | -moz-win-glass | -moz-win-mediatext | -moz-win-media-toolbox | -moz-window-button-box | -moz-window-button-box-maximized | -moz-window-button-close | -moz-window-button-maximize | -moz-window-button-minimize | -moz-window-button-restore | -moz-window-frame-bottom | -moz-window-frame-left | -moz-window-frame-right | -moz-window-titlebar | -moz-window-titlebar-maximized',
+  '-webkit-appearance': 'auto | none | button | button-bevel | caps-lock-indicator | caret | checkbox | default-button | listbox | listitem | media-fullscreen-button | media-mute-button | media-play-button | media-seek-back-button | media-seek-forward-button | media-slider | media-sliderthumb | menulist | menulist-button | menulist-text | menulist-textfield | push-button | radio | searchfield | searchfield-cancel-button | searchfield-decoration | searchfield-results-button | searchfield-results-decoration | slider-horizontal | slider-vertical | sliderthumb-horizontal | sliderthumb-vertical | square-button | textarea | textfield | scrollbarbutton-down | scrollbarbutton-left | scrollbarbutton-right | scrollbarbutton-up | scrollbargripper-horizontal | scrollbargripper-vertical | scrollbarthumb-horizontal | scrollbarthumb-vertical | scrollbartrack-horizontal | scrollbartrack-vertical',
   'aspect-ratio': 'auto || <ratio>',
 
   'backdrop-filter': '<filter-function-list> | none',
@@ -313,7 +267,7 @@ const Properties = {
   'font-optical-sizing': 'auto | none',
   'font-palette': 'none | normal | light | dark | <custom-ident>',
   'font-size': '<absolute-size> | <relative-size> | <len-pct0+>',
-  'font-size-adjust': '<num> | none',
+  'font-size-adjust': 'none | [ex-height|cap-height|ch-width|ic-width|ic-height]? [from-font|<num0+>]',
   'font-stretch': '<font-stretch-named> | <pct>',
   'font-style': 'normal | italic | oblique <angle>?',
   'font-synthesis': 'none | [ weight || style ]',
@@ -524,8 +478,8 @@ const Properties = {
   'right': '<top>',
   'rotate': 'none | [ x | y | z | <num>{3} ]? && <angle>',
   'row-gap': '<column-gap>',
-  'ruby-align': 1,
-  'ruby-position': 1,
+  'ruby-align': 'start | center | space-between | space-around',
+  'ruby-position': 'alternate || [over|under] | inter-character',
 
   'scale': 'none | <num-pct>{1,3}',
   'scroll-behavior': 'auto | smooth',
@@ -651,8 +605,7 @@ const Properties = {
   'word-break': 'normal | keep-all | break-all | break-word',
   'word-spacing': '<len> | normal',
   'word-wrap': 'normal | break-word | anywhere',
-  'writing-mode': 'horizontal-tb | vertical-rl | vertical-lr | ' +
-    'lr-tb | rl-tb | tb-rl | bt-rl | tb-lr | bt-lr | lr-bt | rl-bt | lr | rl | tb',
+  'writing-mode': 'horizontal-tb | vertical-rl | vertical-lr | sideways-rl | sideways-lr',
 
   'x': '<len-pct> | <num>',
   'y': '<x>',
@@ -667,5 +620,8 @@ const Properties = {
   '-webkit-text-stroke-width': '<border-width>',
   '-webkit-user-modify': 'read-only | read-write | write-only',
 };
+Properties['-ms-appearance'] = 'icon | ' + (
+  Properties['-o-appearance'] = 'none | window | desktop | workspace | document | tooltip | dialog | button | push-button | hyperlink | radio | radio-button | checkbox | menu-item | tab | menu | menubar | pull-down-menu | pop-up-menu | list-menu | radio-group | checkbox-group | outline-tree | range | field | combo-box | signature | password | normal'
+);
 
 export default Properties;
