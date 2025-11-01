@@ -290,7 +290,9 @@ export default class Matcher {
     } else if ((fn = src.readMatch(rxFuncBegin, true))) {
       m = new Matcher(Matcher.funcTest, Matcher.funcToStr, {
         name: fn[1].toLowerCase(),
-        body: !fn[2] && Matcher.parseAlt(src),
+        body: fn[2] // if there's no inline body grammar in `src`
+          ? VTFunctions._[fn[1]] || false /* for funcTest */
+          : Matcher.parseAlt(src),
       });
       if (!fn[2] && !src.readMatch(rxFuncEnd)) Matcher.parsingFailed(src, rxFuncEnd);
     } else {

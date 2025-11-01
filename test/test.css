@@ -664,3 +664,7 @@ a {flex-flow: row wr/*incomplete*/}
 .anchor {
   margin-block-start: anchor-size(--my-anchor self-/*block*/, 20px);
 }
+.gradient {
+  background-image: radial-gradient(farthest-side at left bottom in Oklab, color(display-p3 0.918 0.2 0.161), #081);
+  background-image: repeating-conic-gradient(from 90deg, red 0 25%, green 25% 50%, blue 50% 75%, black 75% 100%);
+}

@@ -3,12 +3,14 @@ const VTComplex = {
   __proto__: null,
   '<absolute-size>': 'xx-small | x-small | small | medium | large | x-large | xx-large',
   '<alpha>': '/ <num-pct-none>',
+  '<angular-color-stop>': '<color> <angle-pct-zero>{0,2}',
   '<animateable-feature>': 'scroll-position | contents | <animateable-feature-name>',
   '<animation-direction>': 'normal | reverse | alternate | alternate-reverse',
   '<animation-fill-mode>': 'none | forwards | backwards | both',
   '<animation-timeline>': 'auto | none | <custom-ident> | ' +
     'scroll( [ [ root | nearest | self ] || <axis> ]? ) | ' +
     'view( [ <axis> || [ [ auto | <len-pct> ]{1,2} ]# ]? )',
+  '<at-pos>': 'at <position>',
   '<attachment>': 'scroll | fixed | local',
   '<auto-repeat>':
     'repeat( [ auto-fill | auto-fit ] , [ <line-names>? <fixed-size> ]+ <line-names>? )',
@@ -43,6 +45,8 @@ const VTComplex = {
   '<box>': 'padding-box | border-box | content-box',
   '<box-fsv>': 'fill-box | stroke-box | view-box',
   '<color>': '<named-or-hex-color> | <fn:color>',
+  '<color-interpolation-method>': 'in [ <rectangular-color-space> | <polar-color-space> <hue-interpolation-method>? ]',
+  '<color-stop-list>': '<linear-color-stop> [, [ [<len-pct> ,]? <linear-color-stop> ]# ]?',
   '<compositing-operator>': 'add | subtract | intersect | exclude',
   '<contain-intrinsic>': 'auto? [ none | <len> ]',
   '<content-distribution>': 'space-between | space-around | space-evenly | stretch',
@@ -106,19 +110,20 @@ const VTComplex = {
     'repeating-gradient()',
   '<grid-line>': 'auto | [ <int> && <ident-for-grid>? ] | <ident-for-grid> | ' +
     '[ span && [ <int> || <ident-for-grid> ] ]',
+  '<hue-interpolation-method>': '[shorter|longer|increasing|decreasing] hue',
   '<image>': '<image-no-set> | image-set( <image-set># )',
   '<image-no-set>': '<url> | <gradient> | -webkit-cross-fade()',
   '<image-set>': '[ <image-no-set> | <string> ] [ <resolution> || type( <string> ) ]',
   '<inflexible-breadth>': '<len-pct> | min-content | max-content | auto',
-  '<inset>': 'inset( <inset-arg> )',
-  '<inset-arg>': '<len-pct>{1,4} <border-radius-round>?',
   '<line-height>': '<num> | <len-pct> | normal',
   '<line-names>': '"[" <ident-for-grid> "]"',
+  '<linear-color-stop>': '<color> <len-pct>?',
   '<masking-mode>': 'alpha | luminance | match-source',
   '<overflow-position>': 'unsafe | safe',
   '<overflow>': '<vis-hid> | clip | scroll | auto | overlay', // TODO: warning about `overlay`
   '<overscroll>': 'contain | none | auto',
   '<paint>': 'none | <color> | <url> [ none | <color> ]? | context-fill | context-stroke',
+  '<polar-color-space>': 'hsl | hwb | lch | oklch',
   // Because our `alt` combinator is ordered, we need to test these
   // in order from longest possible match to shortest.
   '<position>':
@@ -128,20 +133,17 @@ const VTComplex = {
     '[ left | center | right ] || [ top | center | bottom ]',
   '<position-area>': '[left|center|right|span-left|span-right|x-start|x-end|span-x-start|span-x-end|self-x-start|self-x-end|span-self-x-start|span-self-x-end|span-all] || [top|center|bottom|span-top|span-bottom|y-start|y-end|span-y-start|span-y-end|self-y-start|self-y-end|span-self-y-start|span-self-y-end|span-all] | [block-start|center|block-end|span-block-start|span-block-end|span-all] || [inline-start|center|inline-end|span-inline-start|span-inline-end|span-all] | [self-block-start|center|self-block-end|span-self-block-start|span-self-block-end|span-all] || [self-inline-start|center|self-inline-end|span-self-inline-start|span-self-inline-end|span-all] | [start|center|end|span-start|span-end|span-all]{1,2} | [self-start|center|self-end|span-self-start|span-self-end|span-all]{1,2}',
   '<ratio>': '<num0+> [ / <num0+> ]?',
-  '<ray>': 'ray( <angle> && [closest-side | closest-corner | farthest-side | farthest-corner | sides]?' +
-    ' && contain? && [at <position>]? )',
-  '<rect>': 'rect( <rect-arg> )',
-  '<rect-arg>': '[ <len> | auto ]#{4} <border-radius-round>?',
+  '<radial-extent>': 'closest-corner | closest-side | farthest-corner | farthest-side',
   '<relative-size>': 'smaller | larger',
   '<repeat-style>': 'repeat-x | repeat-y | [ repeat | space | round | no-repeat ]{1,2}',
-  '<rgb-xyz>': 'srgb|srgb-linear|display-p3|a98-rgb|prophoto-rgb|rec2020|xyz|xyz-d50|xyz-d65',
+  '<rectangular-color-space>': 'srgb|srgb-linear|display-p3|display-p3-linear|a98-rgb|prophoto-rgb|rec2020|lab|oklab|xyz|xyz-d50|xyz-d65',
   '<self-position>': 'center | start | end | self-start | self-end | flex-start | flex-end',
   '<shadow>': 'inset? && [ <len>{2,4} && <color>? ]',
   '<shape-box>': '<box> | margin-box',
   '<shape-radius>': '<len-pct0+> | closest-side | farthest-side',
   '<timing-function>': 'linear|ease|ease-in|ease-out|ease-in-out|step-start|step-end | ' +
     'cubic-bezier( <num0-1> , <num> , <num0-1> , <num> ) | ' +
-    'linear( [ <num> && [ <pct>{1,2} ]? ]# ) | ' +
+    'linear( [ <num> && <pct>{0,2} ]# ) | ' +
     'steps( <int> [ , [ jump-start | jump-end | jump-none | jump-both | start | end ] ]? )',
   '<text-align>': 'start | end | left | right | center | justify | match-parent',
   '<track-breadth>': '<len-pct> | <flex> | min-content | max-content | auto',
@@ -154,8 +156,6 @@ const VTComplex = {
   '<vis-hid>': 'visible | hidden',
   '<width-base>': '<len-pct> | min-content | max-content | fit-content | stretch | contain | ' +
     '-moz-available | -webkit-fill-available | anchor-size() | calc-size()',
-  '<xywh>': 'xywh( <xywh-arg> )',
-  '<xywh-arg>': '<len-pct>{2} <len-pct0+>{2} <border-radius-round>?',
 };
 
 export default VTComplex;

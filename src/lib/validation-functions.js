@@ -1,31 +1,36 @@
 /* eslint-disable max-len */
+import {pick} from './util.js';
+
+const _ = {
+  __proto__: null,
+  'anchor': '<custom-prop>? && [inside|outside|top|left|right|bottom|start|end|self-start|self-end|center|<pct>] [, <len-pct>]?',
+  'anchor-size': '[<custom-prop> || [width|height|block|inline|self-block|self-inline] ]? [, <len-pct>]?',
+  'conic-gradient': '[ [ [ [ from <angle-zero> ]? <at-pos>? ] || <color-interpolation-method> ] , ]? [ <angular-color-stop> [, [ [<angle-pct-zero> ,]? <angular-color-stop> ]# ]? ]',
+  'linear-gradient': '[ [ [ [ <angle-zero> | to [[left|right] || [top|bottom]] ] || <color-interpolation-method> ] , ]? <color-stop-list> ]?',
+  'radial-gradient': '[ [ [ [ [circle|ellipse] || [<radial-extent> | <len0+> | <len-pct0+>{2}] ]? <at-pos>? ] || <color-interpolation-method> ] , ]? <color-stop-list>',
+  ray: '<angle> && [<radial-extent> | sides]? && contain? && [at <position>]?',
+  rect: '[ <len> | auto ]#{4} <border-radius-round>?',
+  inset: '<len-pct>{1,4} <border-radius-round>?',
+  xywh: '<len-pct>{2} <len-pct0+>{2} <border-radius-round>?',
+};
 const VTFunctions = {
-  _: {
+  _,
+  basicShape: pick(_, ['inset', 'rect', 'xywh'], {
     __proto__: null,
-    'anchor': '<custom-prop>? && [inside|outside|top|left|right|bottom|start|end|self-start|self-end|center|<pct>] [, <len-pct>]?',
-    'anchor-size': '[<custom-prop> || [width|height|block|inline|self-block|self-inline] ]? [, <len-pct>]?',
-  },
-  basicShape: {
-    __proto__: null,
-    circle: '<shape-radius> [ at <position> ]?',
-    ellipse: '[ <shape-radius>{2} ]? [ at <position> ]?',
-    inset: '<inset-arg>',
+    circle: '<shape-radius> <at-pos>?',
+    ellipse: '<shape-radius>{2}? <at-pos>?',
     path: '[ <fill-rule> , ]? <string>',
     polygon: '[ <fill-rule> , ]? [ <len-pct> <len-pct> ]#',
-    rect: '<rect-arg>',
     shape: '[ [from|move|line|hline|vline|curve|smooth|arc] [to|by]? [<ident>|<len-pct>]+ ]#',
-    xywh: '<xywh-arg>',
-  },
+  }),
   color: {
     __proto__: null,
-    'color-mix': 'in [ srgb | srgb-linear | lab | oklab | xyz | xyz-d50 | xyz-d65 ' +
-      '| [ hsl | hwb | lch | oklch ] [ [ shorter | longer | increasing | decreasing ] hue ]? ' +
-      '] , [ <color> && <pct0-100>? ]#{2}',
+    'color-mix': '[ <color-interpolation-method> , ]? [ <color> && <pct0-100>? ]#{2}',
     'color': 'from <color> [ ' +
         '<custom-prop> [ <num-pct-none> <custom-ident> ]# | ' +
-        '<rgb-xyz> [ <num-pct-none> | r | g | b | x | y | z ]{3} ' +
+        '<rectangular-color-space> [ <num-pct-none> | r | g | b | x | y | z ]{3} ' +
       '] [ / <num-pct-none> | r | g | b | x | y | z ]? | ' +
-      '[ <rgb-xyz> <num-pct-none>{3} | <custom-prop> <num-pct-none># ] <alpha>?',
+      '[ <rectangular-color-space> <num-pct-none>{3} | <custom-prop> <num-pct-none># ] <alpha>?',
     'hsl': '<hue> , <pct>#{2} [ , <num-pct0+> ]? | ' +
       '[ <hue> | none ] <num-pct-none>{2} <alpha>? | ' +
       'from <color> [ <hue> | <rel-hsl> ] <rel-hsl-num-pct>{2} [ / <rel-hsl-num-pct> ]?',
@@ -55,7 +60,7 @@ const VTFunctions = {
     'contrast': '<num-pct>?',
     'drop-shadow': '[ <len>{2,3} && <color>? ]?',
     'grayscale': '<num-pct>?',
-    'hue-rotate': '<angle-or-0>?',
+    'hue-rotate': '<angle-zero>?',
     'invert': '<num-pct>?',
     'opacity': '<num-pct>?',
     'saturate': '<num-pct>?',
@@ -66,19 +71,19 @@ const VTFunctions = {
     matrix: '<num>#{6}',
     matrix3d: '<num>#{16}',
     perspective: '<len0+> | none',
-    rotate: '<angle-or-0> | none',
-    rotate3d: '<num>#{3} , <angle-or-0>',
-    rotateX: '<angle-or-0>',
-    rotateY: '<angle-or-0>',
-    rotateZ: '<angle-or-0>',
+    rotate: '<angle-zero> | none',
+    rotate3d: '<num>#{3} , <angle-zero>',
+    rotateX: '<angle-zero>',
+    rotateY: '<angle-zero>',
+    rotateZ: '<angle-zero>',
     scale: '[ <num-pct> ]#{1,2} | none',
     scale3d: '<num-pct>#{3}',
     scaleX: '<num-pct>',
     scaleY: '<num-pct>',
     scaleZ: '<num-pct>',
-    skew: '<angle-or-0> [ , <angle-or-0> ]?',
-    skewX: '<angle-or-0>',
-    skewY: '<angle-or-0>',
+    skew: '<angle-zero> [ , <angle-zero> ]?',
+    skewX: '<angle-zero>',
+    skewY: '<angle-zero>',
     translate: '<len-pct>#{1,2} | none',
     translate3d: '<len-pct>#{2} , <len>',
     translateX: '<len-pct>',
@@ -97,5 +102,8 @@ const VTFunctions = {
     if (low !== key) Object.defineProperty(obj, low, {value: obj[key], writable: true});
   }
 }
+for (const key in _)
+  if (key.endsWith('-gradient'))
+    _['repeating-' + key] = _[key];
 
 export default VTFunctions;

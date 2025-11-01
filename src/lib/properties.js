@@ -191,7 +191,7 @@ const Properties = {
   'caret-shape': 'auto | bar | block | underscore',
   'caption-side': 'top | bottom | inline-start | inline-end',
   'clear': 'none | right | left | both | inline-start | inline-end',
-  'clip': '<rect> | auto',
+  'clip': 'rect() | auto',
   'clip-path': '<url> | [ <basic-shape> || <geometry-box> ] | none',
   'clip-rule': '<fill-rule>',
   'color': '<color>',
@@ -448,13 +448,13 @@ const Properties = {
 
   'object-fit': 'fill | contain | cover | none | scale-down',
   'object-position': '<position>',
-  'object-view-box': 'none | <inset> | <rect> | <xywh>',
+  'object-view-box': 'none | inset() | rect() | xywh()',
   'offset':
     '[ <offset-position>? <offset-path> [<len-pct> || <offset-rotate>]? | <offset-position> ] ' +
     '[ / <offset-anchor> ]?',
   'offset-anchor': 'auto | <position>',
   'offset-distance': '<len-pct>',
-  'offset-path': 'none | [ <ray> | <url> | <basic-shape> ] || <coord-box>',
+  'offset-path': 'none | [ ray() | <url> | <basic-shape> ] || <coord-box>',
   'offset-position': 'auto | <position>',
   'offset-rotate': '[ auto | reverse ] || <angle>',
   'opacity': '<num0-1> | <pct>',

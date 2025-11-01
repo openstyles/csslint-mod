@@ -67,7 +67,7 @@ error	533	7	Expected FUNCTION, IDENT but found " ".
 error	534	10	Expected "{" but found ";".
 error	536	1	Expected "{" but found "}".
 warning	540	19	Non-alphabetical order: "margin".
-warning	545	33	Expected [ [ <url> | radial-gradient() | linear-gradient() | conic-gradient() | gradient() | repeating-radial-gradient() | repeating-linear-gradient() | repeating-conic-gradient() | repeating-gradient() | -webkit-cross-fade() | <string> ] [ <resolution> || type( <string> ) ] ]# but found ""foo.png" foo".
+warning	545	33	Expected [ [ <url> | radial-gradient() | linear-gradient() | conic-gradient() | gradient() | repeating-radial-gradient() | repeating-linear-gradient() | repeating-conic-gradient() | repeating-gradient() | -webkit-cross-fade() | <string> ] [ <resolution> || type() ] ]# but found ""foo.png" foo".
 warning	550	32	Expected [ [ root | nearest | self ] || [ block | inline | vertical | horizontal ] ]? but found "root2 block".
 error	570	15	Expected "{" but found "too".
 error	571	18	Expected "(" but found "{".
@@ -84,4 +84,4 @@ warning	584	42	Expected <named-or-hex-color> | color-mix() | color() | hsl() | h
 warning	585	1	Empty rule.
 error	585	10	Expected ":" but found "}".
 warning	587	19	Expected end of value but found "wr".
-warning	665	35	Expected [ <custom-prop> || width|height|block|inline|self-block|self-inline ]? [ , <length-percentage> ]? but found "--my-anchor self-/*block*/, 20...".
+warning	665	35	Expected [ <custom-prop> || [ width|height|block|inline|self-block|self-inline ] ]? [ , <length-percentage> ]? but found "--my-anchor self-/*block*/, 20...".
