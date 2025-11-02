@@ -45,7 +45,10 @@ export default class StringSource {
   /** @param {number} code */
   readMatchCode(code) {
     if (code === this.string.charCodeAt(this.offset)) {
-      return this.read();
+      if (code === 10)
+        return this.read(1, '\n');
+      this.col++; this.offset++;
+      return String.fromCharCode(code);
     }
   }
 

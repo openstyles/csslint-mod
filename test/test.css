@@ -16,7 +16,7 @@
       .h\:fc-\40 escape:nth-child(2) {}
       .h\:fc-\40 escape:nth-child(2n) {}
       .ha\:fc-\40 escape:nth-child(odd) {}
-      .ha\: fc-\40 escape:nth-child(even of :not([hidden])) {}
+      .ha\:fc-\40 escape:nth-child(even of :not([hidden])) {}
       .ha\30 fc-\40 escape:nth-child(3n + -6) {}
       .ha\30-c-\40 escape:nth-child(-3n+-6) {}
       .h\300a -\40 escape:nth-child(-3-+6) {}
