@@ -19,10 +19,10 @@
     "build": "rollup -c",
     "watch": "rollup -c -w",
     "lint": "eslint \"**/*.js\" --cache",
-    "test": "npm run lint && node --import=extensionless/register test/test.js",
-    "pre-version": "test",
-    "bump": "npm version patch",
-    "bump2": "npm version minor"
+    "test": "pnpm lint && node --import=extensionless/register test/test.js",
+    "preversion": "pnpm test",
+    "bump": "pnpm version patch",
+    "bump2": "pnpm version minor"
   },
   "devDependencies": {
     "chalk": "^5.4.1",

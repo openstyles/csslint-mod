@@ -693,8 +693,10 @@ var ruleKnownPseudos = [{
     'after': 1 + 2, // also allows ":"
     'backdrop': 2,
     'before': 1 + 2, // also allows ":"
+    'column': 2,
     'cue': 2,
     'cue-region': 2,
+    'details-content': 2,
     'file-selector-button': 2,
     'first-letter': 1 + 2, // also allows ":"
     'first-line': 1 + 2, // also allows ":"
@@ -702,13 +704,25 @@ var ruleKnownPseudos = [{
     'highlight': 2 + Func,
     'marker': 2,
     'part': 2 + Func,
+    'picker': 2 + Func,
+    'picker-icon': 2,
     'placeholder': 2 + Moz,
+    'scroll-button': 2 + Func,
+    'scroll-marker': 2,
+    'scroll-marker-group': 2,
     'selection': 2 + Moz,
     'slotted': 2 + Func,
     'spelling-error': 2,
     'target-text': 2,
+    'view-transition': 2,
+    'view-transition-group': 2 + Func,
+    'view-transition-image-pair': 2 + Func,
+    'view-transition-new': 2 + Func,
+    'view-transition-old': 2 + Func,
     // classes
     'active': 1,
+    'active-view-transition': 1,
+    'active-view-transition-type': 1 + Func,
     'any-link': 1 + Moz + WK,
     'autofill': 1 + WK,
     'blank': 1,
@@ -730,6 +744,7 @@ var ruleKnownPseudos = [{
     'fullscreen': 1,
     'future': 1,
     'has': 1 + Func,
+    'has-slotted': 1,
     'host': 1 + FuncToo,
     'host-context': 1 + Func,
     'hover': 1,
@@ -743,6 +758,7 @@ var ruleKnownPseudos = [{
     'left': 1,
     'link': 1,
     'local-link': 1,
+    'modal': 1,
     'not': 1 + Func,
     'nth-child': 1 + Func,
     'nth-col': 1 + Func,
@@ -752,6 +768,7 @@ var ruleKnownPseudos = [{
     'nth-of-type': 1 + Func,
     'only-child': 1,
     'only-of-type': 1,
+    'open': 1,
     'optional': 1,
     'out-of-range': 1,
     'past': 1,
@@ -759,6 +776,7 @@ var ruleKnownPseudos = [{
     'picture-in-picture': 1,
     'placeholder-shown': 1,
     'playing': 1,
+    'popover-open': 1,
     'read-only': 1,
     'read-write': 1,
     'required': 1,
@@ -767,8 +785,12 @@ var ruleKnownPseudos = [{
     'scope': 1,
     'state': 1 + Func,
     'target': 1,
+    'target-after': 1,
+    'target-before': 1,
+    'target-current': 1,
     'target-within': 1,
     'user-invalid': 1,
+    'user-valid': 1,
     'valid': 1,
     'visited': 1,
     'where': 1 + Func,
@@ -1458,7 +1480,7 @@ const CSSLint = Object.assign(new parserlib.util.EventDispatcher(), {
       if (rule) rule.init(rule, parser, reporter);
     }
     try {
-      if (ruleset.doc) parser._stack.push(true);
+      if (ruleset.doc) parser._stack.push({});
       parser.parse(text, {reuseCache});
     } catch (ex) {
       reporter.error('Fatal error, cannot continue!\n' + ex.stack, ex, {});
