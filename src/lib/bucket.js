@@ -1,9 +1,10 @@
 import NamedColors from './named-colors';
-import {isOwn} from './util';
 
 /** Much faster than flat array or regexp */
 export default class Bucket {
   constructor(src) {
+    /** @type {Map<number, string|string[]>} */
+    this.map = new Map();
     this.addFrom(src);
   }
 
@@ -15,9 +16,9 @@ export default class Bucket {
     for (let str of typeof src === 'string' ? [src] : src) {
       let c = (str = str.toLowerCase()).charCodeAt(0);
       if (c === 34 /* " */) c = (str = str.slice(1, -1)).charCodeAt(0);
-      src = this[c = c * 100 + str.length];
-      if (src == null) this[c] = str;
-      else if (typeof src === 'string') this[c] = [src, str];
+      src = this.map.get(c = c * 100 + str.length);
+      if (src == null) this.map.set(c, str);
+      else if (typeof src === 'string') this.map.set(c, [src, str]);
       else src.push(str);
     }
     return this;
@@ -25,26 +26,34 @@ export default class Bucket {
 
   /** @return {string} */
   join(sep) {
-    let res = '';
-    for (const v of Object.values(this)) {
-      res += `${res ? sep : ''}${typeof v === 'string' ? v : v.join(sep)}`;
+    const res = [];
+    for (const v of this.map.values()) {
+      if (typeof v === 'string') res.push(v);
+      else res.push(...v);
     }
-    return res;
+    return res.join(sep);
   }
 
   /**
    * @param {Token} tok
-   * @param {number} [c] - first char code
    * @param {string} [lowText] - text to use instead of token's text
-   * @return {boolean | any}
+   * @param {number} [vendorPos] - check ignoring vendor prefix
+   * @return {boolean}
    */
-  has(tok, c = tok.code, lowText) {
-    const len = (lowText || tok).length;
-    if (!isOwn(this, c = c * 100 + len)) return false;
+  has(tok, lowText, vendorPos) {
+    let val;
+    let low = lowText ?? tok.lowText;
+    let len = (low ?? tok).length;
+    if (len >= 100 || (val =
+      this.map.get(
+        (vendorPos ? tok.vendorCode : tok.code) * 100 +
+        (vendorPos ? len -= vendorPos : len))
+    ) == null) return false;
     if (len === 1) return true;
-    const val = this[c];
-    const low = lowText || (tok.lowText ??= tok.text.toLowerCase());
-    return typeof val === 'string' ? val === low : val.includes(low);
+    low ??= tok.lowText = tok.text.toLowerCase();
+    return val === low || (
+      typeof val === 'object' ? val.includes(vendorPos ? low.slice(vendorPos) : low)
+        : vendorPos ? low.endsWith(val) : false);
   }
 }
 

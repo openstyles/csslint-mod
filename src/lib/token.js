@@ -29,6 +29,7 @@ export default class Token {
     this.line = line;
     this.offset = offset;
     this.offset2 = offset + 1;
+    this.lowText = null;
     this.type = '';
     this.code = toLowAscii(code);
     this._input = input;
@@ -86,7 +87,7 @@ export class TokenFunc extends Token {
     if (expr) {
       tok.expr = expr;
       let n = tok.name;
-      if (B.calc.has(tok, tok.code, n)) {
+      if (B.calc.has(tok, n)) {
         tok.isCalc = true;
       } else if (n === 'var' || n === 'env' || tok.id === DASHED_FUNCTION) {
         tok.isVar = true;

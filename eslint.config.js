@@ -197,7 +197,7 @@ export default [
         args: 'after-used',
         argsIgnorePattern: '^_',
       }],
-      'no-use-before-define': [2, {functions: false, variables: false}],
+      'no-use-before-define': [2, {classes: false, functions: false, variables: false}],
       'no-useless-call': [2],
       'no-useless-computed-key': [2],
       'no-useless-concat': [2],
