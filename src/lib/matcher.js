@@ -397,14 +397,13 @@ const parse = Matcher.parse = str => {
  */
 const parseAlt = src => {
   const alts = [];
-  let literals = '';
+  let literals;
   let litIndex;
   do {
     let s = src.peek();
     if ((/* a-z - */ s >= 97 && s <= 122 || s === 45) && (s = src.readMatch(rxPlainTextAlt))) {
-      if (literals) literals += ' | ';
-      else litIndex = alts.length;
-      literals += s;
+      literals ??= (litIndex = alts.length, []);
+      literals.push(s);
     } else {
       const ors = [];
       do {
@@ -418,11 +417,16 @@ const parseAlt = src => {
         } while (src.readMatch(rxAndAndSep));
         ors.push(Matcher.many(null, ands));
       } while (src.readMatch(rxOrOrSep));
-      alts.push(!ors[1] ? ors[0] : new ManyMatcher(false, ors));
+      const single = !ors[1] && ors[0];
+      if (single && single instanceof StringsMatcher) {
+        literals ??= (litIndex = alts.length, []);
+        literals.push((/**@type{StringsMatcher}*/single).str);
+      }
+      alts.push(single || new ManyMatcher(false, ors));
     }
   } while (src.readMatch(rxOrSep));
   if (literals)
-    alts.splice(litIndex, 0, singleTerm(literals));
+    alts.splice(litIndex, 0, singleTerm(literals.join('|')));
   return !alts[1] ? alts[0] : new AltMatcher(alts);
 };
 
