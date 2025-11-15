@@ -132,11 +132,12 @@ const VTComplex = {
     '[ top | center | bottom | <len-pct> ]? | ' +
     '[ left | center | right ] || [ top | center | bottom ]',
   '<position-area>': '[left|center|right|span-left|span-right|x-start|x-end|span-x-start|span-x-end|self-x-start|self-x-end|span-self-x-start|span-self-x-end|span-all] || [top|center|bottom|span-top|span-bottom|y-start|y-end|span-y-start|span-y-end|self-y-start|self-y-end|span-self-y-start|span-self-y-end|span-all] | [block-start|center|block-end|span-block-start|span-block-end|span-all] || [inline-start|center|inline-end|span-inline-start|span-inline-end|span-all] | [self-block-start|center|self-block-end|span-self-block-start|span-self-block-end|span-all] || [self-inline-start|center|self-inline-end|span-self-inline-start|span-self-inline-end|span-all] | [start|center|end|span-start|span-end|span-all]{1,2} | [self-start|center|self-end|span-self-start|span-self-end|span-all]{1,2}',
+  '<predefined-rgb>': 'srgb|srgb-linear|display-p3|display-p3-linear|a98-rgb|prophoto-rgb|rec2020',
   '<ratio>': '<num0+> [ / <num0+> ]?',
   '<radial-extent>': 'closest-corner | closest-side | farthest-corner | farthest-side',
   '<relative-size>': 'smaller | larger',
   '<repeat-style>': 'repeat-x | repeat-y | [ repeat | space | round | no-repeat ]{1,2}',
-  '<rectangular-color-space>': 'srgb|srgb-linear|display-p3|display-p3-linear|a98-rgb|prophoto-rgb|rec2020|lab|oklab|xyz|xyz-d50|xyz-d65',
+  '<rectangular-color-space>': '<predefined-rgb>|lab|oklab|<xyz-space>',
   '<self-position>': 'center | start | end | self-start | self-end | flex-start | flex-end',
   '<shadow>': 'inset? && [ <len>{2,4} && <color>? ]',
   '<shape-box>': '<box> | margin-box',
@@ -156,6 +157,7 @@ const VTComplex = {
   '<vis-hid>': 'visible | hidden',
   '<width-base>': '<len-pct> | min-content | max-content | fit-content | stretch | contain | ' +
     '-moz-available | -webkit-fill-available | anchor-size() | calc-size()',
+  '<xyz-space>': 'xyz | xyz-d50 | xyz-d65',
 };
 
 export default VTComplex;
