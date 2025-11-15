@@ -1,5 +1,5 @@
 import Bucket from './bucket';
-import {GlobalKeywords, isOwn} from './util';
+import {GlobalKeywords} from './util';
 import {
   ANGLE, FUNCTION, IDENT, LENGTH, NUMBER, PCT, RESOLUTION, STRING, TIME, URANGE,
 } from './tokens';
@@ -65,13 +65,14 @@ const VTSimple = {
 };
 
 for (const type of ['hsl', 'hwb', 'lab', 'lch', 'rgb']) {
-  const letters = {};
-  for (let i = 0; i < type.length;) letters[type.charCodeAt(i++)] = 1;
+  const letters = Array(26).fill(0);
+  for (let i = 0, c; (c = type.charCodeAt(i++));)
+    letters[c - 97] = 1;
   VTSimple[`<rel-${type}>`] = p => p.type === 'none'
-    || (p.length === 1 ? isOwn(letters, p.code) : p.length === 5 && buAlpha.has(p));
+    || (p.length === 1 ? letters[p.code - 97] : p.length === 5 && buAlpha.has(p));
   VTSimple[`<rel-${type}-num-pct>`] = p => p.type === 'none'
     || p.isCalc || p.id === NUMBER || p.id === PCT
-    || (p.length === 1 ? isOwn(letters, p.code) : p.length === 5 && buAlpha.has(p));
+    || (p.length === 1 ? letters[p.code - 97] : p.length === 5 && buAlpha.has(p));
 }
 
 export default VTSimple;
