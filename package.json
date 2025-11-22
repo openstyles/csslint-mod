@@ -11,7 +11,8 @@
     "linter"
   ],
   "files": [
-    "dist"
+    "dist",
+    "src/lib"
   ],
   "main": "dist/csslint.js",
   "type": "module",
