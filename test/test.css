@@ -674,3 +674,7 @@ a {flex-flow: row wr/*incomplete*/}
   color: color(from green srgb r g b / 0.5);
   color: color(from #123456 xyz calc(x + 0.75) y calc(z - 0.35))
 }
+
+.anchored {
+  container-type: anchored;
+}

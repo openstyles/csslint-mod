@@ -172,7 +172,7 @@ const Properties = {
   'contain-intrinsic-width': '<contain-intrinsic>',
   'container': '<container-name> [ / <container-type> ]?',
   'container-name': 'none | <ident-not-none>+',
-  'container-type': 'normal || [ size | inline-size ]',
+  'container-type': 'normal | [ [ size | inline-size ] || scroll-state || anchored ]',
   'content': 'normal | none | <content-list> [ / <string> ]?',
   'content-visibility': 'auto | <vis-hid>',
   //#region corner (shorthands)
@@ -462,7 +462,7 @@ const Properties = {
   'position-area': 'auto | <position-area>',
   'position-try': '<position-try-order>? <position-try-fallbacks>',
   'position-try-order': 'normal | most-width | most-height | most-block-size | most-inline-size',
-  'position-try-fallbacks': 'none | [<custom-prop> || flip-block || flip-inline || flip-start | <position-area> ]#',
+  'position-try-fallbacks': 'none | [[<custom-prop> || <try-tactic>] | <position-area> ]#',
   'position-visibility': 'always | [ anchors-valid || anchors-visible || no-overflow ]',
   'print-color-adjust': 'economy | exact',
 

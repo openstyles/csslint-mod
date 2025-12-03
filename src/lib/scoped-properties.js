@@ -11,6 +11,7 @@ const ScopedProperties = {
     __proto__: null,
     'aspect-ratio': '<ratio>',
     'block-size': '<len>',
+    'fallback': 'none | [ [<custom-prop> || <try-tactic>] | <position-area-query> ]',
     'height': '<len>',
     'inline-size': '<len>',
     'orientation': 'portrait|landscape',

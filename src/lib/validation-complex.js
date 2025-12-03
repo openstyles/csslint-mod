@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+let tmp;
 const VTComplex = {
   __proto__: null,
   '<absolute-size>': 'xx-small | x-small | small | medium | large | x-large | xx-large',
@@ -131,7 +132,8 @@ const VTComplex = {
     '[ left | center | right | <len-pct> ] ' +
     '[ top | center | bottom | <len-pct> ]? | ' +
     '[ left | center | right ] || [ top | center | bottom ]',
-  '<position-area>': '[left|center|right|span-left|span-right|x-start|x-end|span-x-start|span-x-end|self-x-start|self-x-end|span-self-x-start|span-self-x-end|span-all] || [top|center|bottom|span-top|span-bottom|y-start|y-end|span-y-start|span-y-end|self-y-start|self-y-end|span-self-y-start|span-self-y-end|span-all] | [block-start|center|block-end|span-block-start|span-block-end|span-all] || [inline-start|center|inline-end|span-inline-start|span-inline-end|span-all] | [self-block-start|center|self-block-end|span-self-block-start|span-self-block-end|span-all] || [self-inline-start|center|self-inline-end|span-self-inline-start|span-self-inline-end|span-all] | [start|center|end|span-start|span-end|span-all]{1,2} | [self-start|center|self-end|span-self-start|span-self-end|span-all]{1,2}',
+  '<position-area>': tmp = '[left|center|right|span-left|span-right|x-start|x-end|span-x-start|span-x-end|self-x-start|self-x-end|span-self-x-start|span-self-x-end|span-all] || [top|center|bottom|span-top|span-bottom|y-start|y-end|span-y-start|span-y-end|self-y-start|self-y-end|span-self-y-start|span-self-y-end|span-all] | [block-start|center|block-end|span-block-start|span-block-end|span-all] || [inline-start|center|inline-end|span-inline-start|span-inline-end|span-all] | [self-block-start|center|self-block-end|span-self-block-start|span-self-block-end|span-all] || [self-inline-start|center|self-inline-end|span-self-inline-start|span-self-inline-end|span-all] | [start|center|end|span-start|span-end|span-all]{1,2} | [self-start|center|self-end|span-self-start|span-self-end|span-all]{1,2}',
+  '<position-area-query>': tmp.replace(/]/g, '|any]'),
   '<predefined-rgb>': 'srgb|srgb-linear|display-p3|display-p3-linear|a98-rgb|prophoto-rgb|rec2020',
   '<ratio>': '<num0+> [ / <num0+> ]?',
   '<radial-extent>': 'closest-corner | closest-side | farthest-corner | farthest-side',
@@ -152,6 +154,7 @@ const VTComplex = {
   '<track-repeat>': 'repeat( [ <int1+> ] , [ <line-names>? <track-size> ]+ <line-names>? )',
   '<track-size>': '<track-breadth> | minmax( <inflexible-breadth> , <track-breadth> ) | ' +
     'fit-content( <len-pct> )',
+  '<try-tactic>': 'flip-block || flip-inline || flip-start || flip-x || flip-y',
   '<txbhv>': 'normal | allow-discrete',
   '<url>': '<uri> | src( <string> [ <ident> | <func> ]* )',
   '<vis-hid>': 'visible | hidden',
