@@ -44,7 +44,7 @@ const UVAR_PROXY = [PCT, ...TT.mediaValue, ...TT.identString]
 const rxCommentUso = /(\*)\[\[[-\w]+]]\*\/|\*(?:[^*]+|\*(?!\/))*(?:\*\/|$)/y;
 const rxDigits = /\d+/y;
 const rxMaybeQuote = /\s*['"]?/y;
-const rxName = /(?:[-_\da-zA-Z\u00A0-\uFFFF]+|\\(?:[0-9a-fA-F]{1,6}\s?|.|$))+/y;
+const rxName = /(?:[-_\da-zA-Z\u00A1-\uFFFF]+|\\(?:[0-9a-fA-F]{1,6}\s?|.|$))+/y;
 const rxNth = /(even|odd)|(?:([-+]?\d*n)(?:\s*([-+])(\s*\d+)?)?|[-+]?\d+)((?=\s+of\s+|\s*\)))?/yi;
 const rxNumberDigit = /\d*(?:(\.)\d*)?(?:(e)[+-]?\d+)?/iy;
 const rxNumberDot = /\d+(?:(e)[+-]?\d+)?/iy;
@@ -58,7 +58,7 @@ const rxStringDoubleQ = /(?:[^\n\\"]+|\\(?:[0-9a-fA-F]{1,6}\s?|.|\n|$))*/y;
 const rxStringSingleQ = /(?:[^\n\\']+|\\(?:[0-9a-fA-F]{1,6}\s?|.|\n|$))*/y;
 const rxUnescapeNoLF = /\\(?:([0-9a-fA-F]{1,6})\s?|(.))/g;
 const rxUnicodeRange = /\+([\da-f]{1,6})(\?{1,6}|-([\da-f]{1,6}))?/iy; // U was already consumed
-const rxUnquotedUrl = /(?:[-!#$%&*-[\]-~\u00A0-\uFFFF]+|\\(?:[0-9a-fA-F]{1,6}\s|.|$))+/y;
+const rxUnquotedUrl = /(?:[-!#$%&*-[\]-~\u00A1-\uFFFF]+|\\(?:[0-9a-fA-F]{1,6}\s|.|$))+/y;
 const [rxDeclBlock, rxDeclValue] = ((
   exclude = String.raw`'"{}()[\]\\/`,
   orSlash = ']|/(?!\\*))',
