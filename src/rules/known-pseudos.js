@@ -134,7 +134,7 @@ export default [{
     'any': 1 + Func + Moz + WK,
     'calendar-picker-indicator': 2 + WK,
     'clear-button': 2 + WK,
-    'color-swatch': 2 + WK,
+    'color-swatch': 2 + Moz + WK,
     'color-swatch-wrapper': 2 + WK,
     'date-and-time-value': 2 + WK,
     'datetime-edit': 2 + WK,
