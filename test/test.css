@@ -678,3 +678,7 @@ a {flex-flow: row wr/*incomplete*/}
 .anchored {
   container-type: anchored;
 }
+
+.complex-not-selector:not([a][b]) {
+  display: none;
+}

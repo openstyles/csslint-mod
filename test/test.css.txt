@@ -29,7 +29,9 @@ warning	76	24	Expected end of value but found "00".
 warning	78	20	Expected <unicode-range># but found "U+3000???-9FFF, U+ffz??".
 warning	79	5	Misplaced property "color".
 warning	83	5	Non-alphabetical order: "base-palette".
+warning	89	33	Complex selector inside :not().
 warning	90	5	"svg.mobile-hero:not(.a + .b .c)" is overqualified, just use ".mobile-hero" without element name.
+warning	90	25	Complex selector inside :not().
 warning	95	31	Expected end of value but found "/".
 warning	97	7	Unknown property "object-overflow".
 warning	98	7	Non-alphabetical order: "clip-path".
@@ -84,3 +86,4 @@ warning	585	1	Empty rule.
 error	585	10	Expected ":" but found "}".
 warning	587	19	Expected end of value but found "wr".
 warning	665	35	Expected [ <custom-prop> || [ width|height|block|inline|self-block|self-inline ] ]? [ , <length-percentage> ]? but found "--my-anchor self-/*block*/, 20...".
+warning	682	27	Complex selector inside :not().
