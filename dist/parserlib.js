@@ -255,7 +255,7 @@ const B = /** @type {{[key:string]: Bucket}} */ {
   calc: ['abs', 'calc', 'calc-size', 'clamp', 'if', 'min', 'max', 'mod',
     'progress', 'rem', 'round', 'sign'],
   colors: NamedColors,
-  containerFn: ['scroll-state(', 'style('],
+  containerFn: ['anchored', 'scroll-state(', 'style('],
   marginSyms: [
     'bottom-center', 'bottom-left-corner', 'bottom-left', 'bottom-right-corner', 'bottom-right',
     'left-bottom', 'left-middle', 'left-top',
@@ -517,7 +517,7 @@ const Properties = {
   'contain-intrinsic-width': '<contain-intrinsic>',
   'container': '<container-name> [ / <container-type> ]?',
   'container-name': 'none | <ident-not-none>+',
-  'container-type': 'normal || [ size | inline-size ]',
+  'container-type': 'normal | [ [ size | inline-size ] || scroll-state || anchored ]',
   'content': 'normal | none | <content-list> [ / <string> ]?',
   'content-visibility': 'auto | <vis-hid>',
   //#region corner (shorthands)
@@ -807,7 +807,7 @@ const Properties = {
   'position-area': 'auto | <position-area>',
   'position-try': '<position-try-order>? <position-try-fallbacks>',
   'position-try-order': 'normal | most-width | most-height | most-block-size | most-inline-size',
-  'position-try-fallbacks': 'none | [<custom-prop> || flip-block || flip-inline || flip-start | <position-area> ]#',
+  'position-try-fallbacks': 'none | [[<custom-prop> || <try-tactic>] | <position-area> ]#',
   'position-visibility': 'always | [ anchors-valid || anchors-visible || no-overflow ]',
   'print-color-adjust': 'economy | exact',
 
@@ -1086,6 +1086,7 @@ const ScopedProperties = {
     __proto__: null,
     'aspect-ratio': '<ratio>',
     'block-size': '<len>',
+    'fallback': 'none | [ [<custom-prop> || <try-tactic>] | <position-area-query> ]',
     'height': '<len>',
     'inline-size': '<len>',
     'orientation': 'portrait|landscape',
@@ -1181,6 +1182,7 @@ const ScopedProperties = {
 };
 
 /* eslint-disable max-len */
+let tmp;
 const VTComplex = {
   __proto__: null,
   '<absolute-size>': 'xx-small | x-small | small | medium | large | x-large | xx-large',
@@ -1313,7 +1315,8 @@ const VTComplex = {
     '[ left | center | right | <len-pct> ] ' +
     '[ top | center | bottom | <len-pct> ]? | ' +
     '[ left | center | right ] || [ top | center | bottom ]',
-  '<position-area>': '[left|center|right|span-left|span-right|x-start|x-end|span-x-start|span-x-end|self-x-start|self-x-end|span-self-x-start|span-self-x-end|span-all] || [top|center|bottom|span-top|span-bottom|y-start|y-end|span-y-start|span-y-end|self-y-start|self-y-end|span-self-y-start|span-self-y-end|span-all] | [block-start|center|block-end|span-block-start|span-block-end|span-all] || [inline-start|center|inline-end|span-inline-start|span-inline-end|span-all] | [self-block-start|center|self-block-end|span-self-block-start|span-self-block-end|span-all] || [self-inline-start|center|self-inline-end|span-self-inline-start|span-self-inline-end|span-all] | [start|center|end|span-start|span-end|span-all]{1,2} | [self-start|center|self-end|span-self-start|span-self-end|span-all]{1,2}',
+  '<position-area>': tmp = '[left|center|right|span-left|span-right|x-start|x-end|span-x-start|span-x-end|self-x-start|self-x-end|span-self-x-start|span-self-x-end|span-all] || [top|center|bottom|span-top|span-bottom|y-start|y-end|span-y-start|span-y-end|self-y-start|self-y-end|span-self-y-start|span-self-y-end|span-all] | [block-start|center|block-end|span-block-start|span-block-end|span-all] || [inline-start|center|inline-end|span-inline-start|span-inline-end|span-all] | [self-block-start|center|self-block-end|span-self-block-start|span-self-block-end|span-all] || [self-inline-start|center|self-inline-end|span-self-inline-start|span-self-inline-end|span-all] | [start|center|end|span-start|span-end|span-all]{1,2} | [self-start|center|self-end|span-self-start|span-self-end|span-all]{1,2}',
+  '<position-area-query>': tmp.replace(/]/g, '|any]'),
   '<predefined-rgb>': 'srgb|srgb-linear|display-p3|display-p3-linear|a98-rgb|prophoto-rgb|rec2020',
   '<ratio>': '<num0+> [ / <num0+> ]?',
   '<radial-extent>': 'closest-corner | closest-side | farthest-corner | farthest-side',
@@ -1334,6 +1337,7 @@ const VTComplex = {
   '<track-repeat>': 'repeat( [ <int1+> ] , [ <line-names>? <track-size> ]+ <line-names>? )',
   '<track-size>': '<track-breadth> | minmax( <inflexible-breadth> , <track-breadth> ) | ' +
     'fit-content( <len-pct> )',
+  '<try-tactic>': 'flip-block || flip-inline || flip-start || flip-x || flip-y',
   '<txbhv>': 'normal | allow-discrete',
   '<url>': '<uri> | src( <string> [ <ident> | <func> ]* )',
   '<vis-hid>': 'visible | hidden',
@@ -2406,7 +2410,7 @@ const UVAR_PROXY = [PCT, ...TT.mediaValue, ...TT.identString]
 const rxCommentUso = /(\*)\[\[[-\w]+]]\*\/|\*(?:[^*]+|\*(?!\/))*(?:\*\/|$)/y;
 const rxDigits = /\d+/y;
 const rxMaybeQuote = /\s*['"]?/y;
-const rxName = /(?:[-_\da-zA-Z\u00A0-\uFFFF]+|\\(?:[0-9a-fA-F]{1,6}\s?|.|$))+/y;
+const rxName = /(?:[-_\da-zA-Z\u00A1-\uFFFF]+|\\(?:[0-9a-fA-F]{1,6}\s?|.|$))+/y;
 const rxNth = /(even|odd)|(?:([-+]?\d*n)(?:\s*([-+])(\s*\d+)?)?|[-+]?\d+)((?=\s+of\s+|\s*\)))?/yi;
 const rxNumberDigit = /\d*(?:(\.)\d*)?(?:(e)[+-]?\d+)?/iy;
 const rxNumberDot = /\d+(?:(e)[+-]?\d+)?/iy;
@@ -2420,7 +2424,7 @@ const rxStringDoubleQ = /(?:[^\n\\"]+|\\(?:[0-9a-fA-F]{1,6}\s?|.|\n|$))*/y;
 const rxStringSingleQ = /(?:[^\n\\']+|\\(?:[0-9a-fA-F]{1,6}\s?|.|\n|$))*/y;
 const rxUnescapeNoLF = /\\(?:([0-9a-fA-F]{1,6})\s?|(.))/g;
 const rxUnicodeRange = /\+([\da-f]{1,6})(\?{1,6}|-([\da-f]{1,6}))?/iy; // U was already consumed
-const rxUnquotedUrl = /(?:[-!#$%&*-[\]-~\u00A0-\uFFFF]+|\\(?:[0-9a-fA-F]{1,6}\s|.|$))+/y;
+const rxUnquotedUrl = /(?:[-!#$%&*-[\]-~\u00A1-\uFFFF]+|\\(?:[0-9a-fA-F]{1,6}\s|.|$))+/y;
 const [rxDeclBlock, rxDeclValue] = ((
   exclude = String.raw`'"{}()[\]\\/`,
   orSlash = ']|/(?!\\*))',
