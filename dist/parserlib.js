@@ -250,12 +250,13 @@ class Bucket {
   }
 }
 
-const B = /** @type {{[key:string]: Bucket}} */ {
+/** @type {{[key:string]: Bucket}} */
+const B = {
   attrIS: ['i', 's', ']'], // "]" is to improve the error message,
   calc: ['abs', 'calc', 'calc-size', 'clamp', 'if', 'min', 'max', 'mod',
     'progress', 'rem', 'round', 'sign'],
   colors: NamedColors,
-  containerFn: ['anchored', 'scroll-state(', 'style('],
+  containerFn: ['anchored(', 'scroll-state(', 'style('],
   marginSyms: [
     'bottom-center', 'bottom-left-corner', 'bottom-left', 'bottom-right-corner', 'bottom-right',
     'left-bottom', 'left-middle', 'left-top',
@@ -386,8 +387,8 @@ const Properties = {
   'background-image': '<bg-image>#',
   'background-origin': '<box>#',
   'background-position': '<bg-position>#',
-  'background-position-x': '[ center | [ left | right ]? <len-pct>? ]#',
-  'background-position-y': '[ center | [ top | bottom ]? <len-pct>? ]#',
+  'background-position-x': '[ center | [ [left|right|x-start|x-end]? <len-pct>? ]! ]#',
+  'background-position-y': '[ center | [ [top|bottom|y-start|y-end]? <len-pct>? ]! ]#',
   'background-repeat': '<repeat-style>#',
   'background-size': '<bg-size>#',
   'baseline-shift': 'baseline | sub | super | <len-pct>',
@@ -718,7 +719,7 @@ const Properties = {
     '<geometry-box> || [ <geometry-box> | no-clip ] || ' +
     '<compositing-operator> || <masking-mode> ]#',
   'mask-border': '<mask-border-source> ||' +
-    '<mask-border-slice> [ / <mask-border-width>? [ / <mask-border-outset> ]? ]? ||' +
+    '<mask-border-slice> [ / <mask-border-width> [ / <mask-border-outset> ]? ]? ||' +
     '<mask-border-repeat> || <mask-border-mode>',
   'mask-border-mode': '<mask-type>',
   'mask-border-outset': '[ <len> | <num> ]{1,4}',
@@ -1217,6 +1218,7 @@ const VTComplex = {
   '<blend-mode>': 'normal | multiply | screen | overlay | darken | lighten | color-dodge | ' +
     'color-burn | hard-light | soft-light | difference | exclusion | hue | ' +
     'saturation | color | luminosity | plus-darker | plus-lighter',
+  /** @param {typeof Matcher} M */
   '<border-image-slice>': M => M.many([true],
     // [<num> | <pct>]{1,4} && fill?
     // but 'fill' can appear between any of the numbers
@@ -1438,7 +1440,7 @@ const VTSimple = {
   '<angle>': p => p.isCalc || p.id === ANGLE,
   '<angle-pct-zero>': p => p.isCalc || p.is0 || p.id === ANGLE || p.id === PCT,
   '<angle-zero>': p => p.isCalc || p.is0 || p.id === ANGLE,
-  '<ascii4>': p => p.id === STRING && p.length === 4 && !/[^\x20-\x7E]/.test(p.text),
+  '<ascii4>': p => p.id === STRING && (p = p.string).length === 4 && !/[^\x20-\x7E]/.test(p),
   '<attr>': p => p.isAttr,
   '<custom-ident>': p => p.id === IDENT && !buReserved.has(p),
   '<custom-prop>': p => p.type === '--' && p.id === IDENT,
@@ -1498,7 +1500,6 @@ class PropValueIterator {
   constructor(value) {
     this.i = 0;
     this.parts = value.parts;
-    this.value = value;
   }
 
   get hasNext() {
@@ -1556,22 +1557,35 @@ function validateProperty(tok, value, stream, Props) {
     return;
   }
   // Property-specific validation.
-  const expr = new PropValueIterator(value);
   let m = Matcher.cache[spec] || Matcher.parse(spec);
-  res = m.match(expr, p0);
-  if ((!res || expr.hasNext) && /\battr\(/i.test(valueSrc)) {
-    if (!res) {
+  const expr = new PropValueIterator(value);
+  for (let from = 0, to, ti, ifs = value.name === 'if' && p0.expr.parts, len = ifs.length || 1;
+       from < len; from++) {
+    if (ifs) {
+      from++; // skip the condition
+      if (from === len || ifs[from].id !== COLON)
+        return vtFailure(ifs[from], ':');
+      to = ++from;
+      while (++to < len && (ti = ifs[to].id) !== SEMICOLON && ti !== RPAREN) {/**/}
+      expr.parts = ifs.slice(from, to);
       expr.i = 0;
-      expr.tryAttr = true;
-      res = m.match(expr);
+      from = to;
     }
-    for (let i, epp = expr.parts; (i = expr.i) < epp.length && epp[i].isAttr;) {
-      expr.next();
+    res = m.match(expr, p0);
+    if ((!res || expr.hasNext) && /\battr\(/i.test(valueSrc)) {
+      if (!res) {
+        expr.i = 0;
+        expr.tryAttr = true;
+        res = m.match(expr);
+      }
+      for (let i, epp = expr.parts; (i = expr.i) < epp.length && epp[i].isAttr;) {
+        expr.next();
+      }
     }
+    if (expr.hasNext && (res || expr.i)) return vtFailure(expr.parts[expr.i]);
+    if (!res && (m = expr.badFunc)) return vtFailure(m[0], vtDescribe(spec, m[1]));
+    if (!res) return vtFailure(ifs ? expr.parts.join(' ') : value, vtDescribe(spec));
   }
-  if (expr.hasNext && (res || expr.i)) return vtFailure(expr.parts[expr.i]);
-  if (!res && (m = expr.badFunc)) return vtFailure(m[0], vtDescribe(spec, m[1]));
-  if (!res) return vtFailure(expr.value, vtDescribe(spec));
   if (!known) validationCache.set(prop, (known = new Set()));
   known.add(valueSrc);
 }
@@ -1803,7 +1817,7 @@ class AltMatcher extends Matcher {
 }
 
 /**
- * MOD: "?" | "*" | "+" | "#" | "{" | "#{"
+ * MOD: "?" | "*" | "+" | "#" | "!" | "{" | "#{"
  * @param {StringSource} src
  * @return {Matcher}
  */
@@ -1982,27 +1996,32 @@ class ManyMatcher extends Matcher {
  * @return {Matcher}
  */
 class SeqMatcher extends Matcher {
-  /** @param {Matcher[]} */
-  constructor(ms) {
+  /**
+   * @param {Matcher[]} ms
+   * @param {boolean} [some] something must match when everything is optional
+   */
+  constructor(ms, some) {
     super(SEQ);
     this.ms = ms;
+    this.some = some;
   }
 
   /**
    * @param {PropValueIterator} expr
    * @param {Token} p
-   * @return {!boolean|void}
+   * @return {!boolean}
    */
   test(expr, p) {
-    let min1, i, m, res;
-    for (i = 0; (m = this.ms[i++]); p = undefined) {
+    let ok = !this.some;
+    let res;
+    for (const m of this.ms) {
       if (!(res = m.match(expr, p)))
         return;
-      if (!min1 && (m.min !== 0 || res === 1 || res > 1))
-        min1 = true;
-      // a number >= 1 is returned only from BracesMatcher.test
+      if (!ok && typeof res === 'number'/* BracesMatcher.test() returns >= 1 */)
+        ok = true;
+      p = undefined;
     }
-    return true;
+    return ok;
   }
 
   toString(prec) {
@@ -2079,7 +2098,7 @@ const parse = Matcher.parse = str => {
  * ANDAND: SEQ [ " && " SEQ ]*  (all match in any order)
  * SEQ: TERM [" " TERM]*  (all match in specified order)
  * TERM: [ "<" type ">" | literal | "[ " ALT " ]" | fn "()" | fn "( " ALT " )" ] MOD?
- * MOD: "?" | "*" | "+" | "#" | [ "{" | "#{" ] <num>[,[<num>]?]? "}" ]
+ * MOD: "?" | "*" | "+" | "#" | "!" | [ "{" | "#{" ] <num>[,[<num>]?]? "}" ]
  * The specified literal spaces like " | " are optional except " " in SEQ (i.e. \s+)
  * @param {StringSource} src
  * @return {Matcher}
@@ -2167,6 +2186,10 @@ const parseTerm = src => {
   } else if (fn === 35 /* # */) {
     fn = src.peek(2) !== 63 /* ? */ ? 1 : (src.read(2), 0);
     m = m.braces(fn, Infinity, '#', ',');
+  } else if (fn === 33 /* ! */) {
+    if (!(m instanceof SeqMatcher))
+      parsingFailed(src, '"!" is only allowed after "]"');
+    (/**@type{SeqMatcher}*/m).some = true;
   } else fn = 0;
   if (fn) src.read();
   return m;
@@ -2933,21 +2956,19 @@ const ATS = {
    * @param {Token} start
    */
   container(stream, start) {
-    let name, next;
-    do {
-      // <container-name>? <container-query>?
-      name = stream.matchSmart(IDENT);
-      if (B.andNoneNotOr.has(name))
-        name = stream.unget();
-      next = stream.grab(); // TODO: collect conditions array instead
+    try {
       this._at = start.atName;
-      this._condition(stream, next, this._containerCondition);
+      do {
+        // <container-name>? <container-query>?
+        const tok = stream.matchSmart(IDENT) || undefined;
+        const name = tok && !B.not.has(tok) && tok;
+        const cond = this._condition(stream, name ? undefined : tok, this._containerCondition);
+        if (!name && !cond)
+          stream._failure('name and/or condition', tok);
+      } while (stream.match(COMMA));
+    } finally {
       this._at = undefined;
-      if (next !== stream.token)
-        next = null;
-      else if (!name)
-        throw new ParseError('Expecting name or condition', next);
-    } while (next?.id === COMMA || stream.match(COMMA));
+    }
     this._block(stream, start, {event: ['container']});
   },
 
@@ -3677,21 +3698,25 @@ class Parser extends EventDispatcher {
    */
   _condition(stream, tok = stream.grab(), fn) {
     if (B.not.has(tok)) {
-      this._conditionInParens(stream, undefined, fn);
-    } else {
-      let more;
-      do { this._conditionInParens(stream, tok, fn); tok = undefined; }
-      while ((more = stream.matchSmart(IDENT, !more ? B.andOr : B.or.has(more) ? B.or : B.and)));
+      return this._conditionInParens(stream, LPAREN, fn);
     }
+    let more;
+    while (this._conditionInParens(stream, tok, fn) && (
+      tok = undefined,
+      more = stream.matchSmart(IDENT, !more ? B.andOr : B.or.has(more) ? B.or : B.and)
+    )) {/**/}
+    return !tok;
   }
 
   /**
    * @param {TokenStream} stream
-   * @param {Token} [tok]
+   * @param {Token|number} [tok]
    * @param {function} [fn]
    */
   _conditionInParens(stream, tok = stream.matchSmart(TT.condition), fn) {
-    let x, reuse, paren;
+    if (tok === LPAREN && (tok = stream.grab()).id !== LPAREN)
+      stream._failure(LPAREN, tok);
+    let x, reuse, paren, nothing;
     if (fn && fn.call(this, stream, tok)) ; else if (tok.name) {
       this._function(stream, tok);
       reuse = 0;
@@ -3699,7 +3724,7 @@ class Parser extends EventDispatcher {
       if (fn && fn.call(this, stream, tok, paren)) ; else if (tok.id !== IDENT) {
         this._condition(stream, tok);
       } else if (B.not.has(tok)) {
-        this._conditionInParens(stream);
+        this._conditionInParens(stream, LPAREN);
       } else if ((x = stream.matchSmart(TT.mediaOp)).id !== LPAREN) { // a definition/comparison
         if (x.id === COLON) {
           this._declaration(stream, tok, {colon: x, inParens: true, scope: this._at});
@@ -3711,8 +3736,11 @@ class Parser extends EventDispatcher {
         this._expr(stream, RPAREN, true);
         reuse = true; // )
       }
+    } else {
+      nothing = true;
     }
     if (reuse !== 0) stream.matchSmart(RPAREN, {must: 1, reuse});
+    return !nothing;
   }
 
   /**
@@ -3726,7 +3754,7 @@ class Parser extends EventDispatcher {
       stream.unget();
       this._mediaExpression(stream, paren);
     } else if (!paren && B.containerFn.has(tok)) {
-      this._condition(stream, {id: LPAREN});
+      this._expr(stream, RPAREN, true); // TODO: parse properly
     } else {
       return;
     }

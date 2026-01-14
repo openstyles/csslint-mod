@@ -710,6 +710,7 @@ var ruleKnownPseudos = [{
     'scroll-button': 2 + Func,
     'scroll-marker': 2,
     'scroll-marker-group': 2,
+    'search-text': 2,
     'selection': 2 + Moz,
     'slotted': 2 + Func,
     'spelling-error': 2,
