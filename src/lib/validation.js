@@ -4,7 +4,7 @@ import ScopedProperties from './scoped-properties';
 import {clipString} from './util';
 import VTComplex from './validation-complex';
 import {buGlobalKeywords} from './validation-simple';
-import {IDENT} from './tokens.js';
+import {COLON, IDENT, RPAREN, SEMICOLON} from './tokens.js';
 
 const validationCache = new Map();
 
@@ -14,7 +14,6 @@ export class PropValueIterator {
   constructor(value) {
     this.i = 0;
     this.parts = value.parts;
-    this.value = value;
   }
 
   get hasNext() {
@@ -72,22 +71,35 @@ export function validateProperty(tok, value, stream, Props) {
     return;
   }
   // Property-specific validation.
-  const expr = new PropValueIterator(value);
   let m = Matcher.cache[spec] || Matcher.parse(spec);
-  res = m.match(expr, p0);
-  if ((!res || expr.hasNext) && /\battr\(/i.test(valueSrc)) {
-    if (!res) {
+  const expr = new PropValueIterator(value);
+  for (let from = 0, to, ti, ifs = value.name === 'if' && p0.expr.parts, len = ifs.length || 1;
+       from < len; from++) {
+    if (ifs) {
+      from++; // skip the condition
+      if (from === len || ifs[from].id !== COLON)
+        return vtFailure(ifs[from], ':');
+      to = ++from;
+      while (++to < len && (ti = ifs[to].id) !== SEMICOLON && ti !== RPAREN) {/**/}
+      expr.parts = ifs.slice(from, to);
       expr.i = 0;
-      expr.tryAttr = true;
-      res = m.match(expr);
+      from = to;
     }
-    for (let i, epp = expr.parts; (i = expr.i) < epp.length && epp[i].isAttr;) {
-      expr.next();
+    res = m.match(expr, p0);
+    if ((!res || expr.hasNext) && /\battr\(/i.test(valueSrc)) {
+      if (!res) {
+        expr.i = 0;
+        expr.tryAttr = true;
+        res = m.match(expr);
+      }
+      for (let i, epp = expr.parts; (i = expr.i) < epp.length && epp[i].isAttr;) {
+        expr.next();
+      }
     }
+    if (expr.hasNext && (res || expr.i)) return vtFailure(expr.parts[expr.i]);
+    if (!res && (m = expr.badFunc)) return vtFailure(m[0], vtDescribe(spec, m[1]));
+    if (!res) return vtFailure(ifs ? expr.parts.join(' ') : value, vtDescribe(spec));
   }
-  if (expr.hasNext && (res || expr.i)) return vtFailure(expr.parts[expr.i]);
-  if (!res && (m = expr.badFunc)) return vtFailure(m[0], vtDescribe(spec, m[1]));
-  if (!res) return vtFailure(expr.value, vtDescribe(spec));
   if (!known) validationCache.set(prop, (known = new Set()));
   known.add(valueSrc);
 }

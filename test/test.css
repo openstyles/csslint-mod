@@ -688,3 +688,7 @@ a {flex-flow: row wr/*incomplete*/}
   background-position-x: right 20px;
   background-position-y: bottom 10px;
 }
+
+.if-expr {
+  background-color: if(style(attr(data-columns, type<number>) > 2): lightblue; else: white);
+}
