@@ -23,7 +23,7 @@ const VTSimple = {
   '<angle>': p => p.isCalc || p.id === ANGLE,
   '<angle-pct-zero>': p => p.isCalc || p.is0 || p.id === ANGLE || p.id === PCT,
   '<angle-zero>': p => p.isCalc || p.is0 || p.id === ANGLE,
-  '<ascii4>': p => p.id === STRING && p.length === 4 && !/[^\x20-\x7E]/.test(p.text),
+  '<ascii4>': p => p.id === STRING && (p = p.string).length === 4 && !/[^\x20-\x7E]/.test(p),
   '<attr>': p => p.isAttr,
   '<custom-ident>': p => p.id === IDENT && !buReserved.has(p),
   '<custom-prop>': p => p.type === '--' && p.id === IDENT,

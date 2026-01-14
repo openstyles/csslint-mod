@@ -681,4 +681,5 @@ a {flex-flow: row wr/*incomplete*/}
 
 .complex-not-selector:not([a][b]) {
   display: none;
+  font-feature-settings: "c2sc";
 }
