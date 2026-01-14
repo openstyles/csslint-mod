@@ -117,21 +117,25 @@ class Parser extends EventDispatcher {
    */
   _condition(stream, tok = stream.grab(), fn) {
     if (B.not.has(tok)) {
-      this._conditionInParens(stream, undefined, fn);
-    } else {
-      let more;
-      do { this._conditionInParens(stream, tok, fn); tok = undefined; }
-      while ((more = stream.matchSmart(IDENT, !more ? B.andOr : B.or.has(more) ? B.or : B.and)));
+      return this._conditionInParens(stream, LPAREN, fn);
     }
+    let more;
+    while (this._conditionInParens(stream, tok, fn) && (
+      tok = undefined,
+      more = stream.matchSmart(IDENT, !more ? B.andOr : B.or.has(more) ? B.or : B.and)
+    )) {/**/}
+    return !tok;
   }
 
   /**
    * @param {TokenStream} stream
-   * @param {Token} [tok]
+   * @param {Token|number} [tok]
    * @param {function} [fn]
    */
   _conditionInParens(stream, tok = stream.matchSmart(TT.condition), fn) {
-    let x, reuse, paren;
+    if (tok === LPAREN && (tok = stream.grab()).id !== LPAREN)
+      stream._failure(LPAREN, tok);
+    let x, reuse, paren, nothing;
     if (fn && fn.call(this, stream, tok)) {
       // NOP
     } else if (tok.name) {
@@ -143,7 +147,7 @@ class Parser extends EventDispatcher {
       } else if (tok.id !== IDENT) {
         this._condition(stream, tok);
       } else if (B.not.has(tok)) {
-        this._conditionInParens(stream);
+        this._conditionInParens(stream, LPAREN);
       } else if ((x = stream.matchSmart(TT.mediaOp)).id !== LPAREN) { // a definition/comparison
         if (x.id === COLON) {
           this._declaration(stream, tok, {colon: x, inParens: true, scope: this._at});
@@ -155,8 +159,11 @@ class Parser extends EventDispatcher {
         this._expr(stream, RPAREN, true);
         reuse = true; // )
       }
+    } else {
+      nothing = true;
     }
     if (reuse !== 0) stream.matchSmart(RPAREN, {must: 1, reuse});
+    return !nothing;
   }
 
   /**
@@ -170,7 +177,7 @@ class Parser extends EventDispatcher {
       stream.unget();
       this._mediaExpression(stream, paren);
     } else if (!paren && B.containerFn.has(tok)) {
-      this._condition(stream, {id: LPAREN});
+      this._expr(stream, RPAREN, true); // TODO: parse properly
     } else {
       return;
     }

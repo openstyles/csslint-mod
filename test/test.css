@@ -659,7 +659,7 @@ a {flex-flow: row wr/*incomplete*/}
   width: attr(length em, 0px);
 }
 
-@container scroll-state(stuck: top) {}
+@container scroll-state(stuck: top), scroll-state(scrolled: top), style(1em < 20px) {}
 
 .anchor {
   margin-block-start: anchor-size(--my-anchor self-/*block*/, 20px);

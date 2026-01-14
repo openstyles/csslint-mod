@@ -63,7 +63,7 @@ export const B = {
   calc: ['abs', 'calc', 'calc-size', 'clamp', 'if', 'min', 'max', 'mod',
     'progress', 'rem', 'round', 'sign'],
   colors: NamedColors,
-  containerFn: ['anchored', 'scroll-state(', 'style('],
+  containerFn: ['anchored(', 'scroll-state(', 'style('],
   marginSyms: [
     'bottom-center', 'bottom-left-corner', 'bottom-left', 'bottom-right-corner', 'bottom-right',
     'left-bottom', 'left-middle', 'left-top',
