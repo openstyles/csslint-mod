@@ -34,6 +34,7 @@ const VTComplex = {
   '<blend-mode>': 'normal | multiply | screen | overlay | darken | lighten | color-dodge | ' +
     'color-burn | hard-light | soft-light | difference | exclusion | hue | ' +
     'saturation | color | luminosity | plus-darker | plus-lighter',
+  /** @param {typeof Matcher} M */
   '<border-image-slice>': M => M.many([true],
     // [<num> | <pct>]{1,4} && fill?
     // but 'fill' can appear between any of the numbers

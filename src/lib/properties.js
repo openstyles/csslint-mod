@@ -373,7 +373,7 @@ const Properties = {
     '<geometry-box> || [ <geometry-box> | no-clip ] || ' +
     '<compositing-operator> || <masking-mode> ]#',
   'mask-border': '<mask-border-source> ||' +
-    '<mask-border-slice> [ / <mask-border-width>? [ / <mask-border-outset> ]? ]? ||' +
+    '<mask-border-slice> [ / <mask-border-width> [ / <mask-border-outset> ]? ]? ||' +
     '<mask-border-repeat> || <mask-border-mode>',
   'mask-border-mode': '<mask-type>',
   'mask-border-outset': '[ <len> | <num> ]{1,4}',
