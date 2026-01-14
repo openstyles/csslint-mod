@@ -114,7 +114,7 @@ class AltMatcher extends Matcher {
 }
 
 /**
- * MOD: "?" | "*" | "+" | "#" | "{" | "#{"
+ * MOD: "?" | "*" | "+" | "#" | "!" | "{" | "#{"
  * @param {StringSource} src
  * @return {Matcher}
  */
@@ -293,27 +293,32 @@ class ManyMatcher extends Matcher {
  * @return {Matcher}
  */
 class SeqMatcher extends Matcher {
-  /** @param {Matcher[]} */
-  constructor(ms) {
+  /**
+   * @param {Matcher[]} ms
+   * @param {boolean} [some] something must match when everything is optional
+   */
+  constructor(ms, some) {
     super(SEQ);
     this.ms = ms;
+    this.some = some;
   }
 
   /**
    * @param {PropValueIterator} expr
    * @param {Token} p
-   * @return {!boolean|void}
+   * @return {!boolean}
    */
   test(expr, p) {
-    let min1, i, m, res;
-    for (i = 0; (m = this.ms[i++]); p = undefined) {
+    let ok = !this.some;
+    let res;
+    for (const m of this.ms) {
       if (!(res = m.match(expr, p)))
         return;
-      if (!min1 && (m.min !== 0 || res === 1 || res > 1))
-        min1 = true;
-      // a number >= 1 is returned only from BracesMatcher.test
+      if (!ok && typeof res === 'number'/* BracesMatcher.test() returns >= 1 */)
+        ok = true;
+      p = undefined;
     }
-    return true;
+    return ok;
   }
 
   toString(prec) {
@@ -390,7 +395,7 @@ const parse = Matcher.parse = str => {
  * ANDAND: SEQ [ " && " SEQ ]*  (all match in any order)
  * SEQ: TERM [" " TERM]*  (all match in specified order)
  * TERM: [ "<" type ">" | literal | "[ " ALT " ]" | fn "()" | fn "( " ALT " )" ] MOD?
- * MOD: "?" | "*" | "+" | "#" | [ "{" | "#{" ] <num>[,[<num>]?]? "}" ]
+ * MOD: "?" | "*" | "+" | "#" | "!" | [ "{" | "#{" ] <num>[,[<num>]?]? "}" ]
  * The specified literal spaces like " | " are optional except " " in SEQ (i.e. \s+)
  * @param {StringSource} src
  * @return {Matcher}
@@ -478,6 +483,10 @@ const parseTerm = src => {
   } else if (fn === 35 /* # */) {
     fn = src.peek(2) !== 63 /* ? */ ? 1 : (src.read(2), 0);
     m = m.braces(fn, Infinity, '#', ',');
+  } else if (fn === 33 /* ! */) {
+    if (!(m instanceof SeqMatcher))
+      parsingFailed(src, '"!" is only allowed after "]"');
+    (/**@type{SeqMatcher}*/m).some = true;
   } else fn = 0;
   if (fn) src.read();
   return m;

@@ -683,3 +683,8 @@ a {flex-flow: row wr/*incomplete*/}
   display: none;
   font-feature-settings: "c2sc";
 }
+
+.side-relative-background {
+  background-position-x: right 20px;
+  background-position-y: bottom 10px;
+}
