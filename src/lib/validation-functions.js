@@ -28,6 +28,7 @@ const VTFunctions = {
     'alpha': 'from <color> <alpha>?',
     'color-mix': '[ <color-interpolation-method> , ]? [ <color> && <pct0-100>? ]#{2}',
     'color': '[<predefined-rgb>|<xyz-space>] <num-pct-none>{3} <alpha>? | from <color> [[<predefined-rgb> [<num-pct-none>|r|g|b]{3} | <xyz-space> [<num-pct-none>|x|y|z]{3}] | [<dashed-ident> <num-pct-none>+ ]] [/ [alpha|<num-pct-none>]]?',
+    'contrast-color': '<color>',
     'hsl': '<hue> , <pct>#{2} [ , <num-pct0+> ]? | ' +
       '[ <hue> | none ] <num-pct-none>{2} <alpha>? | ' +
       'from <color> [ <hue> | <rel-hsl> ] <rel-hsl-num-pct>{2} [ / <rel-hsl-num-pct> ]?',
