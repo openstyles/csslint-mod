@@ -26,7 +26,7 @@ const VTSimple = {
   '<ascii4>': p => p.id === STRING && (p = p.string).length === 4 && !/[^\x20-\x7E]/.test(p),
   '<attr>': p => p.isAttr,
   '<custom-ident>': p => p.id === IDENT && !buReserved.has(p),
-  '<custom-prop>': p => p.type === '--' && p.id === IDENT,
+  '<dashed-ident>': p => p.type === '--' && p.id === IDENT,
   '<flex>': p => p.isCalc || p.units === 'fr' && p.number >= 0,
   '<func>': p => p.id === FUNCTION,
   '<hue>': p => p.isCalc || p.id === NUMBER || p.id === ANGLE,

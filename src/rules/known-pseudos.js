@@ -39,6 +39,7 @@ export default [{
     'target-text': 2,
     'view-transition': 2,
     'view-transition-group': 2 + Func,
+    'view-transition-group-children': 2 + Func,
     'view-transition-image-pair': 2 + Func,
     'view-transition-new': 2 + Func,
     'view-transition-old': 2 + Func,

@@ -11,8 +11,8 @@ const Properties = {
   'alignment-baseline': 'auto | baseline | use-script | before-edge | text-before-edge | ' +
     'after-edge | text-after-edge | central | middle | ideographic | alphabetic | ' +
     'hanging | mathematical',
-  'anchor-name': 'none | <custom-prop>#',
-  'anchor-scope': 'none | all | <custom-prop>#',
+  'anchor-name': 'none | <dashed-ident>#',
+  'anchor-scope': 'none | all | <dashed-ident>#',
   'animation': '[ <time0+> || <timing-function> || <time> || [ infinite | <num0+> ] || ' +
     '<animation-direction> || <animation-fill-mode> || ' +
     '[ running | paused ] || [ none | <custom-ident> | <string> ] || <animation-timeline> ]#',
@@ -57,6 +57,7 @@ const Properties = {
   'border-image-slice': '<border-image-slice>',
   'border-image-source': '<image> | none',
   'border-image-width': '[ <len-pct0+> | <num0+> | auto ]{1,4}',
+  'border-shape': 'none | [<basic-shape> <geometry-box>?]{1,2}',
   'border-spacing': '<len>{1,2}',
   //#region border shorthand
   'border': '<border-shorthand>',
@@ -459,11 +460,11 @@ const Properties = {
   'pointer-events': 'auto | none | visiblePainted | visibleFill | visibleStroke | visible | ' +
     'painted | fill | stroke | all',
   'position': 'static | relative | absolute | fixed | sticky',
-  'position-anchor': 'auto | <custom-prop>',
+  'position-anchor': 'auto | <dashed-ident>',
   'position-area': 'auto | <position-area>',
   'position-try': '<position-try-order>? <position-try-fallbacks>',
   'position-try-order': 'normal | most-width | most-height | most-block-size | most-inline-size',
-  'position-try-fallbacks': 'none | [[<custom-prop> || <try-tactic>] | <position-area> ]#',
+  'position-try-fallbacks': 'none | [[<dashed-ident> || <try-tactic>] | <position-area> ]#',
   'position-visibility': 'always | [ anchors-valid || anchors-visible || no-overflow ]',
   'print-color-adjust': 'economy | exact',
 
@@ -510,11 +511,9 @@ const Properties = {
   'scroll-snap-stop': 'normal | always',
   'scroll-snap-type': 'none | [ x | y | block | inline | both ] [ mandatory | proximity ]?',
   'scroll-target-group': 'none | auto',
-  'scroll-timeline': '[ <scroll-timeline-name> ' +
-    '[ <scroll-timeline-axis> || <scroll-timeline-attachment> ]? ]#',
-  'scroll-timeline-attachment': '[ local | defer | ancestor ]#',
+  'scroll-timeline': '[ <scroll-timeline-name> <scroll-timeline-axis>? ]#',
   'scroll-timeline-axis': '<axis>#',
-  'scroll-timeline-name': 'none | <custom-ident>#',
+  'scroll-timeline-name': 'none | <dashed-ident>#',
   'scrollbar-color': 'auto | dark | light | <color>{2}',
   'scrollbar-gutter': 'auto | stable && both-edges?',
   'scrollbar-width': 'auto | thin | none',
@@ -571,6 +570,7 @@ const Properties = {
   'text-wrap': 'wrap | nowrap | balance | stable | pretty',
   'text-wrap-mode': 'wrap | nowrap',
   'text-wrap-style': 'auto | balance | stable | pretty',
+  'timeline-scope': 'none | all | <dashed-ident>#',
   'top': 'auto | <len-pct> | anchor() | anchor-size()',
   'touch-action': 'auto|none|pan-x|pan-y|pan-left|pan-right|pan-up|pan-down|manipulation',
   'transform': 'none | <fn:transform>+',
@@ -594,6 +594,10 @@ const Properties = {
 
   'vertical-align': 'auto | use-script | baseline | sub | super | top | text-top | ' +
     'central | middle | bottom | text-bottom | <len-pct>',
+  'view-timeline': '[ <view-timeline-name> [ <view-timeline-axis> || <view-timeline-inset> ]? ]#',
+  'view-timeline-axis': '<axis>#',
+  'view-timeline-inset': '[ [ auto | <len-pct> ]{1,2} ]#',
+  'view-timeline-name': '[ none | <dashed-ident> ]#',
   'view-transition-class': 'none | <ident-not-none>+',
   'view-transition-name': 'none | auto | match-element | <custom-ident>',
   'visibility': '<vis-hid> | collapse',

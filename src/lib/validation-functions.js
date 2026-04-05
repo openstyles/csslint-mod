@@ -3,8 +3,8 @@ import {pick} from './util.js';
 
 const _ = {
   __proto__: null,
-  'anchor': '<custom-prop>? && [inside|outside|top|left|right|bottom|start|end|self-start|self-end|center|<pct>] [, <len-pct>]?',
-  'anchor-size': '[<custom-prop> || [width|height|block|inline|self-block|self-inline] ]? [, <len-pct>]?',
+  'anchor': '<dashed-ident>? && [inside|outside|top|left|right|bottom|start|end|self-start|self-end|center|<pct>] [, <len-pct>]?',
+  'anchor-size': '[<dashed-ident> || [width|height|block|inline|self-block|self-inline] ]? [, <len-pct>]?',
   'conic-gradient': '[ [ [ [ from <angle-zero> ]? <at-pos>? ] || <color-interpolation-method> ] , ]? [ <angular-color-stop> [, [ [<angle-pct-zero> ,]? <angular-color-stop> ]# ]? ]',
   'linear-gradient': '[ [ [ [ <angle-zero> | to [[left|right] || [top|bottom]] ] || <color-interpolation-method> ] , ]? <color-stop-list> ]?',
   'radial-gradient': '[ [ [ [ [circle|ellipse] || [<radial-extent> | <len0+> | <len-pct0+>{2}] ]? <at-pos>? ] || <color-interpolation-method> ] , ]? <color-stop-list>',
@@ -27,7 +27,7 @@ const VTFunctions = {
     __proto__: null,
     'alpha': 'from <color> <alpha>?',
     'color-mix': '[ <color-interpolation-method> , ]? [ <color> && <pct0-100>? ]#{2}',
-    'color': '[<predefined-rgb>|<xyz-space>] <num-pct-none>{3} <alpha>? | from <color> [[<predefined-rgb> [<num-pct-none>|r|g|b]{3} | <xyz-space> [<num-pct-none>|x|y|z]{3}] | [<custom-prop> <num-pct-none>+ ]] [/ [alpha|<num-pct-none>]]?',
+    'color': '[<predefined-rgb>|<xyz-space>] <num-pct-none>{3} <alpha>? | from <color> [[<predefined-rgb> [<num-pct-none>|r|g|b]{3} | <xyz-space> [<num-pct-none>|x|y|z]{3}] | [<dashed-ident> <num-pct-none>+ ]] [/ [alpha|<num-pct-none>]]?',
     'hsl': '<hue> , <pct>#{2} [ , <num-pct0+> ]? | ' +
       '[ <hue> | none ] <num-pct-none>{2} <alpha>? | ' +
       'from <color> [ <hue> | <rel-hsl> ] <rel-hsl-num-pct>{2} [ / <rel-hsl-num-pct> ]?',
