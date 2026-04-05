@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "chalk": "^5.4.1",
-    "eslint": "^9.17.0",
+    "eslint": "^10.2.0",
     "extensionless": "^1.9.9",
     "fs-extra": "^11.2.0",
     "globals": "^15.14.0",
