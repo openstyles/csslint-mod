@@ -357,8 +357,8 @@ const Properties = {
   'alignment-baseline': 'auto | baseline | use-script | before-edge | text-before-edge | ' +
     'after-edge | text-after-edge | central | middle | ideographic | alphabetic | ' +
     'hanging | mathematical',
-  'anchor-name': 'none | <custom-prop>#',
-  'anchor-scope': 'none | all | <custom-prop>#',
+  'anchor-name': 'none | <dashed-ident>#',
+  'anchor-scope': 'none | all | <dashed-ident>#',
   'animation': '[ <time0+> || <timing-function> || <time> || [ infinite | <num0+> ] || ' +
     '<animation-direction> || <animation-fill-mode> || ' +
     '[ running | paused ] || [ none | <custom-ident> | <string> ] || <animation-timeline> ]#',
@@ -403,6 +403,7 @@ const Properties = {
   'border-image-slice': '<border-image-slice>',
   'border-image-source': '<image> | none',
   'border-image-width': '[ <len-pct0+> | <num0+> | auto ]{1,4}',
+  'border-shape': 'none | [<basic-shape> <geometry-box>?]{1,2}',
   'border-spacing': '<len>{1,2}',
   //#region border shorthand
   'border': '<border-shorthand>',
@@ -500,16 +501,17 @@ const Properties = {
   'color-profile': 1,
   'color-rendering': 'auto | optimizeSpeed | optimizeQuality',
   'color-scheme': 'normal | [ light | dark | <custom-ident> ]+ && only?',
-  'column-count': '<int> | auto',
-  'column-fill': 'auto | balance',
+  'column-count': 'auto | <int1+>',
+  'column-fill': 'auto | balance | balance-all',
   'column-gap': 'normal | <len-pct>',
+  'column-height': 'auto | <len0+>',
   'column-rule': '<border-shorthand>',
   'column-rule-color': '<color>',
   'column-rule-style': '<border-style>',
   'column-rule-width': '<border-width>',
-  'column-span': 'none | all',
-  'column-width': '<len> | auto',
-  'columns': 1,
+  'column-span': 'none | <int1+> | all | auto',
+  'column-width': 'auto | <len0+>',
+  'columns': '[ <column-width> || <column-count> ] [ / <column-height> ]?',
   'contain': 'none | strict | content | [ size || layout || style || paint ]',
   'contain-intrinsic-block-size': '<contain-intrinsic>',
   'contain-intrinsic-height': '<contain-intrinsic>',
@@ -686,7 +688,7 @@ const Properties = {
   'justify-self': 'auto | normal | stretch | anchor-center | <baseline-position> | <overflow-position>? [ <self-position> | left | right ]',
 
   'left': '<top>',
-  'letter-spacing': '<len> | normal',
+  'letter-spacing': '<len-pct> | normal',
   'lighting-color': '<color>',
   'line-height': '<line-height>',
   'line-break': 'auto | loose | normal | strict | anywhere',
@@ -804,11 +806,11 @@ const Properties = {
   'pointer-events': 'auto | none | visiblePainted | visibleFill | visibleStroke | visible | ' +
     'painted | fill | stroke | all',
   'position': 'static | relative | absolute | fixed | sticky',
-  'position-anchor': 'auto | <custom-prop>',
+  'position-anchor': 'auto | <dashed-ident>',
   'position-area': 'auto | <position-area>',
   'position-try': '<position-try-order>? <position-try-fallbacks>',
   'position-try-order': 'normal | most-width | most-height | most-block-size | most-inline-size',
-  'position-try-fallbacks': 'none | [[<custom-prop> || <try-tactic>] | <position-area> ]#',
+  'position-try-fallbacks': 'none | [[<dashed-ident> || <try-tactic>] | <position-area> ]#',
   'position-visibility': 'always | [ anchors-valid || anchors-visible || no-overflow ]',
   'print-color-adjust': 'economy | exact',
 
@@ -855,11 +857,9 @@ const Properties = {
   'scroll-snap-stop': 'normal | always',
   'scroll-snap-type': 'none | [ x | y | block | inline | both ] [ mandatory | proximity ]?',
   'scroll-target-group': 'none | auto',
-  'scroll-timeline': '[ <scroll-timeline-name> ' +
-    '[ <scroll-timeline-axis> || <scroll-timeline-attachment> ]? ]#',
-  'scroll-timeline-attachment': '[ local | defer | ancestor ]#',
+  'scroll-timeline': '[ <scroll-timeline-name> <scroll-timeline-axis>? ]#',
   'scroll-timeline-axis': '<axis>#',
-  'scroll-timeline-name': 'none | <custom-ident>#',
+  'scroll-timeline-name': 'none | <dashed-ident>#',
   'scrollbar-color': 'auto | dark | light | <color>{2}',
   'scrollbar-gutter': 'auto | stable && both-edges?',
   'scrollbar-width': 'auto | thin | none',
@@ -916,6 +916,7 @@ const Properties = {
   'text-wrap': 'wrap | nowrap | balance | stable | pretty',
   'text-wrap-mode': 'wrap | nowrap',
   'text-wrap-style': 'auto | balance | stable | pretty',
+  'timeline-scope': 'none | all | <dashed-ident>#',
   'top': 'auto | <len-pct> | anchor() | anchor-size()',
   'touch-action': 'auto|none|pan-x|pan-y|pan-left|pan-right|pan-up|pan-down|manipulation',
   'transform': 'none | <fn:transform>+',
@@ -939,6 +940,10 @@ const Properties = {
 
   'vertical-align': 'auto | use-script | baseline | sub | super | top | text-top | ' +
     'central | middle | bottom | text-bottom | <len-pct>',
+  'view-timeline': '[ <view-timeline-name> [ <view-timeline-axis> || <view-timeline-inset> ]? ]#',
+  'view-timeline-axis': '<axis>#',
+  'view-timeline-inset': '[ [ auto | <len-pct> ]{1,2} ]#',
+  'view-timeline-name': '[ none | <dashed-ident> ]#',
   'view-transition-class': 'none | <ident-not-none>+',
   'view-transition-name': 'none | auto | match-element | <custom-ident>',
   'visibility': '<vis-hid> | collapse',
@@ -949,7 +954,7 @@ const Properties = {
   'width': 'auto | <width-base>',
   'will-change': 'auto | <animateable-feature>#',
   'word-break': 'normal | keep-all | break-all | break-word',
-  'word-spacing': '<len> | normal',
+  'word-spacing': '<len-pct> | normal',
   'word-wrap': 'normal | break-word | anywhere',
   'writing-mode': 'horizontal-tb | vertical-rl | vertical-lr | sideways-rl | sideways-lr',
 
@@ -1087,7 +1092,7 @@ const ScopedProperties = {
     __proto__: null,
     'aspect-ratio': '<ratio>',
     'block-size': '<len>',
-    'fallback': 'none | [ [<custom-prop> || <try-tactic>] | <position-area-query> ]',
+    'fallback': 'none | [ [<dashed-ident> || <try-tactic>] | <position-area-query> ]',
     'height': '<len>',
     'inline-size': '<len>',
     'orientation': 'portrait|landscape',
@@ -1204,7 +1209,7 @@ const VTComplex = {
     '[ <line-names>? [ <fixed-size> | <fixed-repeat> ] ]* <line-names>?',
   '<autospace>': 'no-autospace | ' +
     '[ ideograph-alpha || ideograph-numeric || punctuation ] || [ insert|replace ]',
-  '<axis>': 'block | inline | vertical | horizontal',
+  '<axis>': 'block | inline | x | y',
   '<baseline-position>': '[ first | last ]? baseline',
   '<basic-shape>': '<fn:basicShape>',
   '<bg-image>': '<image> | none',
@@ -1443,7 +1448,7 @@ const VTSimple = {
   '<ascii4>': p => p.id === STRING && (p = p.string).length === 4 && !/[^\x20-\x7E]/.test(p),
   '<attr>': p => p.isAttr,
   '<custom-ident>': p => p.id === IDENT && !buReserved.has(p),
-  '<custom-prop>': p => p.type === '--' && p.id === IDENT,
+  '<dashed-ident>': p => p.type === '--' && p.id === IDENT,
   '<flex>': p => p.isCalc || p.units === 'fr' && p.number >= 0,
   '<func>': p => p.id === FUNCTION,
   '<hue>': p => p.isCalc || p.id === NUMBER || p.id === ANGLE,
@@ -1610,8 +1615,8 @@ function vtFailure(unit, what) {
 
 const _ = {
   __proto__: null,
-  'anchor': '<custom-prop>? && [inside|outside|top|left|right|bottom|start|end|self-start|self-end|center|<pct>] [, <len-pct>]?',
-  'anchor-size': '[<custom-prop> || [width|height|block|inline|self-block|self-inline] ]? [, <len-pct>]?',
+  'anchor': '<dashed-ident>? && [inside|outside|top|left|right|bottom|start|end|self-start|self-end|center|<pct>] [, <len-pct>]?',
+  'anchor-size': '[<dashed-ident> || [width|height|block|inline|self-block|self-inline] ]? [, <len-pct>]?',
   'conic-gradient': '[ [ [ [ from <angle-zero> ]? <at-pos>? ] || <color-interpolation-method> ] , ]? [ <angular-color-stop> [, [ [<angle-pct-zero> ,]? <angular-color-stop> ]# ]? ]',
   'linear-gradient': '[ [ [ [ <angle-zero> | to [[left|right] || [top|bottom]] ] || <color-interpolation-method> ] , ]? <color-stop-list> ]?',
   'radial-gradient': '[ [ [ [ [circle|ellipse] || [<radial-extent> | <len0+> | <len-pct0+>{2}] ]? <at-pos>? ] || <color-interpolation-method> ] , ]? <color-stop-list>',
@@ -1634,7 +1639,8 @@ const VTFunctions = {
     __proto__: null,
     'alpha': 'from <color> <alpha>?',
     'color-mix': '[ <color-interpolation-method> , ]? [ <color> && <pct0-100>? ]#{2}',
-    'color': '[<predefined-rgb>|<xyz-space>] <num-pct-none>{3} <alpha>? | from <color> [[<predefined-rgb> [<num-pct-none>|r|g|b]{3} | <xyz-space> [<num-pct-none>|x|y|z]{3}] | [<custom-prop> <num-pct-none>+ ]] [/ [alpha|<num-pct-none>]]?',
+    'color': '[<predefined-rgb>|<xyz-space>] <num-pct-none>{3} <alpha>? | from <color> [[<predefined-rgb> [<num-pct-none>|r|g|b]{3} | <xyz-space> [<num-pct-none>|x|y|z]{3}] | [<dashed-ident> <num-pct-none>+ ]] [/ [alpha|<num-pct-none>]]?',
+    'contrast-color': '<color>',
     'hsl': '<hue> , <pct>#{2} [ , <num-pct0+> ]? | ' +
       '[ <hue> | none ] <num-pct-none>{2} <alpha>? | ' +
       'from <color> [ <hue> | <rel-hsl> ] <rel-hsl-num-pct>{2} [ / <rel-hsl-num-pct> ]?',
@@ -2498,7 +2504,7 @@ class TokenStream {
     /** Closing token of the currently processed block */
     this._pair = 0;
     this._resetBuf();
-    define(this, 'grab', {writable: true, value: this.get.bind(this, 0, 0)});
+    define(this, 'grab', {writable: true, value: this.get.bind(this, false, false, false)});
   }
 
   _resetBuf() {
@@ -2514,9 +2520,10 @@ class TokenStream {
   /**
    * @param {boolean} [uvar] - include UVAR
    * @param {boolean} [ws] - include WS
+   * @param {boolean} [cmt] - include COMMENT
    * @return {Token}
    */
-  get(uvar, ws = true) {
+  get(uvar, ws = true, cmt) {
     let {_buf: buf, _cur: i, _max: MAX} = this;
     let tok, ti, slot;
     do {
@@ -2524,12 +2531,12 @@ class TokenStream {
       if (i >= buf.length) {
         if (buf.length < MAX) i++;
         else this._cycle = (this._cycle + 1) % MAX;
-        ti = (tok = buf[slot] = this._getToken(uvar, ws)).id;
+        ti = (tok = buf[slot] = this._getToken(uvar, ws, cmt)).id;
         break;
       }
       ++i;
       ti = (tok = buf[slot]).id;
-    } while (ti === COMMENT || !ws && ti === WS || !uvar && ti === UVAR);
+    } while (!cmt && ti === COMMENT || !ws && ti === WS || !uvar && ti === UVAR);
     if (ti === AMP) this._amp++;
     this._cur = i;
     this.token = tok;
@@ -2609,9 +2616,12 @@ class TokenStream {
   }
 
   /**
-   * @return {Token|void}
+   * @param {boolean} [uvar]
+   * @param {boolean} [ws]
+   * @param {boolean} [cmt]
+   * @return {Token}
    */
-  _getToken(uvar, ws) {
+  _getToken(uvar, ws, cmt) {
     const src = this.source;
     let a, b, c, v, text, col, line, offset;
     while (true) {
@@ -2623,8 +2633,10 @@ class TokenStream {
         if (ws) { v = WS; break; }
       } else if (a === 47/* / */) {
         if (b !== 42/* * */) { v = DIV; break; }
-        a = src.readMatch(rxCommentUso, true);
-        if (uvar && a[1]) { v = UVAR; break; }
+        v = src.readMatch(rxCommentUso, true);
+        if (uvar && v[1]) { v = UVAR; break; }
+        if (cmt && v[0]) { v = COMMENT; break; }
+        v = 0;
       } else break;
     }
     const tok = new Token(v || CHAR, col, line, offset, src.string, a);
@@ -3656,13 +3668,19 @@ class Parser extends EventDispatcher {
     const stream = this.stream = new TokenStream(input);
     const opts = this.options;
     const atAny = !opts.globalsOnly && this._unknownAtRule;
-    const atFuncs = !atAny ? ATS_GLOBAL : opts.topDocOnly ? ATS_TDO : ATS;
+    const topDocOnly = opts.topDocOnly && COMMENT;
+    const atFuncs = !atAny ? ATS_GLOBAL : topDocOnly ? ATS_TDO : ATS;
     init(reuseCache && this);
     this.fire('startstylesheet');
-    for (let ti, fn, tok; (ti = (tok = stream.grab()).id);) {
+    for (let ti, fn, tok, topCmt; (ti = (tok = stream.get(false, false, topDocOnly)).id);) {
       try {
         if (ti === AT && (fn = atFuncs[tok.atName] || atAny)) {
+          if (topCmt) tok.comment = topCmt;
           fn.call(this, stream, tok);
+          topCmt = null;
+        } else if (ti === COMMENT || (topCmt = null)) {
+          if (!topCmt) topCmt = tok;
+          else topCmt.offset2 = tok.offset2;
         } else if (ti === CDCO) {
           // Skipping cruft
         } else if (!atAny) {
@@ -4088,7 +4106,7 @@ class Parser extends EventDispatcher {
     const parts = [];
     const isEndMap = typeof end === 'object';
     let /** @type {Token} */ tok, ti, isVar, endParen;
-    while ((ti = (tok = stream.get(UVAR, 0)).id) && !(isEndMap ? end[ti] : end === ti)) {
+    while ((ti = (tok = stream.get(UVAR, false)).id) && !(isEndMap ? end[ti] : end === ti)) {
       let dumb2;
       if ((endParen = Parens[ti])) {
         if (!dumb && ti === LBRACE && parts.length) break;
