@@ -8,8 +8,8 @@ import ScopedProperties from './scoped-properties.js';
 import Token, {TokenFunc, TokenValue} from './token';
 import TokenStream, {OrDie, OrDieReusing, TT} from './token-stream';
 import {
-  AMP, AT, CDCO, COLON, COMMA, DASHED_FUNCTION, DELIM, DIV, DOT, FUNCTION, HASH, IDENT, LBRACE,
-  LBRACKET, LPAREN, NUMBER, PIPE, RBRACE, RBRACKET, RPAREN, SEMICOLON, STAR, UVAR, WS,
+  AMP, AT, CDCO, COLON, COMMA, COMMENT, DASHED_FUNCTION, DELIM, DIV, DOT, FUNCTION, HASH, IDENT,
+  LBRACE, LBRACKET, LPAREN, NUMBER, PIPE, RBRACE, RBRACKET, RPAREN, SEMICOLON, STAR, UVAR, WS,
 } from './tokens';
 import {assign, clipString, define, EventDispatcher, isOwn, ParseError, PDESC} from './util';
 import {validateProperty} from './validation';
@@ -75,13 +75,19 @@ class Parser extends EventDispatcher {
     const stream = this.stream = new TokenStream(input);
     const opts = this.options;
     const atAny = !opts.globalsOnly && this._unknownAtRule;
-    const atFuncs = !atAny ? ATS_GLOBAL : opts.topDocOnly ? ATS_TDO : ATS;
+    const topDocOnly = opts.topDocOnly && COMMENT;
+    const atFuncs = !atAny ? ATS_GLOBAL : topDocOnly ? ATS_TDO : ATS;
     parserCache.init(reuseCache && this);
     this.fire('startstylesheet');
-    for (let ti, fn, tok; (ti = (tok = stream.grab()).id);) {
+    for (let ti, fn, tok, topCmt; (ti = (tok = stream.get(false, false, topDocOnly)).id);) {
       try {
         if (ti === AT && (fn = atFuncs[tok.atName] || atAny)) {
+          if (topCmt) tok.comment = topCmt;
           fn.call(this, stream, tok);
+          topCmt = null;
+        } else if (ti === COMMENT || (topCmt = null)) {
+          if (!topCmt) topCmt = tok;
+          else topCmt.offset2 = tok.offset2;
         } else if (ti === CDCO) {
           // Skipping cruft
         } else if (!atAny) {
@@ -511,7 +517,7 @@ class Parser extends EventDispatcher {
     const parts = [];
     const isEndMap = typeof end === 'object';
     let /** @type {Token} */ tok, ti, isVar, endParen;
-    while ((ti = (tok = stream.get(UVAR, 0)).id) && !(isEndMap ? end[ti] : end === ti)) {
+    while ((ti = (tok = stream.get(UVAR, false)).id) && !(isEndMap ? end[ti] : end === ti)) {
       let dumb2;
       if ((endParen = Parens[ti])) {
         if (!dumb && ti === LBRACE && parts.length) break;

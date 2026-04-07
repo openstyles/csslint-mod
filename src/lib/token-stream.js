@@ -109,7 +109,7 @@ export default class TokenStream {
     /** Closing token of the currently processed block */
     this._pair = 0;
     this._resetBuf();
-    define(this, 'grab', {writable: true, value: this.get.bind(this, 0, 0)});
+    define(this, 'grab', {writable: true, value: this.get.bind(this, false, false, false)});
   }
 
   _resetBuf() {
@@ -125,9 +125,10 @@ export default class TokenStream {
   /**
    * @param {boolean} [uvar] - include UVAR
    * @param {boolean} [ws] - include WS
+   * @param {boolean} [cmt] - include COMMENT
    * @return {Token}
    */
-  get(uvar, ws = true) {
+  get(uvar, ws = true, cmt) {
     let {_buf: buf, _cur: i, _max: MAX} = this;
     let tok, ti, slot;
     do {
@@ -135,12 +136,12 @@ export default class TokenStream {
       if (i >= buf.length) {
         if (buf.length < MAX) i++;
         else this._cycle = (this._cycle + 1) % MAX;
-        ti = (tok = buf[slot] = this._getToken(uvar, ws)).id;
+        ti = (tok = buf[slot] = this._getToken(uvar, ws, cmt)).id;
         break;
       }
       ++i;
       ti = (tok = buf[slot]).id;
-    } while (ti === COMMENT || !ws && ti === WS || !uvar && ti === UVAR);
+    } while (!cmt && ti === COMMENT || !ws && ti === WS || !uvar && ti === UVAR);
     if (ti === AMP) this._amp++;
     this._cur = i;
     this.token = tok;
@@ -220,9 +221,12 @@ export default class TokenStream {
   }
 
   /**
-   * @return {Token|void}
+   * @param {boolean} [uvar]
+   * @param {boolean} [ws]
+   * @param {boolean} [cmt]
+   * @return {Token}
    */
-  _getToken(uvar, ws) {
+  _getToken(uvar, ws, cmt) {
     const src = this.source;
     let a, b, c, v, text, col, line, offset;
     while (true) {
@@ -234,8 +238,10 @@ export default class TokenStream {
         if (ws) { v = WS; break; }
       } else if (a === 47/* / */) {
         if (b !== 42/* * */) { v = DIV; break; }
-        a = src.readMatch(rxCommentUso, true);
-        if (uvar && a[1]) { v = UVAR; break; }
+        v = src.readMatch(rxCommentUso, true);
+        if (uvar && v[1]) { v = UVAR; break; }
+        if (cmt && v[0]) { v = COMMENT; break; }
+        v = 0;
       } else break;
     }
     const tok = new Token(v || CHAR, col, line, offset, src.string, a);
