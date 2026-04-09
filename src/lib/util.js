@@ -1,4 +1,11 @@
-export const GlobalKeywords = ['initial', 'inherit', 'revert', 'unset'];
+export const GlobalKeywords = [
+  'initial',
+  'inherit',
+  'revert',
+  'revert-layer',
+  'revert-rule',
+  'unset',
+];
 export const {assign, defineProperty: define} = Object;
 export const PDESC = {configurable: true, enumerable: true, writable: true, value: null};
 export const isOwn = Object.call.bind({}.hasOwnProperty);
