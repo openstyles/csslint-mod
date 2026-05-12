@@ -694,3 +694,9 @@ a {flex-flow: row wr/*incomplete*/}
 }
 
 @container --foo { input { color:green; } }
+
+.rule.box-sizing.err { padding-inline:1px; width:2px; }
+.rule.box-sizing.ok { padding-block:1px; width:2px; }
+.rule.box-sizing.ok { padding-inline:0Q; width:2px; }
+.rule.box-sizing.ok { border:none; width:2px; }
+.rule.box-sizing.ok { border-block-start:1px; box-sizing: border-box; height:2px; }

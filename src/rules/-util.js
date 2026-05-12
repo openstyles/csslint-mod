@@ -1,3 +1,6 @@
+import parserlib from '../parserlib.js';
+
+export const parserUtil = parserlib.util;
 export let shorthands, shorthandsFor;
 
 /** Gets the lower-cased text without vendor prefix */

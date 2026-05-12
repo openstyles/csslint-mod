@@ -1,5 +1,5 @@
 import parserlib from './parserlib.js';
-import {Reporter} from './rules/-util';
+import {parserUtil, Reporter} from './rules/-util';
 import ruleBoxModel from './rules/box-model';
 import ruleCompatibleVendorPrefixes from './rules/compatible-vendor-prefixes';
 import ruleDisplayPropertyGrouping from './rules/display-property-grouping';
@@ -105,7 +105,7 @@ const rules = {
   'zero-units': ruleZeroUnits,
 };
 
-const CSSLint = Object.assign(new parserlib.util.EventDispatcher(), {
+const CSSLint = Object.assign(new parserUtil.EventDispatcher(), {
 
   rules,
 
@@ -172,7 +172,7 @@ const CSSLint = Object.assign(new parserlib.util.EventDispatcher(), {
         msg.message = msg.message.replace(rxGrammarAbbr, unabbreviate);
       }
     }
-    parserlib.util.cache.feedback(report);
+    parserUtil.cache.feedback(report);
     return report;
   },
 });

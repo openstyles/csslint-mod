@@ -1,4 +1,4 @@
-import Bucket from './lib/bucket';
+import Bucket, {B} from './lib/bucket';
 import Combinators from './lib/combinators';
 import Matcher from './lib/matcher';
 import Parser from './lib/parser';
@@ -31,6 +31,7 @@ export default {
     Units,
   },
   util: {
+    B,
     Bucket,
     EventDispatcher,
     Matcher,

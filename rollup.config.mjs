@@ -14,7 +14,7 @@ fse.emptyDir(DST);
 export default [{
   input: 'src/csslint.js',
   output: {...OUTPUT, name: 'CSSLint'},
-  external: './parserlib.js',
+  external: ['./parserlib.js', '../parserlib.js'],
 }, {
   input: 'src/parserlib.js',
   output: {...OUTPUT, name: 'parserlib'},

@@ -1,54 +1,62 @@
-import {getPropName, registerRuleEvents} from './-util';
+import {getPropName, parserUtil, registerRuleEvents} from './-util';
 
 export default [{
   desc: 'width or height specified with padding or border and no box-sizing.',
   url: 'Beware-of-box-model-size',
 }, (rule, parser, reporter) => {
-  const sizeProps = {
-    width: ['border', 'border-left', 'border-right', 'padding', 'padding-left', 'padding-right'],
-    height: ['border', 'border-bottom', 'border-top', 'padding', 'padding-bottom', 'padding-top'],
-  };
+  const rx = /^(?:(border)|padding)(?:-(?:left|right|(top|bottom)|(?:inline|(block)(?:-(?:start|end))?)))?$/;
+  const sizeProps = {width: false, height: true};
   const stack = [];
-  let props;
+  const {B} = parserUtil;
+  let props, inRule;
   registerRuleEvents(parser, {
     start() {
       stack.push(props);
-      props = {};
+      inRule = true;
+      props = null;
     },
     property(event) {
-      if (!props || event.inParens) return;
-      const name = getPropName(event.property);
-      if (sizeProps.width.includes(name) || sizeProps.height.includes(name)) {
-        if (!/^0+\D*$/.test(event.value) &&
-          (name !== 'border' || !/^none$/i.test(event.value))) {
-          props[name] = {
-            line: event.property.line,
-            col: event.property.col,
-            value: event.value,
-          };
+      if (!inRule || event.inParens)
+        return;
+      const p = event.property;
+      const name = getPropName(p);
+      const value = /**@type{TokenValue<Token>}*/event.value;
+      const m = rx.exec(name);
+      let v;
+      if (m) {
+        if (!((v = value.parts[0]).number === 0 || m[1] && B.none.has(v))) {
+          (props ??= new Map()).set(name, {
+            line: p.line,
+            col: p.col,
+            b: !!m[1], // border***
+            h: !!(m[2] || m[3]), // height-related
+            value,
+          });
         }
-      } else if (name === 'box-sizing' ||
-        /^(width|height)/i.test(name) &&
-        /^(length|%)/.test(event.value.parts[0].type)) {
-        props[name] = 1;
+      } else if (name === 'box-sizing'
+        || name in sizeProps && ((v = value.parts[0].type) === 'length' || v === '%')
+      ) {
+        (props ??= new Map()).set(name, false);
       }
     },
     end() {
-      if (!props['box-sizing']) {
+      if (props && props.size > 1 && !props.has('box-sizing')) {
         for (const size in sizeProps) {
-          if (!props[size]) continue;
-          for (const prop of sizeProps[size]) {
-            if (prop !== 'padding' || !props[prop]) continue;
-            const {value: {parts}, line, col} = props[prop];
+          if (!props.has(size))
+            continue;
+          const h = sizeProps[size];
+          for (const [k, v] of props) {
+            if (!v || v.b || v.h !== h)
+              continue;
+            const {value: {parts}, line, col} = v;
             if (parts.length !== 2 || parts[0].number) {
-              reporter.report(
-                `No box-sizing and ${size} in ${prop}`,
-                {line, col}, rule);
+              reporter.report(`No box-sizing and ${size} in ${k}`, {line, col}, rule);
             }
           }
         }
       }
       props = stack.pop();
+      inRule = false;
     },
   });
 }];
