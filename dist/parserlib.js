@@ -295,7 +295,14 @@ const Combinators = [];
 /*   ~   */ Combinators[126] = 'sibling';
 /*  ||   */ Combinators[124] = 'column';
 
-const GlobalKeywords = ['initial', 'inherit', 'revert', 'unset'];
+const GlobalKeywords = [
+  'initial',
+  'inherit',
+  'revert',
+  'revert-layer',
+  'revert-rule',
+  'unset',
+];
 const {assign, defineProperty: define} = Object;
 const PDESC = {configurable: true, enumerable: true, writable: true, value: null};
 const isOwn = Object.call.bind({}.hasOwnProperty);
@@ -797,6 +804,7 @@ const Properties = {
   'page-break-before': '<page-break-after>',
   'page-break-inside': 'auto | avoid',
   'paint-order': 'normal | [ fill || stroke || markers ]',
+  'path-length': 'none | <num0+>',
   'perspective': 'none | <len0+>',
   'perspective-origin': '<position>',
   'place-content': '<align-content> <justify-content>?',
@@ -1613,28 +1621,34 @@ function vtFailure(unit, what) {
 
 /* eslint-disable max-len */
 
-const _ = {
-  __proto__: null,
-  'anchor': '<dashed-ident>? && [inside|outside|top|left|right|bottom|start|end|self-start|self-end|center|<pct>] [, <len-pct>]?',
-  'anchor-size': '[<dashed-ident> || [width|height|block|inline|self-block|self-inline] ]? [, <len-pct>]?',
+const grads = {
   'conic-gradient': '[ [ [ [ from <angle-zero> ]? <at-pos>? ] || <color-interpolation-method> ] , ]? [ <angular-color-stop> [, [ [<angle-pct-zero> ,]? <angular-color-stop> ]# ]? ]',
   'linear-gradient': '[ [ [ [ <angle-zero> | to [[left|right] || [top|bottom]] ] || <color-interpolation-method> ] , ]? <color-stop-list> ]?',
   'radial-gradient': '[ [ [ [ [circle|ellipse] || [<radial-extent> | <len0+> | <len-pct0+>{2}] ]? <at-pos>? ] || <color-interpolation-method> ] , ]? <color-stop-list>',
-  ray: '<angle> && [<radial-extent> | sides]? && contain? && [at <position>]?',
+};
+const rects = {
   rect: '[ <len> | auto ]#{4} <border-radius-round>?',
   inset: '<len-pct>{1,4} <border-radius-round>?',
   xywh: '<len-pct>{2} <len-pct0+>{2} <border-radius-round>?',
 };
 const VTFunctions = {
-  _,
-  basicShape: pick(_, ['inset', 'rect', 'xywh'], {
+  _: {
+    __proto__: null,
+    'anchor': '<dashed-ident>? && [inside|outside|top|left|right|bottom|start|end|self-start|self-end|center|<pct>] [, <len-pct>]?',
+    'anchor-size': '[<dashed-ident> || [width|height|block|inline|self-block|self-inline] ]? [, <len-pct>]?',
+    'ray': '<angle> && [<radial-extent> | sides]? && contain? && [at <position>]?',
+    ...grads,
+    ...rects,
+  },
+  basicShape: {
     __proto__: null,
     circle: '<shape-radius> <at-pos>?',
     ellipse: '<shape-radius>{2}? <at-pos>?',
     path: '[ <fill-rule> , ]? <string>',
     polygon: '[ <fill-rule> , ]? [ <len-pct> <len-pct> ]#',
     shape: '[ [from|move|line|hline|vline|curve|smooth|arc] [to|by]? [<ident>|<len-pct>]+ ]#',
-  }),
+    ...rects,
+  },
   color: {
     __proto__: null,
     'alpha': 'from <color> <alpha>?',
@@ -1712,9 +1726,8 @@ const VTFunctions = {
     if (low !== key) Object.defineProperty(obj, low, {value: obj[key], writable: true});
   }
 }
-for (const key in _)
-  if (key.endsWith('-gradient'))
-    _['repeating-' + key] = _[key];
+for (const key in grads)
+  VTFunctions._['repeating-' + key] = grads[key];
 
 const rxAltSep = /\s*\|\s*/;
 const rxAndAndSep = /\s*&&\s*/y;
@@ -2968,12 +2981,15 @@ const ATS = {
    * @param {Token} start
    */
   container(stream, start) {
+    let brace;
     try {
       this._at = start.atName;
       do {
         // <container-name>? <container-query>?
         const tok = stream.matchSmart(IDENT) || undefined;
         const name = tok && !B.not.has(tok) && tok;
+        if (name && (brace = stream.matchSmart(LBRACE)))
+          break;
         const cond = this._condition(stream, name ? undefined : tok, this._containerCondition);
         if (!name && !cond)
           stream._failure('name and/or condition', tok);
@@ -2981,7 +2997,10 @@ const ATS = {
     } finally {
       this._at = undefined;
     }
-    this._block(stream, start, {event: ['container']});
+    this._block(stream, start, {
+      brace: brace || undefined,
+      event: ['container'],
+    });
   },
 
   /**
@@ -4291,6 +4310,7 @@ var parserlib = {
     Units,
   },
   util: {
+    B,
     Bucket,
     EventDispatcher,
     Matcher,

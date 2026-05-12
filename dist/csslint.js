@@ -1,5 +1,6 @@
 import parserlib from './parserlib.js';
 
+const parserUtil = parserlib.util;
 let shorthands, shorthandsFor;
 
 /** Gets the lower-cased text without vendor prefix */
@@ -198,51 +199,59 @@ var ruleBoxModel = [{
   desc: 'width or height specified with padding or border and no box-sizing.',
   url: 'Beware-of-box-model-size',
 }, (rule, parser, reporter) => {
-  const sizeProps = {
-    width: ['border', 'border-left', 'border-right', 'padding', 'padding-left', 'padding-right'],
-    height: ['border', 'border-bottom', 'border-top', 'padding', 'padding-bottom', 'padding-top'],
-  };
+  const rx = /^(?:(border)|padding)(?:-(?:left|right|(top|bottom)|(?:inline|(block)(?:-(?:start|end))?)))?$/;
+  const sizeProps = {width: false, height: true};
   const stack = [];
-  let props;
+  const {B} = parserUtil;
+  let props, inRule;
   registerRuleEvents(parser, {
     start() {
       stack.push(props);
-      props = {};
+      inRule = true;
+      props = null;
     },
     property(event) {
-      if (!props || event.inParens) return;
-      const name = getPropName(event.property);
-      if (sizeProps.width.includes(name) || sizeProps.height.includes(name)) {
-        if (!/^0+\D*$/.test(event.value) &&
-          (name !== 'border' || !/^none$/i.test(event.value))) {
-          props[name] = {
-            line: event.property.line,
-            col: event.property.col,
-            value: event.value,
-          };
+      if (!inRule || event.inParens)
+        return;
+      const p = event.property;
+      const name = getPropName(p);
+      const value = /**@type{TokenValue<Token>}*/event.value;
+      const m = rx.exec(name);
+      let v;
+      if (m) {
+        if (!((v = value.parts[0]).number === 0 || m[1] && B.none.has(v))) {
+          (props ??= new Map()).set(name, {
+            line: p.line,
+            col: p.col,
+            b: !!m[1], // border***
+            h: !!(m[2] || m[3]), // height-related
+            value,
+          });
         }
-      } else if (name === 'box-sizing' ||
-        /^(width|height)/i.test(name) &&
-        /^(length|%)/.test(event.value.parts[0].type)) {
-        props[name] = 1;
+      } else if (name === 'box-sizing'
+        || name in sizeProps && ((v = value.parts[0].type) === 'length' || v === '%')
+      ) {
+        (props ??= new Map()).set(name, false);
       }
     },
     end() {
-      if (!props['box-sizing']) {
+      if (props && props.size > 1 && !props.has('box-sizing')) {
         for (const size in sizeProps) {
-          if (!props[size]) continue;
-          for (const prop of sizeProps[size]) {
-            if (prop !== 'padding' || !props[prop]) continue;
-            const {value: {parts}, line, col} = props[prop];
+          if (!props.has(size))
+            continue;
+          const h = sizeProps[size];
+          for (const [k, v] of props) {
+            if (!v || v.b || v.h !== h)
+              continue;
+            const {value: {parts}, line, col} = v;
             if (parts.length !== 2 || parts[0].number) {
-              reporter.report(
-                `No box-sizing and ${size} in ${prop}`,
-                {line, col}, rule);
+              reporter.report(`No box-sizing and ${size} in ${k}`, {line, col}, rule);
             }
           }
         }
       }
       props = stack.pop();
+      inRule = false;
     },
   });
 }];
@@ -1065,17 +1074,31 @@ var ruleRegexSelectors = [{
 
 var ruleSelectorNewline = [{
   desc: 'A new line between selectors is a forgotten comma and not a descendant combinator.',
+  error: 'Line break in selector without ","',
 }, (rule, parser, reporter) => {
+  const {allowIndent, error} = rule;
   parser.addListener('startrule', event => {
     for (const {parts} of event.selectors) {
-      for (let i = 0, p, pn; i < parts.length - 1 && (p = parts[i]); i++) {
-        if (p.type === 'descendant' && (pn = parts[i + 1]).line > p.line) {
-          reporter.report('Line break in selector (forgot a comma?)', pn, rule);
+      for (let i = 0, /**@type{TokenSelector}*/p, /**@type{TokenSelector}*/pn, indent;
+           i < parts.length - 1 && (p = parts[i]);
+           i++) {
+        if (!indent)
+          indent = p.col;
+        else if (p.type === 'descendant'
+            && (pn = parts[i + 1]).line > p.line
+            && (!allowIndent || pn.col <= indent)) {
+          reporter.report(error, pn, rule);
         }
       }
     }
   });
 }];
+
+var ruleSelectorNewlineNoIndent = [{
+  desc: ruleSelectorNewline[0].desc + ' unless the subsequent lines are indented.',
+  error: ruleSelectorNewline[0].error + ' or indent',
+  allowIndent: true,
+}, ruleSelectorNewline[1]];
 
 var ruleShorthand = [{
   desc: 'Use shorthand declaration instead of several individual properties.',
@@ -1365,7 +1388,8 @@ var ruleZeroUnits = [{
 // previous CSSLint overrides are used to decide whether the parserlib's cache should be reset
 let prevOverrides;
 
-const rxEmbedded = /\/\*\s*csslint\s+((?:[^*]+|\*(?!\/))+?)\*\//ig;
+/**                                     1                        2      3         4 */
+const rxEmbedded = /\/\*\s*csslint\s+(?:(allow)\s*:|ignore\s*:\s*(start|(end))\b)?((?:[^*]+|\*(?!\/))+?)\*\//ig;
 const rxGrammarAbbr = /([-<])(int|len|num|pct|rel-(\w{3}))(?=\W)/g;
 const ABBR_MAP = {
   int: 'integer',
@@ -1379,17 +1403,6 @@ const ABBR_MAP = {
   'rel-rgb': 'r-g-b-alpha-none',
 };
 const unabbreviate = (_, c, str) => c + (ABBR_MAP[str]) || str;
-const EBMEDDED_RULE_VALUE_MAP = {
-  // error
-  'true': 2,
-  '2': 2,
-  // warning
-  '': 1,
-  '1': 1,
-  // ignore
-  'false': 0,
-  '0': 0,
-};
 const rules = {
   __proto__: null,
   'box-model': ruleBoxModel,
@@ -1415,6 +1428,7 @@ const rules = {
   'qualified-headings': ruleQualifiedHeadings,
   'regex-selectors': ruleRegexSelectors,
   'selector-newline': ruleSelectorNewline,
+  'selector-newline-no-indent': ruleSelectorNewlineNoIndent,
   'shorthand': ruleShorthand,
   'shorthand-overrides': ruleShorthandOverrides,
   'simple-not': ruleSimpleNot,
@@ -1430,7 +1444,7 @@ const rules = {
   'zero-units': ruleZeroUnits,
 };
 
-const CSSLint = Object.assign(new parserlib.util.EventDispatcher(), {
+const CSSLint = Object.assign(new parserUtil.EventDispatcher(), {
 
   rules,
 
@@ -1497,7 +1511,7 @@ const CSSLint = Object.assign(new parserlib.util.EventDispatcher(), {
         msg.message = msg.message.replace(rxGrammarAbbr, unabbreviate);
       }
     }
-    parserlib.util.cache.feedback(report);
+    parserUtil.cache.feedback(report);
     return report;
   },
 });
@@ -1546,49 +1560,28 @@ function applyEmbeddedOverrides(text, ruleset, allow, ignore) {
       if (eol < 0) eol = text.length;
       lineno++;
     }
-
-    const ovr = m[1].toLowerCase();
-    const cmd = ovr.split(':', 1)[0];
-    const i = cmd.length + 1;
-
-    switch (cmd.trim()) {
-
-      case 'allow': {
-        const allowRuleset = {};
-        let num = 0;
-        ovr.slice(i).split(',').forEach(allowRule => {
-          allowRuleset[allowRule.trim()] = true;
-          num++;
-        });
-        if (num) allow[lineno] = allowRuleset;
-        break;
+    const ovr = !m[2/*ignore*/] && m[4].toLowerCase().split(',');
+    if (m[1/*allow*/]) {
+      let res;
+      for (let name of ovr)
+        if ((name = name.trim()) in rules)
+          (res ??= allow[lineno] = {})[name] = true;
+    } else if (m[2/*ignore*/]) {
+      if (!m[3/*end*/]) {
+        ignoreStart ||= lineno;
+      } else if ((ignoreEnd = lineno) && ignoreStart) {
+        ignore.push([ignoreStart, ignoreEnd]);
+        ignoreStart = ignoreEnd = 0;
       }
-
-      case 'ignore':
-        if (ovr.includes('start')) {
-          ignoreStart = ignoreStart || lineno;
-          break;
-        }
-        if (ovr.includes('end')) {
-          ignoreEnd = lineno;
-          if (ignoreStart && ignoreEnd) {
-            ignore.push([ignoreStart, ignoreEnd]);
-            ignoreStart = ignoreEnd = null;
-          }
-        }
-        break;
-
-      default:
-        ovr.slice(i).split(',').forEach(rule => {
-          const pair = rule.split(':');
-          const property = pair[0] || '';
-          const value = pair[1] || '';
-          const mapped = EBMEDDED_RULE_VALUE_MAP[value.trim()];
-          ruleset[property.trim()] = mapped === undefined ? 1 : mapped;
-        });
+    } else {
+      for (const rule of ovr) {
+        const pair = rule.split(':');
+        const name = pair[0].trim();
+        const v = pair[1].trim();
+        ruleset[name] = v === 'true' ? 2 : v === 'false' ? 0 : +v >= 0 ? +v : 1;
+      }
     }
   }
-
   // Close remaining ignore block, if any
   if (ignoreStart) {
     ignore.push([ignoreStart, lineno]);
