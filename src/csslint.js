@@ -23,6 +23,7 @@ import ruleOverqualifiedElements from './rules/overqualified-elements';
 import ruleQualifiedHeadings from './rules/qualified-headings';
 import ruleRegexSelectors from './rules/regex-selectors';
 import ruleSelectorNewline from './rules/selector-newline';
+import ruleSelectorNewlineNoIndent from './rules/selector-newline-no-indent.js';
 import ruleShorthand from './rules/shorthand';
 import ruleShorthandOverrides from './rules/shorthand-overrides';
 import ruleSimpleNot from './rules/simple-not';
@@ -90,6 +91,7 @@ const rules = {
   'qualified-headings': ruleQualifiedHeadings,
   'regex-selectors': ruleRegexSelectors,
   'selector-newline': ruleSelectorNewline,
+  'selector-newline-no-indent': ruleSelectorNewlineNoIndent,
   'shorthand': ruleShorthand,
   'shorthand-overrides': ruleShorthandOverrides,
   'simple-not': ruleSimpleNot,

@@ -700,3 +700,11 @@ a {flex-flow: row wr/*incomplete*/}
 .rule.box-sizing.ok { padding-inline:0Q; width:2px; }
 .rule.box-sizing.ok { border:none; width:2px; }
 .rule.box-sizing.ok { border-block-start:1px; box-sizing: border-box; height:2px; }
+
+.rule
+.selector-newline-no-indent .err { color:red } /* csslint allow:selector-newline */
+.rule
+  .selector-newline-no-indent /* csslint allow:selector-newline */
+  .ok, /* csslint allow:selector-newline */
+.more
+  .ok { color:green } /* csslint allow:selector-newline */

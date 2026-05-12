@@ -88,3 +88,4 @@ warning	587	19	Expected end of value but found "wr".
 warning	665	35	Expected [ <dashed-ident> || [ width|height|block|inline|self-block|self-inline ] ]? [ , <length-percentage> ]? but found "--my-anchor self-/*block*/, 20...".
 warning	682	27	Complex selector inside :not().
 warning	698	24	No box-sizing and width in padding-inline
+warning	705	1	Line break in selector without "," or indent
