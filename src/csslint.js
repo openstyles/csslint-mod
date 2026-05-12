@@ -41,7 +41,8 @@ import ruleZeroUnits from './rules/zero-units';
 // previous CSSLint overrides are used to decide whether the parserlib's cache should be reset
 let prevOverrides;
 
-const rxEmbedded = /\/\*\s*csslint\s+((?:[^*]+|\*(?!\/))+?)\*\//ig;
+/**                                     1                        2      3         4 */
+const rxEmbedded = /\/\*\s*csslint\s+(?:(allow)\s*:|ignore\s*:\s*(start|(end))\b)?((?:[^*]+|\*(?!\/))+?)\*\//ig;
 const rxGrammarAbbr = /([-<])(int|len|num|pct|rel-(\w{3}))(?=\W)/g;
 const ABBR_MAP = {
   int: 'integer',
@@ -55,17 +56,6 @@ const ABBR_MAP = {
   'rel-rgb': 'r-g-b-alpha-none',
 };
 const unabbreviate = (_, c, str) => c + (ABBR_MAP[str]) || str;
-const EBMEDDED_RULE_VALUE_MAP = {
-  // error
-  'true': 2,
-  '2': 2,
-  // warning
-  '': 1,
-  '1': 1,
-  // ignore
-  'false': 0,
-  '0': 0,
-};
 const rules = {
   __proto__: null,
   'box-model': ruleBoxModel,
@@ -223,49 +213,28 @@ function applyEmbeddedOverrides(text, ruleset, allow, ignore) {
       if (eol < 0) eol = text.length;
       lineno++;
     }
-
-    const ovr = m[1].toLowerCase();
-    const cmd = ovr.split(':', 1)[0];
-    const i = cmd.length + 1;
-
-    switch (cmd.trim()) {
-
-      case 'allow': {
-        const allowRuleset = {};
-        let num = 0;
-        ovr.slice(i).split(',').forEach(allowRule => {
-          allowRuleset[allowRule.trim()] = true;
-          num++;
-        });
-        if (num) allow[lineno] = allowRuleset;
-        break;
+    const ovr = !m[2/*ignore*/] && m[4].toLowerCase().split(',');
+    if (m[1/*allow*/]) {
+      let res;
+      for (let name of ovr)
+        if ((name = name.trim()) in rules)
+          (res ??= allow[lineno] = {})[name] = true;
+    } else if (m[2/*ignore*/]) {
+      if (!m[3/*end*/]) {
+        ignoreStart ||= lineno;
+      } else if ((ignoreEnd = lineno) && ignoreStart) {
+        ignore.push([ignoreStart, ignoreEnd]);
+        ignoreStart = ignoreEnd = 0;
       }
-
-      case 'ignore':
-        if (ovr.includes('start')) {
-          ignoreStart = ignoreStart || lineno;
-          break;
-        }
-        if (ovr.includes('end')) {
-          ignoreEnd = lineno;
-          if (ignoreStart && ignoreEnd) {
-            ignore.push([ignoreStart, ignoreEnd]);
-            ignoreStart = ignoreEnd = null;
-          }
-        }
-        break;
-
-      default:
-        ovr.slice(i).split(',').forEach(rule => {
-          const pair = rule.split(':');
-          const property = pair[0] || '';
-          const value = pair[1] || '';
-          const mapped = EBMEDDED_RULE_VALUE_MAP[value.trim()];
-          ruleset[property.trim()] = mapped === undefined ? 1 : mapped;
-        });
+    } else {
+      for (const rule of ovr) {
+        const pair = rule.split(':');
+        const name = pair[0].trim();
+        const v = pair[1].trim();
+        ruleset[name] = v === 'true' ? 2 : v === 'false' ? 0 : +v >= 0 ? +v : 1;
+      }
     }
   }
-
   // Close remaining ignore block, if any
   if (ignoreStart) {
     ignore.push([ignoreStart, lineno]);
