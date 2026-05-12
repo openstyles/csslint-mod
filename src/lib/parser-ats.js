@@ -58,12 +58,15 @@ const ATS = {
    * @param {Token} start
    */
   container(stream, start) {
+    let brace;
     try {
       this._at = start.atName;
       do {
         // <container-name>? <container-query>?
         const tok = stream.matchSmart(IDENT) || undefined;
         const name = tok && !B.not.has(tok) && tok;
+        if (name && (brace = stream.matchSmart(LBRACE)))
+          break;
         const cond = this._condition(stream, name ? undefined : tok, this._containerCondition);
         if (!name && !cond)
           stream._failure('name and/or condition', tok);
@@ -71,7 +74,10 @@ const ATS = {
     } finally {
       this._at = undefined;
     }
-    this._block(stream, start, {event: ['container']});
+    this._block(stream, start, {
+      brace: brace || undefined,
+      event: ['container'],
+    });
   },
 
   /**

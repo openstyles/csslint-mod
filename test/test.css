@@ -692,3 +692,5 @@ a {flex-flow: row wr/*incomplete*/}
 .if-expr {
   background-color: if(style(attr(data-columns, type<number>) > 2): lightblue; else: white);
 }
+
+@container --foo { input { color:green; } }
