@@ -451,6 +451,7 @@ const Properties = {
   'page-break-before': '<page-break-after>',
   'page-break-inside': 'auto | avoid',
   'paint-order': 'normal | [ fill || stroke || markers ]',
+  'path-length': 'none | <num0+>',
   'perspective': 'none | <len0+>',
   'perspective-origin': '<position>',
   'place-content': '<align-content> <justify-content>?',
