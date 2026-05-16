@@ -1,9 +1,15 @@
 /* eslint-disable max-len */
 
+const _conicGradient = '[ [ [ [ from <angle-zero> ]? <at-pos>? ] || <color-interpolation-method> ] , ]? [ <angular-color-stop> [, [ [<angle-pct-zero> ,]? <angular-color-stop> ]# ]? ]';
+const _linearGradient = '[ [ [ [ <angle-zero> | to [[left|right] || [top|bottom]] ] || <color-interpolation-method> ] , ]? <color-stop-list> ]?';
+const _radialGradient = '[ [ [ [ [circle|ellipse] || [<radial-extent> | <len0+> | <len-pct0+>{2}] ]? <at-pos>? ] || <color-interpolation-method> ] , ]? <color-stop-list>';
 const grads = {
-  'conic-gradient': '[ [ [ [ from <angle-zero> ]? <at-pos>? ] || <color-interpolation-method> ] , ]? [ <angular-color-stop> [, [ [<angle-pct-zero> ,]? <angular-color-stop> ]# ]? ]',
-  'linear-gradient': '[ [ [ [ <angle-zero> | to [[left|right] || [top|bottom]] ] || <color-interpolation-method> ] , ]? <color-stop-list> ]?',
-  'radial-gradient': '[ [ [ [ [circle|ellipse] || [<radial-extent> | <len0+> | <len-pct0+>{2}] ]? <at-pos>? ] || <color-interpolation-method> ] , ]? <color-stop-list>',
+  'conic-gradient': _conicGradient,
+  'linear-gradient': _linearGradient,
+  'radial-gradient': _radialGradient,
+  'repeating-conic-gradient': _conicGradient,
+  'repeating-linear-gradient': _linearGradient,
+  'repeating-radial-gradient': _radialGradient,
 };
 const rects = {
   rect: '[ <len> | auto ]#{4} <border-radius-round>?',
@@ -69,6 +75,7 @@ const VTFunctions = {
     'saturate': '<num-pct>?',
     'sepia': '<num-pct>?',
   },
+  gradients: grads,
   transform: {
     __proto__: null,
     matrix: '<num>#{6}',
@@ -105,7 +112,5 @@ const VTFunctions = {
     if (low !== key) Object.defineProperty(obj, low, {value: obj[key], writable: true});
   }
 }
-for (const key in grads)
-  VTFunctions._['repeating-' + key] = grads[key];
 
 export default VTFunctions;

@@ -107,14 +107,11 @@ const VTComplex = {
   '<generic-family>': 'serif | sans-serif | cursive | fantasy | monospace | system-ui | ' +
     'emoji | math | fangsong | ui-serif | ui-sans-serif | ui-monospace | ui-rounded',
   '<geometry-box>': '<shape-box> | <box-fsv>',
-  '<gradient>': 'radial-gradient() | linear-gradient() | conic-gradient() | gradient() | ' +
-    'repeating-radial-gradient() | repeating-linear-gradient() | repeating-conic-gradient() | ' +
-    'repeating-gradient()',
   '<grid-line>': 'auto | [ <int> && <ident-for-grid>? ] | <ident-for-grid> | ' +
     '[ span && [ <int> || <ident-for-grid> ] ]',
   '<hue-interpolation-method>': '[shorter|longer|increasing|decreasing] hue',
   '<image>': '<image-no-set> | image-set( <image-set># )',
-  '<image-no-set>': '<url> | <gradient> | -webkit-cross-fade()',
+  '<image-no-set>': '<url> | <fn:gradients> | -webkit-cross-fade()',
   '<image-set>': '[ <image-no-set> | <string> ] [ <resolution> || type( <string> ) ]',
   '<inflexible-breadth>': '<len-pct> | min-content | max-content | auto',
   '<line-height>': '<num> | <len-pct> | normal',
