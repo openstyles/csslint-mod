@@ -708,3 +708,36 @@ a {flex-flow: row wr/*incomplete*/}
   .ok, /* csslint allow:selector-newline */
 .more
   .ok { color:green } /* csslint allow:selector-newline */
+
+.border-image-slice {
+  border-image-slice: 10% 30%;
+  border-image-slice: 10% fill;
+  border-image-slice: 30 fill 30% 45;
+  border-image-slice: 30%;
+  border-image-slice: 7 12 14 5 fill;
+  border-image-slice: fill 7 12 14 5;
+  border-image-slice: fill 10%;
+}
+.gap {
+  column-rule: repeat(2, 1px solid red, 2px dashed green);
+  column-rule-color: repeat(4, red, cyan);
+  column-rule-color: gray, repeat(auto, red, blue), gray;
+  column-rule-style: dashed, dotted, solid;
+  column-rule-style: repeat(2, solid, dashed);
+  row-rule: 6px solid red;
+  rule: thin, dashed, hotpink;
+  rule: ridge red, repeat(auto, 5px solid green), 10px dotted blue;
+  rule: repeat(2, dashed gray, 10px blue dotted, 20px double), 5px solid red, repeat(4, blue 6px, 5px solid white);
+}
+.gap {
+  column-rule-width: 10px, 20px, repeat(auto, 20px), 30px;
+}
+.position-area {
+  position-area: center span-start;
+  position-area: top span-left;
+  position-area: inline-start span-block-end;
+  position-area: y-start span-x-end;
+  position-area: top span-all;
+  position-area: block-end span-all;
+  position-area: self-x-start span-all;
+}

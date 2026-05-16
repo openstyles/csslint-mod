@@ -1,5 +1,14 @@
 /* eslint-disable max-len */
-let tmp;
+export const _borderShorthand = '<border-shorthand>';
+const _positionArea = (
+  // TODO: fix Matcher::many() so we don't have to reorder || groups to the end of | chain
+  '[%]{1,2}' +
+  ' | [%self-]{1,2}' +
+  ' | [left|right|span-left|span-right|x-start|x-end|span-x-start|span-x-end|%self-x-]' +
+  ' || [top|bottom|span-top|span-bottom|y-start|y-end|span-y-start|span-y-end|%self-y-]' +
+  ' | [%block-] || [%inline-]' +
+  ' | [%self-block-] || [%self-inline-]'
+).replace(/%([-\w]*)/g, '$1start|center|$1end|span-$1start|span-$1end|span-all');
 const VTComplex = {
   __proto__: null,
   '<absolute-size>': 'xx-small | x-small | small | medium | large | x-large | xx-large',
@@ -37,10 +46,7 @@ const VTComplex = {
   /** @param {typeof Matcher} M */
   '<border-image-slice>': M => M.term('<num-pct0+>').braces(1, 4, '', '', M.term('fill')),
   '<border-radius-round>': 'round <border-radius>',
-  '<border-shorthand>': '<border-width> || <border-style> || <color>',
-  '<border-style>':
-    'none | hidden | dotted | dashed | solid | double | groove | ridge | inset | outset',
-  '<border-width>': '<len> | thin | medium | thick',
+  '<border-shorthand>': '<line-width> || <line-style> || <color>',
   '<box>': 'padding-box | border-box | content-box',
   '<box-fsv>': 'fill-box | stroke-box | view-box',
   '<color>': '<named-or-hex-color> | <fn:color>',
@@ -111,8 +117,11 @@ const VTComplex = {
   '<image-no-set>': '<url> | <fn:gradients> | -webkit-cross-fade()',
   '<image-set>': '[ <image-no-set> | <string> ] [ <resolution> || type( <string> ) ]',
   '<inflexible-breadth>': '<len-pct> | min-content | max-content | auto',
+  '<inset-value>': '<len-pct> | overlap-join',
   '<line-height>': '<num> | <len-pct> | normal',
   '<line-names>': '"[" <ident-for-grid> "]"',
+  '<line-style>': 'none | hidden | dotted | dashed | solid | double | groove | ridge | inset | outset',
+  '<line-width>': '<len0+> | thin | medium | thick',
   '<linear-color-stop>': '<color> <len-pct>?',
   '<masking-mode>': 'alpha | luminance | match-source',
   '<overflow-position>': 'unsafe | safe',
@@ -127,14 +136,18 @@ const VTComplex = {
     '[ left | center | right | <len-pct> ] ' +
     '[ top | center | bottom | <len-pct> ]? | ' +
     '[ left | center | right ] || [ top | center | bottom ]',
-  '<position-area>': tmp = '[left|center|right|span-left|span-right|x-start|x-end|span-x-start|span-x-end|self-x-start|self-x-end|span-self-x-start|span-self-x-end|span-all] || [top|center|bottom|span-top|span-bottom|y-start|y-end|span-y-start|span-y-end|self-y-start|self-y-end|span-self-y-start|span-self-y-end|span-all] | [block-start|center|block-end|span-block-start|span-block-end|span-all] || [inline-start|center|inline-end|span-inline-start|span-inline-end|span-all] | [self-block-start|center|self-block-end|span-self-block-start|span-self-block-end|span-all] || [self-inline-start|center|self-inline-end|span-self-inline-start|span-self-inline-end|span-all] | [start|center|end|span-start|span-end|span-all]{1,2} | [self-start|center|self-end|span-self-start|span-self-end|span-all]{1,2}',
-  '<position-area-query>': tmp.replace(/]/g, '|any]'),
+  '<position-area>': _positionArea,
+  '<position-area-query>': _positionArea.replace(/]/g, '|any]'),
   '<predefined-rgb>': 'srgb|srgb-linear|display-p3|display-p3-linear|a98-rgb|prophoto-rgb|rec2020',
   '<ratio>': '<num0+> [ / <num0+> ]?',
   '<radial-extent>': 'closest-corner | closest-side | farthest-corner | farthest-side',
   '<relative-size>': 'smaller | larger',
   '<repeat-style>': 'repeat-x | repeat-y | [ repeat | space | round | no-repeat ]{1,2}',
   '<rectangular-color-space>': '<predefined-rgb>|lab|oklab|<xyz-space>',
+  '<rule-color>': M => _makeGapRule(M, '<color>'),
+  '<rule-style>': M => _makeGapRule(M, '<line-style>'),
+  '<rule-width>': M => _makeGapRule(M, '<line-width>'),
+  '<rule>': M => _makeGapRule(M, _borderShorthand),
   '<self-position>': 'center | start | end | self-start | self-end | flex-start | flex-end',
   '<shadow>': 'inset? && [ <len>{2,4} && <color>? ]',
   '<shape-box>': '<box> | margin-box',
@@ -157,5 +170,9 @@ const VTComplex = {
     '-moz-available | -webkit-fill-available | anchor-size() | calc-size()',
   '<xyz-space>': 'xyz | xyz-d50 | xyz-d65',
 };
+/** @param {typeof Matcher} M */
+const _makeGapRule = (M, type) =>
+  M.parse(`${type} | repeat( <int1+> , ${type}# )`)
+    .braces(0, Infinity, '#', ',', M.parse(`repeat( auto , ${type}# )`));
 
 export default VTComplex;
