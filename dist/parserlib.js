@@ -353,6 +353,199 @@ function clipString(s, len = 30) {
 }
 
 /* eslint-disable max-len */
+const _borderShorthand = '<border-shorthand>';
+const _positionArea = (
+  // TODO: fix Matcher::many() so we don't have to reorder || groups to the end of | chain
+  '[%]{1,2}' +
+  ' | [%self-]{1,2}' +
+  ' | [left|right|span-left|span-right|x-start|x-end|span-x-start|span-x-end|%self-x-]' +
+  ' || [top|bottom|span-top|span-bottom|y-start|y-end|span-y-start|span-y-end|%self-y-]' +
+  ' | [%block-] || [%inline-]' +
+  ' | [%self-block-] || [%self-inline-]'
+).replace(/%([-\w]*)/g, '$1start|center|$1end|span-$1start|span-$1end|span-all');
+const VTComplex = {
+  __proto__: null,
+  '<absolute-size>': 'xx-small | x-small | small | medium | large | x-large | xx-large',
+  '<alpha>': '/ <num-pct-none>',
+  '<angular-color-stop>': '<color> <angle-pct-zero>{0,2}',
+  '<animateable-feature>': 'scroll-position | contents | <animateable-feature-name>',
+  '<animation-direction>': 'normal | reverse | alternate | alternate-reverse',
+  '<animation-fill-mode>': 'none | forwards | backwards | both',
+  '<animation-timeline>': 'auto | none | <custom-ident> | ' +
+    'scroll( [ [ root | nearest | self ] || <axis> ]? ) | ' +
+    'view( [ <axis> || [ [ auto | <len-pct> ]{1,2} ]# ]? )',
+  '<at-pos>': 'at <position>',
+  '<attachment>': 'scroll | fixed | local',
+  '<auto-repeat>':
+    'repeat( [ auto-fill | auto-fit ] , [ <line-names>? <fixed-size> ]+ <line-names>? )',
+  '<auto-track-list>':
+    '[ <line-names>? [ <fixed-size> | <fixed-repeat> ] ]* <line-names>? <auto-repeat> ' +
+    '[ <line-names>? [ <fixed-size> | <fixed-repeat> ] ]* <line-names>?',
+  '<autospace>': 'no-autospace | ' +
+    '[ ideograph-alpha || ideograph-numeric || punctuation ] || [ insert|replace ]',
+  '<axis>': 'block | inline | x | y',
+  '<baseline-position>': '[ first | last ]? baseline',
+  '<basic-shape>': '<fn:basicShape>',
+  '<bg-image>': '<image> | none',
+  '<bg-layer>': '<bg-image> || <bg-position> [ / <bg-size> ]? || <repeat-style> || ' +
+    '<attachment> || <box>{1,2}',
+  '<bg-position>':
+    '[ center | [ left | right ] <len-pct>? ] && [ center | [ top | bottom ] <len-pct>? ] | ' +
+    '[ left | center | right | <len-pct> ] [ top | center | bottom | <len-pct> ] | ' +
+    '[ left | center | right | top | bottom | <len-pct> ]',
+  '<bg-size>': '[ <len-pct> | auto ]{1,2} | cover | contain',
+  '<blend-mode>': 'normal | multiply | screen | overlay | darken | lighten | color-dodge | ' +
+    'color-burn | hard-light | soft-light | difference | exclusion | hue | ' +
+    'saturation | color | luminosity | plus-darker | plus-lighter',
+  /** @param {typeof Matcher} M */
+  '<border-image-slice>': M => M.term('<num-pct0+>').braces(1, 4, '', '', M.term('fill')),
+  '<border-radius-round>': 'round <border-radius>',
+  '<border-shorthand>': '<line-width> || <line-style> || <color>',
+  '<box>': 'padding-box | border-box | content-box',
+  '<box-fsv>': 'fill-box | stroke-box | view-box',
+  '<color>': '<named-or-hex-color> | <fn:color>',
+  '<color-interpolation-method>': 'in [ <rectangular-color-space> | <polar-color-space> <hue-interpolation-method>? ]',
+  '<color-stop-list>': '<linear-color-stop> [, [ [<len-pct> ,]? <linear-color-stop> ]# ]?',
+  '<compositing-operator>': 'add | subtract | intersect | exclude',
+  '<contain-intrinsic>': 'auto? [ none | <len> ]',
+  '<content-distribution>': 'space-between | space-around | space-evenly | stretch',
+  '<content-list>':
+    '[ <string> | <image> | <attr> | ' +
+    'content( text | before | after | first-letter | marker ) | ' +
+    'counter() | counters() | leader() | ' +
+    'open-quote | close-quote | no-open-quote | no-close-quote | ' +
+    'target-counter() | target-counters() | target-text() ]+',
+  '<content-position>': 'center | start | end | flex-start | flex-end',
+  '<coord-box>': '<box> | <box-fsv>',
+  '<corner-shape-value>': 'round|scoop|bevel|notch|square|squircle|<fn:cornerShape>',
+  '<counter>': '[ <ident-not-none> <int>? ]+ | none',
+  '<dasharray>': M => M.alt([M.term('<len-pct0+>'), M.term('<num0+>')])
+    .braces(1, Infinity, '#', M.term(',').braces(0, 1, '?')),
+  '<display-box>': 'contents | none',
+  '<display-inside>': 'flow | flow-root | table | flex | grid | ruby',
+  '<display-internal>': 'table-row-group | table-header-group | table-footer-group | ' +
+    'table-row | table-cell | table-column-group | table-column | table-caption | ' +
+    'ruby-base | ruby-text | ruby-base-container | ruby-text-container',
+  '<display-legacy>': 'inline-block | inline-table | inline-flex | inline-grid',
+  '<display-listitem>': '<display-outside>? && [ flow | flow-root ]? && list-item',
+  '<display-outside>': 'block | inline | run-in',
+  '<dynamic-range>': 'standard | no-limit | constrained',
+  '<explicit-track-list>': '[ <line-names>? <track-size> ]+ <line-names>?',
+  '<family-name>': '<string> | <custom-ident>+',
+  // https://drafts.fxtf.org/filter-effects/#supported-filter-functions
+  // Value may be omitted in which case the default is used
+  '<filter-function-list>': '[ <fn:filter> | <url> ]+',
+  '<final-bg-layer>': '<color> || <bg-image> || <bg-position> [ / <bg-size> ]? || ' +
+    '<repeat-style> || <attachment> || <box>{1,2}',
+  '<fixed-repeat>': 'repeat( [ <int1+> ] , [ <line-names>? <fixed-size> ]+ <line-names>? )',
+  '<fixed-size>':
+    '<len-pct> | minmax( <len-pct> , <track-breadth> | <inflexible-breadth> , <len-pct> )',
+  '<flex-direction>': 'row | row-reverse | column | column-reverse',
+  '<flex-wrap>': 'nowrap | wrap | wrap-reverse',
+  '<font-short-core>': '<font-size> [ / <line-height> ]? <font-family>',
+  '<font-short-tweak-no-pct>':
+    '<font-style> || [ normal | small-caps ] || <font-weight> || <font-stretch-named>',
+  '<font-stretch-named>': 'normal | ultra-condensed | extra-condensed | condensed | ' +
+    'semi-condensed | semi-expanded | expanded | extra-expanded | ultra-expanded',
+  '<font-variant-alternates>': 'stylistic() || historical-forms || styleset() || ' +
+    'character-variant() || swash() || ornaments() || annotation()',
+  '<font-variant-caps>':
+    'small-caps | all-small-caps | petite-caps | all-petite-caps | unicase | titling-caps',
+  '<font-variant-east-asian>': '[ jis78|jis83|jis90|jis04|simplified|traditional ] || ' +
+    '[ full-width | proportional-width ] || ruby',
+  '<font-variant-ligatures>': '[ common-ligatures | no-common-ligatures ] || ' +
+    '[ discretionary-ligatures | no-discretionary-ligatures ] || ' +
+    '[ historical-ligatures | no-historical-ligatures ] || ' +
+    '[ contextual | no-contextual ]',
+  '<font-variant-numeric>': '[ lining-nums | oldstyle-nums ] || ' +
+    '[ proportional-nums | tabular-nums ] || ' +
+    '[ diagonal-fractions | stacked-fractions ] || ' +
+    'ordinal || slashed-zero',
+  '<generic-family>': 'serif | sans-serif | cursive | fantasy | monospace | system-ui | ' +
+    'emoji | math | fangsong | ui-serif | ui-sans-serif | ui-monospace | ui-rounded',
+  '<geometry-box>': '<shape-box> | <box-fsv>',
+  '<grid-line>': 'auto | [ <int> && <ident-for-grid>? ] | <ident-for-grid> | ' +
+    '[ span && [ <int> || <ident-for-grid> ] ]',
+  '<hue-interpolation-method>': '[shorter|longer|increasing|decreasing] hue',
+  '<image>': '<image-no-set> | image-set( <image-set># )',
+  '<image-no-set>': '<url> | <fn:gradients> | -webkit-cross-fade()',
+  '<image-set>': '[ <image-no-set> | <string> ] [ <resolution> || type( <string> ) ]',
+  '<inflexible-breadth>': '<len-pct> | min-content | max-content | auto',
+  '<inset-value>': '<len-pct> | overlap-join',
+  '<line-height>': '<num> | <len-pct> | normal',
+  '<line-names>': '"[" <ident-for-grid> "]"',
+  '<line-style>': 'none | hidden | dotted | dashed | solid | double | groove | ridge | inset | outset',
+  '<line-width>': '<len0+> | thin | medium | thick',
+  '<linear-color-stop>': '<color> <len-pct>?',
+  '<masking-mode>': 'alpha | luminance | match-source',
+  '<overflow-position>': 'unsafe | safe',
+  '<overflow>': '<vis-hid> | clip | scroll | auto | overlay', // TODO: warning about `overlay`
+  '<overscroll>': 'contain | none | auto',
+  '<paint>': 'none | <color> | <url> [ none | <color> ]? | context-fill | context-stroke',
+  '<polar-color-space>': 'hsl | hwb | lch | oklch',
+  // Because our `alt` combinator is ordered, we need to test these
+  // in order from longest possible match to shortest.
+  '<position>':
+    '[ [ left | right ] <len-pct> ] && [ [ top | bottom ] <len-pct> ] | ' +
+    '[ left | center | right | <len-pct> ] ' +
+    '[ top | center | bottom | <len-pct> ]? | ' +
+    '[ left | center | right ] || [ top | center | bottom ]',
+  '<position-area>': _positionArea,
+  '<position-area-query>': _positionArea.replace(/]/g, '|any]'),
+  '<predefined-rgb>': 'srgb|srgb-linear|display-p3|display-p3-linear|a98-rgb|prophoto-rgb|rec2020',
+  '<ratio>': '<num0+> [ / <num0+> ]?',
+  '<radial-extent>': 'closest-corner | closest-side | farthest-corner | farthest-side',
+  '<relative-size>': 'smaller | larger',
+  '<repeat-style>': 'repeat-x | repeat-y | [ repeat | space | round | no-repeat ]{1,2}',
+  '<rectangular-color-space>': '<predefined-rgb>|lab|oklab|<xyz-space>',
+  '<rule-color>': M => _makeGapRule(M, '<color>'),
+  '<rule-style>': M => _makeGapRule(M, '<line-style>'),
+  '<rule-width>': M => _makeGapRule(M, '<line-width>'),
+  '<rule>': M => _makeGapRule(M, _borderShorthand),
+  '<self-position>': 'center | start | end | self-start | self-end | flex-start | flex-end',
+  '<shadow>': 'inset? && [ <len>{2,4} && <color>? ]',
+  '<shape-box>': '<box> | margin-box',
+  '<shape-radius>': '<len-pct0+> | closest-side | farthest-side',
+  '<timing-function>': 'linear|ease|ease-in|ease-out|ease-in-out|step-start|step-end | ' +
+    'cubic-bezier( <num0-1> , <num> , <num0-1> , <num> ) | ' +
+    'linear( [ <num> && <pct>{0,2} ]# ) | ' +
+    'steps( <int> [ , [ jump-start | jump-end | jump-none | jump-both | start | end ] ]? )',
+  '<text-align>': 'start | end | left | right | center | justify | match-parent',
+  '<track-breadth>': '<len-pct> | <flex> | min-content | max-content | auto',
+  '<track-list>': '[ <line-names>? [ <track-size> | <track-repeat> ] ]+ <line-names>?',
+  '<track-repeat>': 'repeat( [ <int1+> ] , [ <line-names>? <track-size> ]+ <line-names>? )',
+  '<track-size>': '<track-breadth> | minmax( <inflexible-breadth> , <track-breadth> ) | ' +
+    'fit-content( <len-pct> )',
+  '<try-tactic>': 'flip-block || flip-inline || flip-start || flip-x || flip-y',
+  '<txbhv>': 'normal | allow-discrete',
+  '<url>': '<uri> | src( <string> [ <ident> | <func> ]* )',
+  '<vis-hid>': 'visible | hidden',
+  '<width-base>': '<len-pct> | min-content | max-content | fit-content | stretch | contain | ' +
+    '-moz-available | -webkit-fill-available | anchor-size() | calc-size()',
+  '<xyz-space>': 'xyz | xyz-d50 | xyz-d65',
+};
+/** @param {typeof Matcher} M */
+const _makeGapRule = (M, type) =>
+  M.parse(`${type} | repeat( <int1+> , ${type}# )`)
+    .braces(0, Infinity, '#', ',', M.parse(`repeat( auto , ${type}# )`));
+
+/* eslint-disable max-len */
+
+const _autoNone = 'auto | none';
+const _borderTopRadius = '<border-top-radius>';
+const _color = '<color>';
+const _cornerShapeValue = '<corner-shape-value>';
+const _cornerTop = '<corner-top>';
+const _cornerTopLeft = '<corner-top-left>';
+const _cornerTopShape = '<corner-top-shape>';
+const _insetValue = '<inset-value>';
+const _insetValue1or2 = _insetValue + '{1,2}';
+const _lenPct0plus = '<len-pct0+>';
+const _lenPct1or2 = '<len-pct>{1,2}';
+const _lineStyle = '<line-style>';
+const _lineWidth = '<line-width>';
+const _ruleVisibilityItems = 'all | around | between | normal';
+const _width = '<width>';
 
 const Properties = {
   __proto__: null,
@@ -390,7 +583,7 @@ const Properties = {
   'background-attachment': '<attachment>#',
   'background-blend-mode': '<blend-mode>',
   'background-clip': '[ <box> | text ]#',
-  'background-color': '<color>',
+  'background-color': _color,
   'background-image': '<bg-image>#',
   'background-origin': '<box>#',
   'background-position': '<bg-position>#',
@@ -400,7 +593,7 @@ const Properties = {
   'background-size': '<bg-size>#',
   'baseline-shift': 'baseline | sub | super | <len-pct>',
   'baseline-source': 'auto | first | last',
-  'block-size': '<width>',
+  'block-size': _width,
   'border-collapse': 'collapse | separate',
   'border-image': '<border-image-source> || <border-image-slice> ' +
     '[ / <border-image-width> | / <border-image-width>? / <border-image-outset> ]? || ' +
@@ -413,77 +606,77 @@ const Properties = {
   'border-shape': 'none | [<basic-shape> <geometry-box>?]{1,2}',
   'border-spacing': '<len>{1,2}',
   //#region border shorthand
-  'border': '<border-shorthand>',
-  'border-block': '<border-shorthand>',
-  'border-block-end': '<border-shorthand>',
-  'border-block-start': '<border-shorthand>',
-  'border-bottom': '<border-shorthand>',
-  'border-inline': '<border-shorthand>',
-  'border-inline-end': '<border-shorthand>',
-  'border-inline-start': '<border-shorthand>',
-  'border-left': '<border-shorthand>',
-  'border-right': '<border-shorthand>',
-  'border-top': '<border-shorthand>',
+  'border': _borderShorthand,
+  'border-block': _borderShorthand,
+  'border-block-end': _borderShorthand,
+  'border-block-start': _borderShorthand,
+  'border-bottom': _borderShorthand,
+  'border-inline': _borderShorthand,
+  'border-inline-end': _borderShorthand,
+  'border-inline-start': _borderShorthand,
+  'border-left': _borderShorthand,
+  'border-right': _borderShorthand,
+  'border-top': _borderShorthand,
   //#endregion
   //#region border color
-  'border-color': '<color>{1,4}',
-  'border-block-color': '<color>{1,2}',
-  'border-block-end-color': '<color>',
-  'border-block-start-color': '<color>',
-  'border-bottom-color': '<color>',
-  'border-inline-color': '<color>{1,2}',
-  'border-inline-end-color': '<color>',
-  'border-inline-start-color': '<color>',
-  'border-left-color': '<color>',
-  'border-right-color': '<color>',
-  'border-top-color': '<color>',
+  'border-color': _color + '{1,4}',
+  'border-block-color': _color + '{1,2}',
+  'border-block-end-color': _color,
+  'border-block-start-color': _color,
+  'border-bottom-color': _color,
+  'border-inline-color': _color + '{1,2}',
+  'border-inline-end-color': _color,
+  'border-inline-start-color': _color,
+  'border-left-color': _color,
+  'border-right-color': _color,
+  'border-top-color': _color,
   //#endregion
   //#region border style
-  'border-block-end-style': '<border-style>',
-  'border-block-start-style': '<border-style>',
-  'border-block-style': '<border-style>{1,2}',
-  'border-bottom-style': '<border-style>',
-  'border-inline-end-style': '<border-style>',
-  'border-inline-start-style': '<border-style>',
-  'border-inline-style': '<border-style>{1,2}',
-  'border-left-style': '<border-style>',
-  'border-right-style': '<border-style>',
-  'border-style': '<border-style>{1,4}',
-  'border-top-style': '<border-style>',
+  'border-block-end-style': _lineStyle,
+  'border-block-start-style': _lineStyle,
+  'border-block-style': _lineStyle + '{1,2}',
+  'border-bottom-style': _lineStyle,
+  'border-inline-end-style': _lineStyle,
+  'border-inline-start-style': _lineStyle,
+  'border-inline-style': _lineStyle + '{1,2}',
+  'border-left-style': _lineStyle,
+  'border-right-style': _lineStyle,
+  'border-style': _lineStyle + '{1,4}',
+  'border-top-style': _lineStyle,
   //#endregion
   //#region border width
-  'border-width': '<border-width>{1,4}',
-  'border-block-end-width': '<border-width>',
-  'border-block-start-width': '<border-width>',
-  'border-block-width': '<border-width>{1,2}',
-  'border-bottom-width': '<border-width>',
-  'border-inline-end-width': '<border-width>',
-  'border-inline-start-width': '<border-width>',
-  'border-inline-width': '<border-width>{1,2}',
-  'border-left-width': '<border-width>',
-  'border-right-width': '<border-width>',
-  'border-top-width': '<border-width>',
+  'border-width': _lineWidth + '{1,4}',
+  'border-block-end-width': _lineWidth,
+  'border-block-start-width': _lineWidth,
+  'border-block-width': _lineWidth + '{1,2}',
+  'border-bottom-width': _lineWidth,
+  'border-inline-end-width': _lineWidth,
+  'border-inline-start-width': _lineWidth,
+  'border-inline-width': _lineWidth + '{1,2}',
+  'border-left-width': _lineWidth,
+  'border-right-width': _lineWidth,
+  'border-top-width': _lineWidth,
   //#endregion
   //#region border radius (shorthands)
   'border-radius': '<len-pct0+>{1,4} [ / <len-pct0+>{1,4} ]?',
-  'border-block-end-radius': '<border-top-radius>',
-  'border-block-start-radius': '<border-top-radius>',
-  'border-bottom-radius': '<border-top-radius>',
-  'border-inline-end-radius': '<border-top-radius>',
-  'border-inline-start-radius': '<border-top-radius>',
-  'border-left-radius': '<border-top-radius>',
-  'border-right-radius': '<border-top-radius>',
+  'border-block-end-radius': _borderTopRadius,
+  'border-block-start-radius': _borderTopRadius,
+  'border-bottom-radius': _borderTopRadius,
+  'border-inline-end-radius': _borderTopRadius,
+  'border-inline-start-radius': _borderTopRadius,
+  'border-left-radius': _borderTopRadius,
+  'border-right-radius': _borderTopRadius,
   'border-top-radius': '<len-pct0+>{1,2} [ / <len-pct0+>{1,2} ]?',
   //#endregion
   //#region border radius (single)
-  'border-bottom-left-radius': '<len-pct>{1,2}',
-  'border-bottom-right-radius': '<len-pct>{1,2}',
-  'border-end-end-radius': '<len-pct>{1,2}',
-  'border-end-start-radius': '<len-pct>{1,2}',
-  'border-start-end-radius': '<len-pct>{1,2}',
-  'border-start-start-radius': '<len-pct>{1,2}',
-  'border-top-left-radius': '<len-pct>{1,2}',
-  'border-top-right-radius': '<len-pct>{1,2}',
+  'border-bottom-left-radius': _lenPct1or2,
+  'border-bottom-right-radius': _lenPct1or2,
+  'border-end-end-radius': _lenPct1or2,
+  'border-end-start-radius': _lenPct1or2,
+  'border-start-end-radius': _lenPct1or2,
+  'border-start-start-radius': _lenPct1or2,
+  'border-top-left-radius': _lenPct1or2,
+  'border-top-right-radius': _lenPct1or2,
   //#endregion
   'bottom': '<top>',
   'box-decoration-break': 'slice | clone',
@@ -502,7 +695,7 @@ const Properties = {
   'clip': 'rect() | auto',
   'clip-path': '<url> | [ <basic-shape> || <geometry-box> ] | none',
   'clip-rule': '<fill-rule>',
-  'color': '<color>',
+  'color': _color,
   'color-interpolation': 'auto | sRGB | linearRGB',
   'color-interpolation-filters': '<color-interpolation>',
   'color-profile': 1,
@@ -510,12 +703,23 @@ const Properties = {
   'color-scheme': 'normal | [ light | dark | <custom-ident> ]+ && only?',
   'column-count': 'auto | <int1+>',
   'column-fill': 'auto | balance | balance-all',
-  'column-gap': 'normal | <len-pct>',
+  'column-gap': 'normal | <len-pct0+> | <line-width>',
   'column-height': 'auto | <len0+>',
-  'column-rule': '<border-shorthand>',
-  'column-rule-color': '<color>',
-  'column-rule-style': '<border-style>',
-  'column-rule-width': '<border-width>',
+  'column-rule': '<rule>',
+  'column-rule-break': '<row-rule-break>',
+  'column-rule-color': '<rule-color>',
+  'column-rule-inset': '<rule-inset>',
+  'column-rule-inset-cap': _insetValue1or2,
+  'column-rule-inset-cap-start': _insetValue,
+  'column-rule-inset-cap-end': _insetValue,
+  'column-rule-inset-junction': _insetValue1or2,
+  'column-rule-inset-junction-start': _insetValue,
+  'column-rule-inset-junction-end': _insetValue,
+  'column-rule-inset-start': _insetValue,
+  'column-rule-inset-end': _insetValue,
+  'column-rule-style': '<rule-style>',
+  'column-rule-visibility-items': _ruleVisibilityItems,
+  'column-rule-width': '<rule-width>',
   'column-span': 'none | <int1+> | all | auto',
   'column-width': 'auto | <len0+>',
   'columns': '[ <column-width> || <column-count> ] [ / <column-height> ]?',
@@ -533,44 +737,44 @@ const Properties = {
   //#region corner (shorthands)
   'corner': '<border-radius> || <corner-shape>',
   'corner-top': '<border-top-radius> || <corner-top-shape>',
-  'corner-bottom': '<corner-top>',
-  'corner-left': '<corner-top>',
-  'corner-right': '<corner-top>',
-  'corner-block-start': '<corner-top>',
-  'corner-block-end': '<corner-top>',
-  'corner-inline-start': '<corner-top>',
-  'corner-inline-end': '<corner-top>',
+  'corner-bottom': _cornerTop,
+  'corner-left': _cornerTop,
+  'corner-right': _cornerTop,
+  'corner-block-start': _cornerTop,
+  'corner-block-end': _cornerTop,
+  'corner-inline-start': _cornerTop,
+  'corner-inline-end': _cornerTop,
   //#endregion
   //#region corner (single)
   'corner-top-left': '<border-top-left-radius> || <corner-top-left-shape>',
-  'corner-top-right': '<corner-top-left>',
-  'corner-bottom-left': '<corner-top-left>',
-  'corner-bottom-right': '<corner-top-left>',
-  'corner-end-end': '<corner-top-left>',
-  'corner-end-start': '<corner-top-left>',
-  'corner-start-end': '<corner-top-left>',
-  'corner-start-start': '<corner-top-left>',
+  'corner-top-right': _cornerTopLeft,
+  'corner-bottom-left': _cornerTopLeft,
+  'corner-bottom-right': _cornerTopLeft,
+  'corner-end-end': _cornerTopLeft,
+  'corner-end-start': _cornerTopLeft,
+  'corner-start-end': _cornerTopLeft,
+  'corner-start-start': _cornerTopLeft,
   //#endregion
   //#region corner shape (shorthands)
   'corner-shape': '<corner-shape-value>{1,4}',
   'corner-top-shape': '<corner-shape-value>{1,2}',
-  'corner-block-end-shape': '<corner-top-shape>',
-  'corner-block-start-shape': '<corner-top-shape>',
-  'corner-bottom-shape': '<corner-top-shape>',
-  'corner-inline-end-shape': '<corner-top-shape>',
-  'corner-inline-start-shape': '<corner-top-shape>',
-  'corner-left-shape': '<corner-top-shape>',
-  'corner-right-shape': '<corner-top-shape>',
+  'corner-block-end-shape': _cornerTopShape,
+  'corner-block-start-shape': _cornerTopShape,
+  'corner-bottom-shape': _cornerTopShape,
+  'corner-inline-end-shape': _cornerTopShape,
+  'corner-inline-start-shape': _cornerTopShape,
+  'corner-left-shape': _cornerTopShape,
+  'corner-right-shape': _cornerTopShape,
   //#endregion
   //#region corner shape (single)
-  'corner-bottom-left-shape': '<corner-shape-value>',
-  'corner-bottom-right-shape': '<corner-shape-value>',
-  'corner-end-end-shape': '<corner-shape-value>',
-  'corner-end-start-shape': '<corner-shape-value>',
-  'corner-start-end-shape': '<corner-shape-value>',
-  'corner-start-start-shape': '<corner-shape-value>',
-  'corner-top-left-shape': '<corner-shape-value>',
-  'corner-top-right-shape': '<corner-shape-value>',
+  'corner-bottom-left-shape': _cornerShapeValue,
+  'corner-bottom-right-shape': _cornerShapeValue,
+  'corner-end-end-shape': _cornerShapeValue,
+  'corner-end-start-shape': _cornerShapeValue,
+  'corner-start-end-shape': _cornerShapeValue,
+  'corner-start-start-shape': _cornerShapeValue,
+  'corner-top-left-shape': _cornerShapeValue,
+  'corner-top-right-shape': _cornerShapeValue,
   //#endregion
   'counter-increment': '<counter>',
   'counter-reset': '<counter>',
@@ -619,16 +823,16 @@ const Properties = {
   'font-feature-settings': '[ <ascii4> [ <int0+> | on | off ]? ]# | normal',
   'font-kerning': 'auto | normal | none',
   'font-language-override': 'normal | <string>',
-  'font-optical-sizing': 'auto | none',
+  'font-optical-sizing': _autoNone,
   'font-palette': 'none | normal | light | dark | <custom-ident>',
   'font-size': '<absolute-size> | <relative-size> | <len-pct0+>',
   'font-size-adjust': 'none | [ex-height|cap-height|ch-width|ic-width|ic-height]? [from-font|<num0+>]',
   'font-stretch': '<font-stretch-named> | <pct>',
   'font-style': 'normal | italic | oblique <angle>?',
   'font-synthesis': 'none | [ weight || style ]',
-  'font-synthesis-style': 'auto | none',
-  'font-synthesis-weight': 'auto | none',
-  'font-synthesis-small-caps': 'auto | none',
+  'font-synthesis-style': _autoNone,
+  'font-synthesis-weight': _autoNone,
+  'font-synthesis-small-caps': _autoNone,
   'font-variant': 'normal | none | [ ' +
     '<font-variant-ligatures> || <font-variant-alternates> || ' +
     '<font-variant-caps> || <font-variant-numeric> || <font-variant-east-asian> ]',
@@ -668,7 +872,7 @@ const Properties = {
     'subgrid [ <line-names> | repeat( [ <int1+> | auto-fill ] , <line-names>+ ) ]*',
 
   'hanging-punctuation': 'none | [ first || [ force-end | allow-end ] || last ]',
-  'height': '<width>',
+  'height': _width,
   'hyphenate-character': '<string> | auto',
   'hyphenate-limit-chars': '[ auto | <int> ]{1,3}',
   'hyphens': 'none | manual | auto',
@@ -677,7 +881,7 @@ const Properties = {
   'image-rendering': 'auto | smooth | high-quality | crisp-edges | pixelated | ' +
     'optimizeSpeed | optimizeQuality | -webkit-optimize-contrast',
   'image-resolution': 1,
-  'inline-size': '<width>',
+  'inline-size': _width,
   'inset': '<top>{1,4}',
   'inset-block': '<top>{1,2}',
   'inset-block-end': '<top>',
@@ -696,7 +900,7 @@ const Properties = {
 
   'left': '<top>',
   'letter-spacing': '<len-pct> | normal',
-  'lighting-color': '<color>',
+  'lighting-color': _color,
   'line-height': '<line-height>',
   'line-break': 'auto | loose | normal | strict | anywhere',
   'list-style': '<list-style-position> || <list-style-image> || <list-style-type>',
@@ -747,12 +951,12 @@ const Properties = {
   'mask-type': 'luminance | alpha',
   'max-height': '<max-width>',
   'max-width': 'none | <width-base>',
-  'min-height': '<width>',
-  'min-width': '<width>',
+  'min-height': _width,
+  'min-width': _width,
   'max-block-size': '<max-width>',
   'max-inline-size': '<max-width>',
-  'min-block-size': '<width>',
-  'min-inline-size': '<width>',
+  'min-block-size': _width,
+  'min-inline-size': _width,
   'mix-blend-mode': '<blend-mode>',
 
   'object-fit': 'fill | contain | cover | none | scale-down',
@@ -769,13 +973,13 @@ const Properties = {
   'opacity': '<num0-1> | <pct>',
   'order': '<int>',
   'orphans': '<int>',
-  'outline': '[ <color> | invert ] || [ auto | <border-style> ] || <border-width>',
+  'outline': '[ <color> | invert ] || [ auto | <line-style> ] || <line-width>',
   'outline-color': '<color> | invert',
   'outline-offset': '<len>',
-  'outline-style': '<border-style> | auto',
-  'outline-width': '<border-width>',
+  'outline-style': '<line-style> | auto',
+  'outline-width': _lineWidth,
   'overflow': '<overflow>{1,2}',
-  'overflow-anchor': 'auto | none',
+  'overflow-anchor': _autoNone,
   'overflow-block': '<overflow>',
   'overflow-clip-margin': 'visual-box | <len0+>',
   'overflow-inline': '<overflow>',
@@ -790,15 +994,15 @@ const Properties = {
 
   'padding': '<len-pct0+>{1,4}',
   'padding-block': '<len-pct0+>{1,2}',
-  'padding-block-end': '<len-pct0+>',
-  'padding-block-start': '<len-pct0+>',
-  'padding-bottom': '<len-pct0+>',
+  'padding-block-end': _lenPct0plus,
+  'padding-block-start': _lenPct0plus,
+  'padding-bottom': _lenPct0plus,
   'padding-inline': '<len-pct0+>{1,2}',
-  'padding-inline-end': '<len-pct0+>',
-  'padding-inline-start': '<len-pct0+>',
-  'padding-left': '<len-pct0+>',
-  'padding-right': '<len-pct0+>',
-  'padding-top': '<len-pct0+>',
+  'padding-inline-end': _lenPct0plus,
+  'padding-inline-start': _lenPct0plus,
+  'padding-left': _lenPct0plus,
+  'padding-right': _lenPct0plus,
+  'padding-top': _lenPct0plus,
   'page': 'auto | <custom-ident>',
   'page-break-after': 'auto | always | avoid | left | right | recto | verso',
   'page-break-before': '<page-break-after>',
@@ -834,8 +1038,34 @@ const Properties = {
   'right': '<top>',
   'rotate': 'none | [ x | y | z | <num>{3} ]? && <angle>',
   'row-gap': '<column-gap>',
+  'row-rule': '<rule>',
+  'row-rule-break': 'none | normal | intersection',
+  'row-rule-color': '<rule-color>',
+  'row-rule-inset': '<rule-inset>',
+  'row-rule-inset-cap': _insetValue1or2,
+  'row-rule-inset-cap-start': _insetValue,
+  'row-rule-inset-cap-end': _insetValue,
+  'row-rule-inset-junction': _insetValue1or2,
+  'row-rule-inset-junction-start': _insetValue,
+  'row-rule-inset-junction-end': _insetValue,
+  'row-rule-inset-start': _insetValue,
+  'row-rule-inset-end': _insetValue,
+  'row-rule-style': '<rule-style>',
+  'row-rule-visibility-items': _ruleVisibilityItems,
+  'row-rule-width': '<rule-width>',
   'ruby-align': 'start | center | space-between | space-around',
   'ruby-position': 'alternate || [over|under] | inter-character',
+  'rule': '<rule>',
+  'rule-color': '<rule-color>',
+  'rule-inset': `${_insetValue1or2} [ / ${_insetValue1or2}]?`,
+  'rule-inset-cap': _insetValue1or2,
+  'rule-inset-junction': _insetValue1or2,
+  'rule-inset-start': _insetValue,
+  'rule-inset-end': _insetValue,
+  'rule-overlap': 'row-over-column | column-over-row',
+  'rule-style': '<rule-style>',
+  'rule-visibility-items': _ruleVisibilityItems,
+  'rule-width': '<rule-width>',
 
   'scale': 'none | <num-pct>{1,3}',
   'scroll-behavior': 'auto | smooth',
@@ -898,14 +1128,14 @@ const Properties = {
   'text-box-trim': 'none | trim-start | trim-end | trim-both',
   'text-combine-upright': 'none | all | [ digits <int2-4>? ]',
   'text-decoration': '<text-decoration-line> || <text-decoration-style> || <color>',
-  'text-decoration-color': '<color>',
+  'text-decoration-color': _color,
   'text-decoration-line': 'none | [ underline || overline || line-through || blink ]',
   'text-decoration-skip': 'none | auto',
   'text-decoration-skip-ink': 'none | auto | all',
   'text-decoration-style': 'solid | double | dotted | dashed | wavy',
   'text-decoration-thickness': 'auto | from-font | <len-pct>',
   'text-emphasis': '<text-emphasis-style> || <color>',
-  'text-emphasis-color': '<color>',
+  'text-emphasis-color': _color,
   'text-emphasis-style': 'none | <string> | ' +
     '[ [ filled | open ] || [ dot | circle | double-circle | triangle | sesame ] ]',
   'text-emphasis-position': '[ over | under ] && [ right | left ]?',
@@ -973,10 +1203,10 @@ const Properties = {
 
   // nonstandard https://compat.spec.whatwg.org/
   '-webkit-box-reflect': '[ above | below | right | left ]? <len>? <image>?',
-  '-webkit-text-fill-color': '<color>',
-  '-webkit-text-stroke': '<border-width> || <color>',
-  '-webkit-text-stroke-color': '<color>',
-  '-webkit-text-stroke-width': '<border-width>',
+  '-webkit-text-fill-color': _color,
+  '-webkit-text-stroke': '<line-width> || <color>',
+  '-webkit-text-stroke-color': _color,
+  '-webkit-text-stroke-width': _lineWidth,
   '-webkit-user-modify': 'read-only | read-write | write-only',
 };
 Properties['-ms-appearance'] = 'icon | ' + (
@@ -1193,172 +1423,6 @@ const ScopedProperties = {
     'navigation': 'auto | none',
     'types': 'none | <ident-not-none>+',
   },
-};
-
-/* eslint-disable max-len */
-let tmp;
-const VTComplex = {
-  __proto__: null,
-  '<absolute-size>': 'xx-small | x-small | small | medium | large | x-large | xx-large',
-  '<alpha>': '/ <num-pct-none>',
-  '<angular-color-stop>': '<color> <angle-pct-zero>{0,2}',
-  '<animateable-feature>': 'scroll-position | contents | <animateable-feature-name>',
-  '<animation-direction>': 'normal | reverse | alternate | alternate-reverse',
-  '<animation-fill-mode>': 'none | forwards | backwards | both',
-  '<animation-timeline>': 'auto | none | <custom-ident> | ' +
-    'scroll( [ [ root | nearest | self ] || <axis> ]? ) | ' +
-    'view( [ <axis> || [ [ auto | <len-pct> ]{1,2} ]# ]? )',
-  '<at-pos>': 'at <position>',
-  '<attachment>': 'scroll | fixed | local',
-  '<auto-repeat>':
-    'repeat( [ auto-fill | auto-fit ] , [ <line-names>? <fixed-size> ]+ <line-names>? )',
-  '<auto-track-list>':
-    '[ <line-names>? [ <fixed-size> | <fixed-repeat> ] ]* <line-names>? <auto-repeat> ' +
-    '[ <line-names>? [ <fixed-size> | <fixed-repeat> ] ]* <line-names>?',
-  '<autospace>': 'no-autospace | ' +
-    '[ ideograph-alpha || ideograph-numeric || punctuation ] || [ insert|replace ]',
-  '<axis>': 'block | inline | x | y',
-  '<baseline-position>': '[ first | last ]? baseline',
-  '<basic-shape>': '<fn:basicShape>',
-  '<bg-image>': '<image> | none',
-  '<bg-layer>': '<bg-image> || <bg-position> [ / <bg-size> ]? || <repeat-style> || ' +
-    '<attachment> || <box>{1,2}',
-  '<bg-position>':
-    '[ center | [ left | right ] <len-pct>? ] && [ center | [ top | bottom ] <len-pct>? ] | ' +
-    '[ left | center | right | <len-pct> ] [ top | center | bottom | <len-pct> ] | ' +
-    '[ left | center | right | top | bottom | <len-pct> ]',
-  '<bg-size>': '[ <len-pct> | auto ]{1,2} | cover | contain',
-  '<blend-mode>': 'normal | multiply | screen | overlay | darken | lighten | color-dodge | ' +
-    'color-burn | hard-light | soft-light | difference | exclusion | hue | ' +
-    'saturation | color | luminosity | plus-darker | plus-lighter',
-  /** @param {typeof Matcher} M */
-  '<border-image-slice>': M => M.many([true],
-    // [<num> | <pct>]{1,4} && fill?
-    // but 'fill' can appear between any of the numbers
-    ['<num-pct0+>', '<num-pct0+>', '<num-pct0+>', '<num-pct0+>', 'fill'].map(M.term)),
-  '<border-radius-round>': 'round <border-radius>',
-  '<border-shorthand>': '<border-width> || <border-style> || <color>',
-  '<border-style>':
-    'none | hidden | dotted | dashed | solid | double | groove | ridge | inset | outset',
-  '<border-width>': '<len> | thin | medium | thick',
-  '<box>': 'padding-box | border-box | content-box',
-  '<box-fsv>': 'fill-box | stroke-box | view-box',
-  '<color>': '<named-or-hex-color> | <fn:color>',
-  '<color-interpolation-method>': 'in [ <rectangular-color-space> | <polar-color-space> <hue-interpolation-method>? ]',
-  '<color-stop-list>': '<linear-color-stop> [, [ [<len-pct> ,]? <linear-color-stop> ]# ]?',
-  '<compositing-operator>': 'add | subtract | intersect | exclude',
-  '<contain-intrinsic>': 'auto? [ none | <len> ]',
-  '<content-distribution>': 'space-between | space-around | space-evenly | stretch',
-  '<content-list>':
-    '[ <string> | <image> | <attr> | ' +
-    'content( text | before | after | first-letter | marker ) | ' +
-    'counter() | counters() | leader() | ' +
-    'open-quote | close-quote | no-open-quote | no-close-quote | ' +
-    'target-counter() | target-counters() | target-text() ]+',
-  '<content-position>': 'center | start | end | flex-start | flex-end',
-  '<coord-box>': '<box> | <box-fsv>',
-  '<corner-shape-value>': 'round|scoop|bevel|notch|square|squircle|<fn:cornerShape>',
-  '<counter>': '[ <ident-not-none> <int>? ]+ | none',
-  '<dasharray>': M => M.alt([M.term('<len-pct0+>'), M.term('<num0+>')])
-    .braces(1, Infinity, '#', M.term(',').braces(0, 1, '?')),
-  '<display-box>': 'contents | none',
-  '<display-inside>': 'flow | flow-root | table | flex | grid | ruby',
-  '<display-internal>': 'table-row-group | table-header-group | table-footer-group | ' +
-    'table-row | table-cell | table-column-group | table-column | table-caption | ' +
-    'ruby-base | ruby-text | ruby-base-container | ruby-text-container',
-  '<display-legacy>': 'inline-block | inline-table | inline-flex | inline-grid',
-  '<display-listitem>': '<display-outside>? && [ flow | flow-root ]? && list-item',
-  '<display-outside>': 'block | inline | run-in',
-  '<dynamic-range>': 'standard | no-limit | constrained',
-  '<explicit-track-list>': '[ <line-names>? <track-size> ]+ <line-names>?',
-  '<family-name>': '<string> | <custom-ident>+',
-  // https://drafts.fxtf.org/filter-effects/#supported-filter-functions
-  // Value may be omitted in which case the default is used
-  '<filter-function-list>': '[ <fn:filter> | <url> ]+',
-  '<final-bg-layer>': '<color> || <bg-image> || <bg-position> [ / <bg-size> ]? || ' +
-    '<repeat-style> || <attachment> || <box>{1,2}',
-  '<fixed-repeat>': 'repeat( [ <int1+> ] , [ <line-names>? <fixed-size> ]+ <line-names>? )',
-  '<fixed-size>':
-    '<len-pct> | minmax( <len-pct> , <track-breadth> | <inflexible-breadth> , <len-pct> )',
-  '<flex-direction>': 'row | row-reverse | column | column-reverse',
-  '<flex-wrap>': 'nowrap | wrap | wrap-reverse',
-  '<font-short-core>': '<font-size> [ / <line-height> ]? <font-family>',
-  '<font-short-tweak-no-pct>':
-    '<font-style> || [ normal | small-caps ] || <font-weight> || <font-stretch-named>',
-  '<font-stretch-named>': 'normal | ultra-condensed | extra-condensed | condensed | ' +
-    'semi-condensed | semi-expanded | expanded | extra-expanded | ultra-expanded',
-  '<font-variant-alternates>': 'stylistic() || historical-forms || styleset() || ' +
-    'character-variant() || swash() || ornaments() || annotation()',
-  '<font-variant-caps>':
-    'small-caps | all-small-caps | petite-caps | all-petite-caps | unicase | titling-caps',
-  '<font-variant-east-asian>': '[ jis78|jis83|jis90|jis04|simplified|traditional ] || ' +
-    '[ full-width | proportional-width ] || ruby',
-  '<font-variant-ligatures>': '[ common-ligatures | no-common-ligatures ] || ' +
-    '[ discretionary-ligatures | no-discretionary-ligatures ] || ' +
-    '[ historical-ligatures | no-historical-ligatures ] || ' +
-    '[ contextual | no-contextual ]',
-  '<font-variant-numeric>': '[ lining-nums | oldstyle-nums ] || ' +
-    '[ proportional-nums | tabular-nums ] || ' +
-    '[ diagonal-fractions | stacked-fractions ] || ' +
-    'ordinal || slashed-zero',
-  '<generic-family>': 'serif | sans-serif | cursive | fantasy | monospace | system-ui | ' +
-    'emoji | math | fangsong | ui-serif | ui-sans-serif | ui-monospace | ui-rounded',
-  '<geometry-box>': '<shape-box> | <box-fsv>',
-  '<gradient>': 'radial-gradient() | linear-gradient() | conic-gradient() | gradient() | ' +
-    'repeating-radial-gradient() | repeating-linear-gradient() | repeating-conic-gradient() | ' +
-    'repeating-gradient()',
-  '<grid-line>': 'auto | [ <int> && <ident-for-grid>? ] | <ident-for-grid> | ' +
-    '[ span && [ <int> || <ident-for-grid> ] ]',
-  '<hue-interpolation-method>': '[shorter|longer|increasing|decreasing] hue',
-  '<image>': '<image-no-set> | image-set( <image-set># )',
-  '<image-no-set>': '<url> | <gradient> | -webkit-cross-fade()',
-  '<image-set>': '[ <image-no-set> | <string> ] [ <resolution> || type( <string> ) ]',
-  '<inflexible-breadth>': '<len-pct> | min-content | max-content | auto',
-  '<line-height>': '<num> | <len-pct> | normal',
-  '<line-names>': '"[" <ident-for-grid> "]"',
-  '<linear-color-stop>': '<color> <len-pct>?',
-  '<masking-mode>': 'alpha | luminance | match-source',
-  '<overflow-position>': 'unsafe | safe',
-  '<overflow>': '<vis-hid> | clip | scroll | auto | overlay', // TODO: warning about `overlay`
-  '<overscroll>': 'contain | none | auto',
-  '<paint>': 'none | <color> | <url> [ none | <color> ]? | context-fill | context-stroke',
-  '<polar-color-space>': 'hsl | hwb | lch | oklch',
-  // Because our `alt` combinator is ordered, we need to test these
-  // in order from longest possible match to shortest.
-  '<position>':
-    '[ [ left | right ] <len-pct> ] && [ [ top | bottom ] <len-pct> ] | ' +
-    '[ left | center | right | <len-pct> ] ' +
-    '[ top | center | bottom | <len-pct> ]? | ' +
-    '[ left | center | right ] || [ top | center | bottom ]',
-  '<position-area>': tmp = '[left|center|right|span-left|span-right|x-start|x-end|span-x-start|span-x-end|self-x-start|self-x-end|span-self-x-start|span-self-x-end|span-all] || [top|center|bottom|span-top|span-bottom|y-start|y-end|span-y-start|span-y-end|self-y-start|self-y-end|span-self-y-start|span-self-y-end|span-all] | [block-start|center|block-end|span-block-start|span-block-end|span-all] || [inline-start|center|inline-end|span-inline-start|span-inline-end|span-all] | [self-block-start|center|self-block-end|span-self-block-start|span-self-block-end|span-all] || [self-inline-start|center|self-inline-end|span-self-inline-start|span-self-inline-end|span-all] | [start|center|end|span-start|span-end|span-all]{1,2} | [self-start|center|self-end|span-self-start|span-self-end|span-all]{1,2}',
-  '<position-area-query>': tmp.replace(/]/g, '|any]'),
-  '<predefined-rgb>': 'srgb|srgb-linear|display-p3|display-p3-linear|a98-rgb|prophoto-rgb|rec2020',
-  '<ratio>': '<num0+> [ / <num0+> ]?',
-  '<radial-extent>': 'closest-corner | closest-side | farthest-corner | farthest-side',
-  '<relative-size>': 'smaller | larger',
-  '<repeat-style>': 'repeat-x | repeat-y | [ repeat | space | round | no-repeat ]{1,2}',
-  '<rectangular-color-space>': '<predefined-rgb>|lab|oklab|<xyz-space>',
-  '<self-position>': 'center | start | end | self-start | self-end | flex-start | flex-end',
-  '<shadow>': 'inset? && [ <len>{2,4} && <color>? ]',
-  '<shape-box>': '<box> | margin-box',
-  '<shape-radius>': '<len-pct0+> | closest-side | farthest-side',
-  '<timing-function>': 'linear|ease|ease-in|ease-out|ease-in-out|step-start|step-end | ' +
-    'cubic-bezier( <num0-1> , <num> , <num0-1> , <num> ) | ' +
-    'linear( [ <num> && <pct>{0,2} ]# ) | ' +
-    'steps( <int> [ , [ jump-start | jump-end | jump-none | jump-both | start | end ] ]? )',
-  '<text-align>': 'start | end | left | right | center | justify | match-parent',
-  '<track-breadth>': '<len-pct> | <flex> | min-content | max-content | auto',
-  '<track-list>': '[ <line-names>? [ <track-size> | <track-repeat> ] ]+ <line-names>?',
-  '<track-repeat>': 'repeat( [ <int1+> ] , [ <line-names>? <track-size> ]+ <line-names>? )',
-  '<track-size>': '<track-breadth> | minmax( <inflexible-breadth> , <track-breadth> ) | ' +
-    'fit-content( <len-pct> )',
-  '<try-tactic>': 'flip-block || flip-inline || flip-start || flip-x || flip-y',
-  '<txbhv>': 'normal | allow-discrete',
-  '<url>': '<uri> | src( <string> [ <ident> | <func> ]* )',
-  '<vis-hid>': 'visible | hidden',
-  '<width-base>': '<len-pct> | min-content | max-content | fit-content | stretch | contain | ' +
-    '-moz-available | -webkit-fill-available | anchor-size() | calc-size()',
-  '<xyz-space>': 'xyz | xyz-d50 | xyz-d65',
 };
 
 let i;
@@ -1621,10 +1685,16 @@ function vtFailure(unit, what) {
 
 /* eslint-disable max-len */
 
+const _conicGradient = '[ [ [ [ from <angle-zero> ]? <at-pos>? ] || <color-interpolation-method> ] , ]? [ <angular-color-stop> [, [ [<angle-pct-zero> ,]? <angular-color-stop> ]# ]? ]';
+const _linearGradient = '[ [ [ [ <angle-zero> | to [[left|right] || [top|bottom]] ] || <color-interpolation-method> ] , ]? <color-stop-list> ]?';
+const _radialGradient = '[ [ [ [ [circle|ellipse] || [<radial-extent> | <len0+> | <len-pct0+>{2}] ]? <at-pos>? ] || <color-interpolation-method> ] , ]? <color-stop-list>';
 const grads = {
-  'conic-gradient': '[ [ [ [ from <angle-zero> ]? <at-pos>? ] || <color-interpolation-method> ] , ]? [ <angular-color-stop> [, [ [<angle-pct-zero> ,]? <angular-color-stop> ]# ]? ]',
-  'linear-gradient': '[ [ [ [ <angle-zero> | to [[left|right] || [top|bottom]] ] || <color-interpolation-method> ] , ]? <color-stop-list> ]?',
-  'radial-gradient': '[ [ [ [ [circle|ellipse] || [<radial-extent> | <len0+> | <len-pct0+>{2}] ]? <at-pos>? ] || <color-interpolation-method> ] , ]? <color-stop-list>',
+  'conic-gradient': _conicGradient,
+  'linear-gradient': _linearGradient,
+  'radial-gradient': _radialGradient,
+  'repeating-conic-gradient': _conicGradient,
+  'repeating-linear-gradient': _linearGradient,
+  'repeating-radial-gradient': _radialGradient,
 };
 const rects = {
   rect: '[ <len> | auto ]#{4} <border-radius-round>?',
@@ -1690,6 +1760,7 @@ const VTFunctions = {
     'saturate': '<num-pct>?',
     'sepia': '<num-pct>?',
   },
+  gradients: grads,
   transform: {
     __proto__: null,
     matrix: '<num>#{6}',
@@ -1726,8 +1797,6 @@ const VTFunctions = {
     if (low !== key) Object.defineProperty(obj, low, {value: obj[key], writable: true});
   }
 }
-for (const key in grads)
-  VTFunctions._['repeating-' + key] = grads[key];
 
 const rxAltSep = /\s*\|\s*/;
 const rxAndAndSep = /\s*&&\s*/y;
@@ -1795,12 +1864,10 @@ class Matcher {
     return !ms[1] ? ms[0] : new AltMatcher(ms);
   }
 
-  braces(min, max, marker, sep) {
+  braces(min, max, marker, sep, outlier) {
     return new BracesMatcher(this, min, max, marker,
-      sep && new SeqMatcher([
-        typeof sep === 'string' ? singleTerm(sep) : sep,
-        this,
-      ]),
+      sep && typeof sep === 'string' ? singleTerm(sep) : sep,
+      outlier,
     );
   }
 
@@ -1847,14 +1914,16 @@ class BracesMatcher extends Matcher {
    * @param {number} max
    * @param {string} [marker]
    * @param {string|Matcher} [sep]
+   * @param {Matcher} [outlier] one optional nonstandard item in the series
    */
-  constructor(m, min, max, marker, sep) {
+  constructor(m, min, max, marker, sep, outlier) {
     super(MOD);
     this.m = m;
     this.min = min;
     this.max = max;
     this.marker = marker;
     this.sep = sep;
+    this.outlier = outlier;
   }
 
   /**
@@ -1863,13 +1932,18 @@ class BracesMatcher extends Matcher {
    * @return {boolean|number}
    */
   test(expr, p) {
-    let i = 0;
     const {min, max, sep, m} = this;
-    while (i < max && (i && sep || m).match(expr, p)) {
+    let {outlier} = this;
+    let num = 0;
+    let lastSep;
+    while (num < max + !!outlier
+        && (m.match(expr, p) && ++num || outlier?.match(expr, p) && !(outlier = null))
+        && (!sep || (lastSep = sep.match(expr)))) {
       p = undefined; // clearing because expr points to the next part now
-      i++;
     }
-    return i >= min && (i || true);
+    if (lastSep)
+      expr.i--;
+    return num >= min && (num || true);
   }
 
   toString() {
