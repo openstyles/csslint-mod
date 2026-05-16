@@ -10,6 +10,7 @@ A fork of the original [CSSLint](https://github.com/CSSLint/csslint) Build v0.10
   * [shorthand-overrides](src/rules/shorthand-overrides.js): require a shorthand to precede an individual property
   * [simple-not](src/rules/simple-not.js): require a simple selector in `:not()`
   * [selector-newline](src/rules/selector-newline.js): warn if descendant selector is on a new line
+  * [selector-newline-no-indent](src/rules/selector-newline-no-indent.js): warn if descendant selector is on a new non-indented line
   * [style-rule-nesting](src/rules/style-rule-nesting.js): warn if CSS nesting is used
 * No support for CLI or extra formatters.
 

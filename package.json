@@ -21,7 +21,7 @@
     "watch": "rollup -c -w",
     "lint": "eslint \"**/*.js\" --cache",
     "test": "pnpm lint && node --import=extensionless/register test/test.js",
-    "preversion": "pnpm test",
+    "preversion": "pnpm test && pnpm run build && git add dist",
     "bump": "pnpm version patch",
     "bump2": "pnpm version minor"
   },
