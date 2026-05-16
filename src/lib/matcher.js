@@ -73,12 +73,10 @@ export default class Matcher {
     return !ms[1] ? ms[0] : new AltMatcher(ms);
   }
 
-  braces(min, max, marker, sep) {
+  braces(min, max, marker, sep, outlier) {
     return new BracesMatcher(this, min, max, marker,
-      sep && new SeqMatcher([
-        typeof sep === 'string' ? singleTerm(sep) : sep,
-        this,
-      ]),
+      sep && typeof sep === 'string' ? singleTerm(sep) : sep,
+      outlier,
     );
   }
 
@@ -125,14 +123,16 @@ class BracesMatcher extends Matcher {
    * @param {number} max
    * @param {string} [marker]
    * @param {string|Matcher} [sep]
+   * @param {Matcher} [outlier] one optional nonstandard item in the series
    */
-  constructor(m, min, max, marker, sep) {
+  constructor(m, min, max, marker, sep, outlier) {
     super(MOD);
     this.m = m;
     this.min = min;
     this.max = max;
     this.marker = marker;
     this.sep = sep;
+    this.outlier = outlier;
   }
 
   /**
@@ -141,13 +141,18 @@ class BracesMatcher extends Matcher {
    * @return {boolean|number}
    */
   test(expr, p) {
-    let i = 0;
     const {min, max, sep, m} = this;
-    while (i < max && (i && sep || m).match(expr, p)) {
+    let {outlier} = this;
+    let num = 0;
+    let lastSep;
+    while (num < max + !!outlier
+        && (m.match(expr, p) && ++num || outlier?.match(expr, p) && !(outlier = null))
+        && (!sep || (lastSep = sep.match(expr)))) {
       p = undefined; // clearing because expr points to the next part now
-      i++;
     }
-    return i >= min && (i || true);
+    if (lastSep)
+      expr.i--;
+    return num >= min && (num || true);
   }
 
   toString() {

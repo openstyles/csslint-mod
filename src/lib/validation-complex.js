@@ -35,10 +35,7 @@ const VTComplex = {
     'color-burn | hard-light | soft-light | difference | exclusion | hue | ' +
     'saturation | color | luminosity | plus-darker | plus-lighter',
   /** @param {typeof Matcher} M */
-  '<border-image-slice>': M => M.many([true],
-    // [<num> | <pct>]{1,4} && fill?
-    // but 'fill' can appear between any of the numbers
-    ['<num-pct0+>', '<num-pct0+>', '<num-pct0+>', '<num-pct0+>', 'fill'].map(M.term)),
+  '<border-image-slice>': M => M.term('<num-pct0+>').braces(1, 4, '', '', M.term('fill')),
   '<border-radius-round>': 'round <border-radius>',
   '<border-shorthand>': '<border-width> || <border-style> || <color>',
   '<border-style>':
