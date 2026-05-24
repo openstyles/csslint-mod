@@ -89,3 +89,5 @@ warning	665	35	Expected [ <dashed-ident> || [ width|height|block|inline|self-blo
 warning	682	27	Complex selector inside :not().
 warning	698	24	No box-sizing and width in padding-inline
 warning	705	1	Line break in selector without "," or indent
+warning	746	11	::after must follow :hover
+warning	746	29	:after must follow :hover

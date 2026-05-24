@@ -741,3 +741,8 @@ a {flex-flow: row wr/*incomplete*/}
   position-area: block-end span-all;
   position-area: self-x-start span-all;
 }
+
+.pseudo-valid-order {
+  a::after:hover, b, a:after:hover { color: red }
+  a:hover::after, a::part(foo):hover, a::slotted(span):hover, a::-webkit-meter-bar:hover { color: green }
+}

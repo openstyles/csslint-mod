@@ -10,6 +10,7 @@ export default [{
   const WK = 0x10;
   const Moz = 0x20;
   const DEAD = 0xDEAD0000; // deprecated
+  const REAL = 0x40; // pseudo element is a real element in DOM tree
   const definitions = {
     // elements
     'after': 1 + 2, // also allows ":"
@@ -25,7 +26,7 @@ export default [{
     'grammar-error': 2,
     'highlight': 2 + Func,
     'marker': 2,
-    'part': 2 + Func,
+    'part': 2 + Func + REAL,
     'picker': 2 + Func,
     'picker-icon': 2,
     'placeholder': 2 + Moz,
@@ -34,7 +35,7 @@ export default [{
     'scroll-marker-group': 2,
     'search-text': 2,
     'selection': 2 + Moz,
-    'slotted': 2 + Func,
+    'slotted': 2 + Func + REAL,
     'spelling-error': 2,
     'target-text': 2,
     'view-transition': 2,
@@ -212,6 +213,7 @@ export default [{
   const checkSelector = ({parts}) => {
     for (const {modifiers} of parts || []) {
       if (!modifiers) continue;
+      let pseudoElement;
       for (const mod of modifiers) {
         if (mod.type === 'pseudo') {
           const {text} = mod;
@@ -235,6 +237,9 @@ export default [{
                 (def & WK) && (def & Moz) && '-webkit- or -moz-' ||
                 (def & WK) && '-webkit-' || '-moz-'} prefix in`,
             (def & DEAD) && 'Deprecated',
+            pseudoElement
+              ? !(def & 2) && `${pseudoElement} must follow`
+              : !defPrefixed && (def & 2) && !(def & REAL) && (pseudoElement = text, false),
           ]) {
             if (err) reporter.report(`${err} ${text.slice(0, all.length)}`, mod, rule);
           }
