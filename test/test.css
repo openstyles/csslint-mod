@@ -746,3 +746,7 @@ a {flex-flow: row wr/*incomplete*/}
   a::after:hover, b, a:after:hover { color: red }
   a:hover::after, a::part(foo):hover, a::slotted(span):hover, a::-webkit-meter-bar:hover { color: green }
 }
+
+.xy-gradient {
+  background: linear-gradient(red 0%, red 0% 1%, red 2%);
+}

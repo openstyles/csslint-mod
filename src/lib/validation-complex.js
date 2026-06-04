@@ -122,7 +122,7 @@ const VTComplex = {
   '<line-names>': '"[" <ident-for-grid> "]"',
   '<line-style>': 'none | hidden | dotted | dashed | solid | double | groove | ridge | inset | outset',
   '<line-width>': '<len0+> | thin | medium | thick',
-  '<linear-color-stop>': '<color> <len-pct>?',
+  '<linear-color-stop>': '<color> <len-pct>{0,2}',
   '<masking-mode>': 'alpha | luminance | match-source',
   '<overflow-position>': 'unsafe | safe',
   '<overflow>': '<vis-hid> | clip | scroll | auto | overlay', // TODO: warning about `overlay`
