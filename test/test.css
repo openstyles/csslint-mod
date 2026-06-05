@@ -750,3 +750,10 @@ a {flex-flow: row wr/*incomplete*/}
 .xy-gradient {
   background: linear-gradient(red 0%, red 0% 1%, red 2%);
 }
+
+.spacey-url {
+  background: url(
+    'https://foo/\
+                  bar.png'
+  );
+}

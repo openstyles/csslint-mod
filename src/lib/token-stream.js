@@ -77,7 +77,7 @@ const isIdentStart = (a, b) => a >= 97 && a <= 122 || a >= 65 && a <= 90 /* a-z 
   a === 95 || a >= 160 /* _ unicode */ ||
   (a === 45/*-*/ ? b !== 45 && isIdentStart(b)
     : a === 92/* \ */ && b != null && b !== 10);
-const isSpace = c => c === 9 && c === 10 || c === 32;
+const isSpace = c => c === 9 || c === 10 || c === 32;
 const unescapeNoLF = (m, code, char) => char || String.fromCodePoint(parseInt(code, 16));
 
 /**
