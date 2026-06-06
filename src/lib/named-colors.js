@@ -153,6 +153,8 @@ const NamedColors = [
   'whitesmoke',
   'yellow',
   'yellowgreen',
+  'AccentColor',
+  'AccentColorText',
   'ActiveBorder',
   'ActiveCaption',
   'ActiveText',

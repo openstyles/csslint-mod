@@ -114,7 +114,7 @@ const VTComplex = {
     '[ span && [ <int> || <ident-for-grid> ] ]',
   '<hue-interpolation-method>': '[shorter|longer|increasing|decreasing] hue',
   '<image>': '<image-no-set> | image-set( <image-set># )',
-  '<image-no-set>': '<url> | <fn:gradients> | -webkit-cross-fade()',
+  '<image-no-set>': '<url> | <fn:gradients> | image( <color> ) | -webkit-cross-fade()',
   '<image-set>': '[ <image-no-set> | <string> ] [ <resolution> || type( <string> ) ]',
   '<inflexible-breadth>': '<len-pct> | min-content | max-content | auto',
   '<inset-value>': '<len-pct> | overlap-join',
@@ -126,7 +126,7 @@ const VTComplex = {
   '<masking-mode>': 'alpha | luminance | match-source',
   '<overflow-position>': 'unsafe | safe',
   '<overflow>': '<vis-hid> | clip | scroll | auto | overlay', // TODO: warning about `overlay`
-  '<overscroll>': 'contain | none | auto',
+  '<overscroll>': 'contain | none | auto | chain',
   '<paint>': 'none | <color> | <url> [ none | <color> ]? | context-fill | context-stroke',
   '<polar-color-space>': 'hsl | hwb | lch | oklch',
   // Because our `alt` combinator is ordered, we need to test these
@@ -164,7 +164,7 @@ const VTComplex = {
     'fit-content( <len-pct> )',
   '<try-tactic>': 'flip-block || flip-inline || flip-start || flip-x || flip-y',
   '<txbhv>': 'normal | allow-discrete',
-  '<url>': '<uri> | src( <string> [ <ident> | <func> ]* )',
+  '<url>': '<uri> | url( <string> <fn:urlModifier>* ) | src( <string> <fn:urlModifier>* )',
   '<vis-hid>': 'visible | hidden',
   '<width-base>': '<len-pct> | min-content | max-content | fit-content | stretch | contain | ' +
     '-moz-available | -webkit-fill-available | anchor-size() | calc-size()',

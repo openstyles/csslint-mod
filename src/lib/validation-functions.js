@@ -30,7 +30,7 @@ const VTFunctions = {
     circle: '<shape-radius> <at-pos>?',
     ellipse: '<shape-radius>{2}? <at-pos>?',
     path: '[ <fill-rule> , ]? <string>',
-    polygon: '[ <fill-rule> , ]? [ <len-pct> <len-pct> ]#',
+    polygon: '[ <fill-rule> [ round <len> ]? , ]? [ <len-pct>{2} ]#',
     shape: '[ [from|move|line|hline|vline|curve|smooth|arc] [to|by]? [<ident>|<len-pct>]+ ]#',
     ...rects,
   },
@@ -49,7 +49,7 @@ const VTFunctions = {
       'from <color> <rel-lab-num-pct>{3} [ / <rel-lab-num-pct> ]?',
     'lch': '<num-pct-none>{2} [ <hue> | none ] <alpha>? | ' +
       'from <color> <rel-lch-num-pct>{2} [ <hue> | <rel-lch> ] [ / <rel-lch-num-pct> ]?',
-    'light-dark': '<color>#{2}',
+    'light-dark': '<color>#{2} | [<image>|none]#{2}',
     'rgb': '[ <num>#{3} | <pct>#{3} ] [ , <num-pct0+> ]? | ' +
       '<num-pct-none>{3} <alpha>? | ' +
       'from <color> <rel-rgb-num-pct>{3} [ / <rel-rgb-num-pct> ]?',
@@ -99,6 +99,12 @@ const VTFunctions = {
     translateX: '<len-pct>',
     translateY: '<len-pct>',
     translateZ: '<len>',
+  },
+  urlModifier: {
+    __proto__: null,
+    'cross-origin': 'anonymous | use-credentials',
+    'integrity': '<string>',
+    'referrer-policy': 'no-referrer | no-referrer-when-downgrade | same-origin | origin | strict-origin | origin-when-cross-origin | strict-origin-when-cross-origin | unsafe-url',
   },
 };
 

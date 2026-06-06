@@ -88,7 +88,10 @@ const ScopedProperties = {
     __proto__: null,
     '<all>': true,
     'bleed': 'auto | <len>',
-    'marks': 'none | [ crop || cross ]',
+    'marks': 'none | crop || cross',
+    'page': 'auto | <custom-ident>',
+    'page-margin-safety': 'none | clamp | add',
+    'page-orientation': 'upright | rotate-left | rotate-right',
     'size': '<len>{1,2} | auto | [ [ A3 | A4 | A5 | B4 | B5 | JIS-B4 | JIS-B5 | ' +
       'ledger | legal | letter ] || [ portrait | landscape ] ]',
   },
