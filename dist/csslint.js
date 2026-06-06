@@ -482,16 +482,18 @@ var ruleDuplicateBackgroundImages = [{
 }, (rule, parser, reporter) => {
   const stack = {};
   parser.addListener('property', event => {
-    if (!/^-(webkit|moz|ms|o)-background(-image)$/i.test(event.property.text)) {
+    if (!/^(-(webkit|moz|ms|o)-)?background(-image)$/i.test(event.property.text)) {
       return;
     }
     for (const part of event.value.parts) {
-      if (part.type !== 'uri') continue;
-      const uri = stack[part.uri];
-      if (!uri) {
-        stack[part.uri] = event;
+      if (part.name !== 'url')
+        continue;
+      const url = part.uri ?? part.expr.parts[0].string;
+      const e = stack[url];
+      if (!e) {
+        stack[url] = event;
       } else {
-        reporter.report(rule.desc + `. First declared at ${uri.line}:${uri.col}.`, event, rule);
+        reporter.report(rule.desc + `. First declared at ${e.line}:${e.col}.`, event, rule);
       }
     }
   });
@@ -697,6 +699,7 @@ var ruleKnownPseudos = [{
   const WK = 0x10;
   const Moz = 0x20;
   const DEAD = 0xDEAD0000; // deprecated
+  const REAL = 0x40; // pseudo element is a real element in DOM tree
   const definitions = {
     // elements
     'after': 1 + 2, // also allows ":"
@@ -712,7 +715,7 @@ var ruleKnownPseudos = [{
     'grammar-error': 2,
     'highlight': 2 + Func,
     'marker': 2,
-    'part': 2 + Func,
+    'part': 2 + Func + REAL,
     'picker': 2 + Func,
     'picker-icon': 2,
     'placeholder': 2 + Moz,
@@ -721,7 +724,7 @@ var ruleKnownPseudos = [{
     'scroll-marker-group': 2,
     'search-text': 2,
     'selection': 2 + Moz,
-    'slotted': 2 + Func,
+    'slotted': 2 + Func + REAL,
     'spelling-error': 2,
     'target-text': 2,
     'view-transition': 2,
@@ -737,6 +740,7 @@ var ruleKnownPseudos = [{
     'any-link': 1 + Moz + WK,
     'autofill': 1 + WK,
     'blank': 1,
+    'buffering': 1,
     'checked': 1,
     'current': 1 + FuncToo,
     'default': 1,
@@ -756,6 +760,7 @@ var ruleKnownPseudos = [{
     'future': 1,
     'has': 1 + Func,
     'has-slotted': 1,
+    'heading': 1 + FuncToo,
     'host': 1 + FuncToo,
     'host-context': 1 + Func,
     'hover': 1,
@@ -770,6 +775,7 @@ var ruleKnownPseudos = [{
     'link': 1,
     'local-link': 1,
     'modal': 1,
+    'muted': 1,
     'not': 1 + Func,
     'nth-child': 1 + Func,
     'nth-col': 1 + Func,
@@ -794,6 +800,8 @@ var ruleKnownPseudos = [{
     'right': 1,
     'root': 1,
     'scope': 1,
+    'seeking': 1,
+    'stalled': 1,
     'state': 1 + Func,
     'target': 1,
     'target-after': 1,
@@ -804,6 +812,7 @@ var ruleKnownPseudos = [{
     'user-valid': 1,
     'valid': 1,
     'visited': 1,
+    'volume-locked': 1,
     'where': 1 + Func,
     'xr-overlay': 1,
     // ::-webkit-scrollbar specific classes
@@ -899,6 +908,7 @@ var ruleKnownPseudos = [{
   const checkSelector = ({parts}) => {
     for (const {modifiers} of parts || []) {
       if (!modifiers) continue;
+      let pseudoElement;
       for (const mod of modifiers) {
         if (mod.type === 'pseudo') {
           const {text} = mod;
@@ -922,6 +932,9 @@ var ruleKnownPseudos = [{
                 (def & WK) && (def & Moz) && '-webkit- or -moz-' ||
                 (def & WK) && '-webkit-' || '-moz-'} prefix in`,
             (def & DEAD) && 'Deprecated',
+            pseudoElement
+              ? !(def & 2) && `${pseudoElement} must follow`
+              : !defPrefixed && (def & 2) && !(def & REAL) && (pseudoElement = text, false),
           ]) {
             if (err) reporter.report(`${err} ${text.slice(0, all.length)}`, mod, rule);
           }

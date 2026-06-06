@@ -153,6 +153,8 @@ const NamedColors = [
   'whitesmoke',
   'yellow',
   'yellowgreen',
+  'AccentColor',
+  'AccentColorText',
   'ActiveBorder',
   'ActiveCaption',
   'ActiveText',
@@ -303,6 +305,12 @@ const GlobalKeywords = [
   'revert-rule',
   'unset',
 ];
+const documentFuncs = {
+  'domain': 1,
+  'regexp': -1, // cannot be a quoteless <uri>
+  'url': 1,
+  'url-prefix': 1,
+};
 const {assign, defineProperty: define} = Object;
 const PDESC = {configurable: true, enumerable: true, writable: true, value: null};
 const isOwn = Object.call.bind({}.hasOwnProperty);
@@ -468,7 +476,7 @@ const VTComplex = {
     '[ span && [ <int> || <ident-for-grid> ] ]',
   '<hue-interpolation-method>': '[shorter|longer|increasing|decreasing] hue',
   '<image>': '<image-no-set> | image-set( <image-set># )',
-  '<image-no-set>': '<url> | <fn:gradients> | -webkit-cross-fade()',
+  '<image-no-set>': '<url> | <fn:gradients> | image( <color> ) | -webkit-cross-fade()',
   '<image-set>': '[ <image-no-set> | <string> ] [ <resolution> || type( <string> ) ]',
   '<inflexible-breadth>': '<len-pct> | min-content | max-content | auto',
   '<inset-value>': '<len-pct> | overlap-join',
@@ -476,11 +484,11 @@ const VTComplex = {
   '<line-names>': '"[" <ident-for-grid> "]"',
   '<line-style>': 'none | hidden | dotted | dashed | solid | double | groove | ridge | inset | outset',
   '<line-width>': '<len0+> | thin | medium | thick',
-  '<linear-color-stop>': '<color> <len-pct>?',
+  '<linear-color-stop>': '<color> <len-pct>{0,2}',
   '<masking-mode>': 'alpha | luminance | match-source',
   '<overflow-position>': 'unsafe | safe',
   '<overflow>': '<vis-hid> | clip | scroll | auto | overlay', // TODO: warning about `overlay`
-  '<overscroll>': 'contain | none | auto',
+  '<overscroll>': 'contain | none | auto | chain',
   '<paint>': 'none | <color> | <url> [ none | <color> ]? | context-fill | context-stroke',
   '<polar-color-space>': 'hsl | hwb | lch | oklch',
   // Because our `alt` combinator is ordered, we need to test these
@@ -518,7 +526,7 @@ const VTComplex = {
     'fit-content( <len-pct> )',
   '<try-tactic>': 'flip-block || flip-inline || flip-start || flip-x || flip-y',
   '<txbhv>': 'normal | allow-discrete',
-  '<url>': '<uri> | src( <string> [ <ident> | <func> ]* )',
+  '<url>': '<uri> | url( <string> <fn:urlModifier>* ) | src( <string> <fn:urlModifier>* )',
   '<vis-hid>': 'visible | hidden',
   '<width-base>': '<len-pct> | min-content | max-content | fit-content | stretch | contain | ' +
     '-moz-available | -webkit-fill-available | anchor-size() | calc-size()',
@@ -582,7 +590,7 @@ const Properties = {
   'background': '[ <bg-layer> , ]* <final-bg-layer>',
   'background-attachment': '<attachment>#',
   'background-blend-mode': '<blend-mode>',
-  'background-clip': '[ <box> | text ]#',
+  'background-clip': '[ <box> | text | border-area ]#',
   'background-color': _color,
   'background-image': '<bg-image>#',
   'background-origin': '<box>#',
@@ -811,7 +819,7 @@ const Properties = {
   'flex-flow': '<flex-direction> || <flex-wrap>',
   'flex-grow': '<num>',
   'flex-shrink': '<num>',
-  'flex-wrap': 'nowrap | wrap | wrap-reverse',
+  'flex-wrap': 'nowrap | [ wrap | wrap-reverse ] || balance',
   'float': 'left | right | none | inline-start | inline-end',
   'flood-color': 1,
   'flood-opacity': '<num0-1>',
@@ -1139,6 +1147,7 @@ const Properties = {
   'text-emphasis-style': 'none | <string> | ' +
     '[ [ filled | open ] || [ dot | circle | double-circle | triangle | sesame ] ]',
   'text-emphasis-position': '[ over | under ] && [ right | left ]?',
+  'text-fit': '[none|grow|shrink] [consistent|per-line|per-line-all]? <pct>?',
   'text-indent': '<len-pct> && hanging? && each-line?',
   'text-justify': 'auto | none | inter-word | inter-character',
   'text-orientation': 'mixed | upright | sideways',
@@ -1407,7 +1416,10 @@ const ScopedProperties = {
     __proto__: null,
     '<all>': true,
     'bleed': 'auto | <len>',
-    'marks': 'none | [ crop || cross ]',
+    'marks': 'none | crop || cross',
+    'page': 'auto | <custom-ident>',
+    'page-margin-safety': 'none | clamp | add',
+    'page-orientation': 'upright | rotate-left | rotate-right',
     'size': '<len>{1,2} | auto | [ [ A3 | A4 | A5 | B4 | B5 | JIS-B4 | JIS-B5 | ' +
       'ledger | legal | letter ] || [ portrait | landscape ] ]',
   },
@@ -1555,7 +1567,7 @@ const VTSimple = {
   '<time>': p => p.isCalc || p.id === TIME,
   '<time0+>': p => p.isCalc || p.id === TIME && p.number >= 0,
   '<unicode-range>': p => p.id === URANGE,
-  '<uri>': p => p.uri != null,
+  '<uri>': p => p.id === URI,
 };
 
 for (const type of ['hsl', 'hwb', 'lab', 'lch', 'rgb']) {
@@ -1715,7 +1727,7 @@ const VTFunctions = {
     circle: '<shape-radius> <at-pos>?',
     ellipse: '<shape-radius>{2}? <at-pos>?',
     path: '[ <fill-rule> , ]? <string>',
-    polygon: '[ <fill-rule> , ]? [ <len-pct> <len-pct> ]#',
+    polygon: '[ <fill-rule> [ round <len> ]? , ]? [ <len-pct>{2} ]#',
     shape: '[ [from|move|line|hline|vline|curve|smooth|arc] [to|by]? [<ident>|<len-pct>]+ ]#',
     ...rects,
   },
@@ -1734,7 +1746,7 @@ const VTFunctions = {
       'from <color> <rel-lab-num-pct>{3} [ / <rel-lab-num-pct> ]?',
     'lch': '<num-pct-none>{2} [ <hue> | none ] <alpha>? | ' +
       'from <color> <rel-lch-num-pct>{2} [ <hue> | <rel-lch> ] [ / <rel-lch-num-pct> ]?',
-    'light-dark': '<color>#{2}',
+    'light-dark': '<color>#{2} | [<image>|none]#{2}',
     'rgb': '[ <num>#{3} | <pct>#{3} ] [ , <num-pct0+> ]? | ' +
       '<num-pct-none>{3} <alpha>? | ' +
       'from <color> <rel-rgb-num-pct>{3} [ / <rel-rgb-num-pct> ]?',
@@ -1784,6 +1796,12 @@ const VTFunctions = {
     translateX: '<len-pct>',
     translateY: '<len-pct>',
     translateZ: '<len>',
+  },
+  urlModifier: {
+    __proto__: null,
+    'cross-origin': 'anonymous | use-credentials',
+    'integrity': '<string>',
+    'referrer-policy': 'no-referrer | no-referrer-when-downgrade | same-origin | origin | strict-origin | origin-when-cross-origin | strict-origin-when-cross-origin | unsafe-url',
   },
 };
 
@@ -1977,7 +1995,9 @@ class FuncMatcher extends Matcher {
    * @return {!boolean|number|void}
    */
   test(expr, p) {
-    const name = p.name; if (!name) return;
+    const name = p.name;
+    if (!name || p.vendorPos)
+      return !!name;
     let e, m, vi;
     const {list} = this;
     if (list)
@@ -2440,7 +2460,7 @@ class TokenFunc extends Token {
 
 /**
  * @template T
- * @prop {T[]} parts
+ * @prop {(T | Token)[]} parts
  */
 class TokenValue extends Token {
   /** @return {TokenValue} */
@@ -2514,7 +2534,6 @@ const TT = {
   propValEndParen: [DELIM, SEMICOLON, RBRACE, RPAREN],
   pseudo: [FUNCTION, IDENT],
   selectorStart: [AMP, PIPE, IDENT, STAR, HASH, DOT, LBRACKET, COLON],
-  stringUri: [STRING, URI],
 };
 const OrDie = {must: true};
 const OrDieReusing = {must: true, reuse: true};
@@ -2525,7 +2544,7 @@ const UVAR_PROXY = [PCT, ...TT.mediaValue, ...TT.identString]
 // Groups must be non-capturing (?:foo) unless explicitly necessary
 const rxCommentUso = /(\*)\[\[[-\w]+]]\*\/|\*(?:[^*]+|\*(?!\/))*(?:\*\/|$)/y;
 const rxDigits = /\d+/y;
-const rxMaybeQuote = /\s*['"]?/y;
+const rxMaybeQuote = /\s*(['"]?)/y;
 const rxName = /(?:[-_\da-zA-Z\u00A1-\uFFFF]+|\\(?:[0-9a-fA-F]{1,6}\s?|.|$))+/y;
 const rxNth = /(even|odd)|(?:([-+]?\d*n)(?:\s*([-+])(\s*\d+)?)?|[-+]?\d+)((?=\s+of\s+|\s*\)))?/yi;
 const rxNumberDigit = /\d*(?:(\.)\d*)?(?:(e)[+-]?\d+)?/iy;
@@ -2559,7 +2578,7 @@ const isIdentStart = (a, b) => a >= 97 && a <= 122 || a >= 65 && a <= 90 /* a-z 
   a === 95 || a >= 160 /* _ unicode */ ||
   (a === 45/*-*/ ? b !== 45 && isIdentStart(b)
     : a === 92/* \ */ && b != null && b !== 10);
-const isSpace = c => c === 9 && c === 10 || c === 32;
+const isSpace = c => c === 9 || c === 10 || c === 32;
 const unescapeNoLF = (m, code, char) => char || String.fromCodePoint(parseInt(code, 16));
 
 /**
@@ -2871,8 +2890,7 @@ class TokenStream {
     if (next === 40/*(*/) {
       src.col++; src.offset++;
       lc = name.toLowerCase();
-      if ((lc === 'url' || lc === 'url-prefix' || lc === 'domain')
-      && (b = this._uriValue(src)) != null) {
+      if (documentFuncs[lc] === 1 && (b = this._uriValue(src)) != null) {
         tok.id = URI;
         tok.type = 'uri';
         tok.uri = b;
@@ -2945,13 +2963,11 @@ class TokenStream {
    */
   _uriValue(src) {
     let v = src.peek();
+    if (v === 34/*"*/ || v === 39/*'*/
+      || isSpace(v) && (rxMaybeQuote.lastIndex = src.offset, rxMaybeQuote.exec(src.string)[1]))
+      return;
     src.mark();
-    v = v === 34/*"*/ || v === 39/*'*/ ? src.read()
-      : isSpace(v) && src.readMatch(rxMaybeQuote).trim();
-    if (v) {
-      v += src.readMatch(v === '"' ? rxStringDoubleQ : rxStringSingleQ);
-      v = src.readMatchStr(v[0]) && parseString(v + v[0]);
-    } else if ((v = src.readMatch(rxUnquotedUrl)) && v.includes('\\')) {
+    if ((v = src.readMatch(rxUnquotedUrl)) && v.includes('\\')) {
       v = v.replace(rxUnescapeNoLF, unescapeNoLF);
     }
     if (v != null && (src.readMatchCode(41/*)*/) || src.readMatch(rxSpaceRParen))) {
@@ -3089,7 +3105,7 @@ const ATS = {
       const tok = stream.matchSmart(TT.docFunc);
       const uri = tok.uri != null;
       const fn = uri ? TokenFunc.from(tok) : tok.name && this._function(stream, tok);
-      if (fn && (uri || fn.name === 'regexp')) functions.push(fn);
+      if (fn && (uri || documentFuncs[fn.name])) functions.push(fn);
       else this.alarm(1, 'Unknown document function', fn);
     } while (stream.matchSmart(COMMA));
     const brace = stream.matchSmart(LBRACE, OrDie);
@@ -3152,7 +3168,7 @@ const ATS = {
    */
   import(stream, start) {
     let layer, name, tok;
-    const uri = (tok = stream.matchSmart(TT.stringUri, OrDie)).uri || tok.string;
+    const url = this._stringOrUrl(stream);
     if ((name = (tok = stream.grab()).name) === 'layer' || !name && B.layer.has(tok)) {
       layer = name ? this._layerName(stream) : '';
       if (name) stream.matchSmart(RPAREN, OrDie);
@@ -3164,7 +3180,7 @@ const ATS = {
     }
     const media = this._mediaQueryList(stream, tok);
     stream.matchSmart(SEMICOLON, OrDie);
-    this.fire({type: 'import', layer, media, uri}, start);
+    this.fire({type: 'import', layer, media, url}, start);
   },
 
   /**
@@ -3241,10 +3257,9 @@ const ATS = {
    */
   namespace(stream, start) {
     const prefix = stream.matchSmart(IDENT).text;
-    const tok = stream.matchSmart(TT.stringUri, OrDie);
-    const uri = tok.uri || tok.string;
+    const url = this._stringOrUrl(stream);
     stream.matchSmart(SEMICOLON, OrDie);
-    this.fire({type: 'namespace', prefix, uri}, start);
+    this.fire({type: 'namespace', prefix, url}, start);
   },
 
   /**
@@ -4254,6 +4269,17 @@ class Parser extends EventDispatcher {
     }
     if (i === len) tok.type = 'color';
     else this.alarm(1, `Expected a hex color but found "${clipString(tok)}".`, tok);
+  }
+
+  /**
+   * @param {TokenStream} stream
+   * @param {Token} [tok]
+   */
+  _stringOrUrl(stream, tok = stream.grab()) {
+    let v = tok.id;
+    if (v === STRING) v = tok.string;
+    else if (tok.name === 'url') v = tok.uri ?? this._function(stream).expr.parts[0].string;
+    else stream._failure('STRING, URI, url()');
   }
 
   //#endregion
