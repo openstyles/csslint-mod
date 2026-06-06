@@ -186,7 +186,9 @@ class FuncMatcher extends Matcher {
    * @return {!boolean|number|void}
    */
   test(expr, p) {
-    const name = p.name; if (!name) return;
+    const name = p.name;
+    if (!name || p.vendorPos)
+      return !!name;
     let e, m, vi;
     const {list} = this;
     if (list)
