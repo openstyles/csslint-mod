@@ -757,3 +757,7 @@ a {flex-flow: row wr/*incomplete*/}
                   bar.png'
   );
 }
+
+.image-color-func {
+  background: image(red), url("./foo.png" cross-origin(anonymous));
+}

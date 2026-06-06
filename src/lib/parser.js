@@ -9,7 +9,8 @@ import Token, {TokenFunc, TokenValue} from './token';
 import TokenStream, {OrDie, OrDieReusing, TT} from './token-stream';
 import {
   AMP, AT, CDCO, COLON, COMMA, COMMENT, DASHED_FUNCTION, DELIM, DIV, DOT, FUNCTION, HASH, IDENT,
-  LBRACE, LBRACKET, LPAREN, NUMBER, PIPE, RBRACE, RBRACKET, RPAREN, SEMICOLON, STAR, UVAR, WS,
+  LBRACE, LBRACKET, LPAREN, NUMBER, PIPE, RBRACE, RBRACKET, RPAREN, SEMICOLON, STAR, STRING, UVAR,
+  WS,
 } from './tokens';
 import {assign, clipString, define, EventDispatcher, isOwn, ParseError, PDESC} from './util';
 import {validateProperty} from './validation';
@@ -574,6 +575,17 @@ class Parser extends EventDispatcher {
     }
     if (i === len) tok.type = 'color';
     else this.alarm(1, `Expected a hex color but found "${clipString(tok)}".`, tok);
+  }
+
+  /**
+   * @param {TokenStream} stream
+   * @param {Token} [tok]
+   */
+  _stringOrUrl(stream, tok = stream.grab()) {
+    let v = tok.id;
+    if (v === STRING) v = tok.string;
+    else if (tok.name === 'url') v = tok.uri ?? this._function(stream).expr.parts[0].string;
+    else stream._failure('STRING, URI, url()');
   }
 
   //#endregion

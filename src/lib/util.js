@@ -6,6 +6,12 @@ export const GlobalKeywords = [
   'revert-rule',
   'unset',
 ];
+export const documentFuncs = {
+  'domain': 1,
+  'regexp': -1, // cannot be a quoteless <uri>
+  'url': 1,
+  'url-prefix': 1,
+};
 export const {assign, defineProperty: define} = Object;
 export const PDESC = {configurable: true, enumerable: true, writable: true, value: null};
 export const isOwn = Object.call.bind({}.hasOwnProperty);

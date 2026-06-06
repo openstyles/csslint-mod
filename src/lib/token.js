@@ -108,7 +108,7 @@ export class TokenFunc extends Token {
 
 /**
  * @template T
- * @prop {T[]} parts
+ * @prop {(T | Token)[]} parts
  */
 export class TokenValue extends Token {
   /** @return {TokenValue} */

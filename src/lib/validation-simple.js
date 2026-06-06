@@ -1,7 +1,7 @@
 import Bucket from './bucket';
 import {GlobalKeywords} from './util';
 import {
-  ANGLE, FUNCTION, IDENT, LENGTH, NUMBER, PCT, RESOLUTION, STRING, TIME, URANGE,
+  ANGLE, FUNCTION, IDENT, LENGTH, NUMBER, PCT, RESOLUTION, STRING, TIME, URANGE, URI,
 } from './tokens';
 
 const buAlpha = new Bucket('alpha');
@@ -61,7 +61,7 @@ const VTSimple = {
   '<time>': p => p.isCalc || p.id === TIME,
   '<time0+>': p => p.isCalc || p.id === TIME && p.number >= 0,
   '<unicode-range>': p => p.id === URANGE,
-  '<uri>': p => p.uri != null,
+  '<uri>': p => p.id === URI,
 };
 
 for (const type of ['hsl', 'hwb', 'lab', 'lch', 'rgb']) {

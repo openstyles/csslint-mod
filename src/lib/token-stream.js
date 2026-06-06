@@ -10,7 +10,7 @@ import Tokens, {
 } from './tokens';
 import Units, {UnitTypeIds} from './units';
 import {
-  clipString, define, isOwn, ParseError, parseString, PDESC, rxUnescapeLF, toLowAscii,
+  clipString, define, documentFuncs, isOwn, ParseError, PDESC, rxUnescapeLF, toLowAscii,
 } from './util';
 
 export const TT = {
@@ -32,7 +32,6 @@ export const TT = {
   propValEndParen: [DELIM, SEMICOLON, RBRACE, RPAREN],
   pseudo: [FUNCTION, IDENT],
   selectorStart: [AMP, PIPE, IDENT, STAR, HASH, DOT, LBRACKET, COLON],
-  stringUri: [STRING, URI],
 };
 export const OrDie = {must: true};
 export const OrDieReusing = {must: true, reuse: true};
@@ -43,7 +42,7 @@ const UVAR_PROXY = [PCT, ...TT.mediaValue, ...TT.identString]
 // Groups must be non-capturing (?:foo) unless explicitly necessary
 const rxCommentUso = /(\*)\[\[[-\w]+]]\*\/|\*(?:[^*]+|\*(?!\/))*(?:\*\/|$)/y;
 const rxDigits = /\d+/y;
-const rxMaybeQuote = /\s*['"]?/y;
+const rxMaybeQuote = /\s*(['"]?)/y;
 const rxName = /(?:[-_\da-zA-Z\u00A1-\uFFFF]+|\\(?:[0-9a-fA-F]{1,6}\s?|.|$))+/y;
 const rxNth = /(even|odd)|(?:([-+]?\d*n)(?:\s*([-+])(\s*\d+)?)?|[-+]?\d+)((?=\s+of\s+|\s*\)))?/yi;
 const rxNumberDigit = /\d*(?:(\.)\d*)?(?:(e)[+-]?\d+)?/iy;
@@ -391,8 +390,7 @@ export default class TokenStream {
     if (next === 40/*(*/) {
       src.col++; src.offset++;
       lc = name.toLowerCase();
-      if ((lc === 'url' || lc === 'url-prefix' || lc === 'domain')
-      && (b = this._uriValue(src)) != null) {
+      if (documentFuncs[lc] === 1 && (b = this._uriValue(src)) != null) {
         tok.id = URI;
         tok.type = 'uri';
         tok.uri = b;
@@ -465,13 +463,11 @@ export default class TokenStream {
    */
   _uriValue(src) {
     let v = src.peek();
+    if (v === 34/*"*/ || v === 39/*'*/
+      || isSpace(v) && (rxMaybeQuote.lastIndex = src.offset, rxMaybeQuote.exec(src.string)[1]))
+      return;
     src.mark();
-    v = v === 34/*"*/ || v === 39/*'*/ ? src.read()
-      : isSpace(v) && src.readMatch(rxMaybeQuote).trim();
-    if (v) {
-      v += src.readMatch(v === '"' ? rxStringDoubleQ : rxStringSingleQ);
-      v = src.readMatchStr(v[0]) && parseString(v + v[0]);
-    } else if ((v = src.readMatch(rxUnquotedUrl)) && v.includes('\\')) {
+    if ((v = src.readMatch(rxUnquotedUrl)) && v.includes('\\')) {
       v = v.replace(rxUnescapeNoLF, unescapeNoLF);
     }
     if (v != null && (src.readMatchCode(41/*)*/) || src.readMatch(rxSpaceRParen))) {

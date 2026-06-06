@@ -4,7 +4,7 @@ import {OrDie, OrDieReusing, TT} from './token-stream';
 import {
   COLON, COMMA, DASHED_FUNCTION, IDENT, LBRACE, LPAREN, PCT, RBRACE, RPAREN, SEMICOLON, STRING,
 } from './tokens';
-import {pick} from './util';
+import {documentFuncs, pick} from './util';
 
 /** Functions for @ symbols */
 const ATS = {
@@ -92,7 +92,7 @@ const ATS = {
       const tok = stream.matchSmart(TT.docFunc);
       const uri = tok.uri != null;
       const fn = uri ? TokenFunc.from(tok) : tok.name && this._function(stream, tok);
-      if (fn && (uri || fn.name === 'regexp')) functions.push(fn);
+      if (fn && (uri || documentFuncs[fn.name])) functions.push(fn);
       else this.alarm(1, 'Unknown document function', fn);
     } while (stream.matchSmart(COMMA));
     const brace = stream.matchSmart(LBRACE, OrDie);
@@ -155,7 +155,7 @@ const ATS = {
    */
   import(stream, start) {
     let layer, name, tok;
-    const uri = (tok = stream.matchSmart(TT.stringUri, OrDie)).uri || tok.string;
+    const url = this._stringOrUrl(stream);
     if ((name = (tok = stream.grab()).name) === 'layer' || !name && B.layer.has(tok)) {
       layer = name ? this._layerName(stream) : '';
       if (name) stream.matchSmart(RPAREN, OrDie);
@@ -167,7 +167,7 @@ const ATS = {
     }
     const media = this._mediaQueryList(stream, tok);
     stream.matchSmart(SEMICOLON, OrDie);
-    this.fire({type: 'import', layer, media, uri}, start);
+    this.fire({type: 'import', layer, media, url}, start);
   },
 
   /**
@@ -244,10 +244,9 @@ const ATS = {
    */
   namespace(stream, start) {
     const prefix = stream.matchSmart(IDENT).text;
-    const tok = stream.matchSmart(TT.stringUri, OrDie);
-    const uri = tok.uri || tok.string;
+    const url = this._stringOrUrl(stream);
     stream.matchSmart(SEMICOLON, OrDie);
-    this.fire({type: 'namespace', prefix, uri}, start);
+    this.fire({type: 'namespace', prefix, url}, start);
   },
 
   /**

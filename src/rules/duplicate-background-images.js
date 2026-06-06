@@ -4,16 +4,18 @@ export default [{
 }, (rule, parser, reporter) => {
   const stack = {};
   parser.addListener('property', event => {
-    if (!/^-(webkit|moz|ms|o)-background(-image)$/i.test(event.property.text)) {
+    if (!/^(-(webkit|moz|ms|o)-)?background(-image)$/i.test(event.property.text)) {
       return;
     }
     for (const part of event.value.parts) {
-      if (part.type !== 'uri') continue;
-      const uri = stack[part.uri];
-      if (!uri) {
-        stack[part.uri] = event;
+      if (part.name !== 'url')
+        continue;
+      const url = part.uri ?? part.expr.parts[0].string;
+      const e = stack[url];
+      if (!e) {
+        stack[url] = event;
       } else {
-        reporter.report(rule.desc + `. First declared at ${uri.line}:${uri.col}.`, event, rule);
+        reporter.report(rule.desc + `. First declared at ${e.line}:${e.col}.`, event, rule);
       }
     }
   });
