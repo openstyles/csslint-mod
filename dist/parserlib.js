@@ -352,6 +352,7 @@ class ParseError extends Error {
     this.col = pos.col;
     this.line = pos.line;
     this.offset = pos.offset;
+    this.end = pos.end;
     this.message = message;
   }
 }
@@ -1607,6 +1608,7 @@ class ValidationError extends Error {
     this.col = pos.col;
     this.line = pos.line;
     this.offset = pos.offset;
+    this.end = pos.end;
     this.message = message;
   }
 }
@@ -2355,6 +2357,7 @@ const OROR = Matcher.OROR = 2;
 const ALT = Matcher.ALT = 1;
 
 /**
+ * @property {{col: number, line: number, offset: number}} end
  * @property {[]} [args] added in selectors
  * @property {string} [atName] lowercase name of @-rule without -vendor- prefix
  * @property {TokenValue} [expr] body of function or block
@@ -2380,7 +2383,6 @@ class Token {
     this.col = col;
     this.line = line;
     this.offset = offset;
-    this.offset2 = offset + 1;
     this.lowText = null;
     this.type = '';
     this.code = toLowAscii(code);
@@ -2393,7 +2395,7 @@ class Token {
   }
 
   get length() {
-    return isOwn(this, 'text') ? this.text.length : this.offset2 - this.offset;
+    return isOwn(this, 'text') ? this.text.length : this.end.offset - this.offset;
   }
 
   get string() {
@@ -2408,7 +2410,7 @@ class Token {
   }
 
   get text() {
-    return this._input.slice(this.offset, this.offset2);
+    return this._input.slice(this.offset, this.end.offset);
   }
 
   set text(val) {
@@ -2434,8 +2436,10 @@ class TokenFunc extends Token {
    */
   static from(tok, expr, end) {
     tok = super.from(tok);
-    if (isOwn(tok, 'text')) tok.offsetBody = tok.offset2;
-    if (end) tok.offset2 = end.offset2;
+    if (isOwn(tok, 'text'))
+      tok.offsetBody = tok.end.offset;
+    if (end)
+      tok.end = end.end;
     if (expr) {
       tok.expr = expr;
       let n = tok.name;
@@ -2453,8 +2457,8 @@ class TokenFunc extends Token {
   toString() { // FIXME: account for escapes
     const s = this._input;
     return isOwn(this, 'text')
-      ? this.text + s.slice(this.offsetBody + 1, this.offset2)
-      : s.slice(this.offset, this.offset2);
+      ? this.text + s.slice(this.offsetBody + 1, this.end.offset)
+      : s.slice(this.offset, this.end.offset);
   }
 }
 
@@ -2475,13 +2479,13 @@ class TokenValue extends Token {
     tok = super.from(tok);
     tok.parts = [];
     tok.id = WS;
-    tok.offset2 = tok.offset;
+    tok.end = {col: tok.col, line: tok.line, offset: tok.offset};
     delete tok.text;
     return tok;
   }
 
   get text() { // FIXME: account for escapes
-    return this._input.slice(this.offset, (this.parts[this.parts.length - 1] || this).offset2);
+    return this._input.slice(this.offset, (this.parts[this.parts.length - 1] || this).end.offset);
   }
 
   set text(val) {
@@ -2850,7 +2854,11 @@ class TokenStream {
     } else if (a == null) {
       tok.id = EOF;
     }
-    if ((v = src.offset) !== offset + 1) tok.offset2 = v;
+    tok.end = {
+      col: src.col,
+      line: src.line,
+      offset: src.offset,
+    };
     if (text) { PDESC.value = text; define(tok, 'text', PDESC); }
     return tok;
   }
@@ -3430,12 +3438,12 @@ function startBlock(start = getToken()) {
   return stack.length;
 }
 
-function endBlock(end = getToken()) {
+function endBlock({end} = getToken()) {
   if (!parser || !stream) return;
   const block = stack.pop();
   block.line2 = end.line;
-  block.col2 = end.col + end.offset2 - end.offset;
-  block.offset2 = end.offset2;
+  block.col2 = end.col;
+  block.offset2 = end.offset;
   const {string} = stream.source;
   const start = block.offset;
   const key = string.slice(start, string.indexOf('{', start) + 1);
@@ -3620,7 +3628,7 @@ const SELECTORS = textToTokenMap({
   '.'(stream, tok) {
     const t2 = stream.matchOrDie(IDENT);
     if (isOwn(t2, 'text')) tok.text = '.' + t2.text;
-    tok.offset2 = t2.offset2;
+    tok.end = t2.end;
     tok.type = 'class';
     return tok;
   },
@@ -3638,11 +3646,10 @@ const SELECTORS = textToTokenMap({
       ns = t1;
     } else if (t1.id === STAR) { // [*
       ns = t1;
-      ns.offset2 = stream.matchOrDie(PIPE).offset2;
-      if (ns.length > 2) ns.text = '*|'; // comment inside
+      ns.end = stream.matchOrDie(PIPE).end;
     } else if ((t2 = stream.get()).id === PIPE) { // [ns|
       ns = t1;
-      ns.offset2++;
+      ns.end = t2.end;
     } else if (isOwn(TT.attrEq, t2.id)) { // [name=, |=, ~=, ^=, *=, $=
       name = t1;
       eq = t2;
@@ -3670,7 +3677,7 @@ const SELECTORS = textToTokenMap({
       /*4*/ mod || '',
     ];
     start.type = 'attribute';
-    start.offset2 = (end || stream.matchSmart(RBRACKET, OrDie)).offset2;
+    start.end = (end || stream.matchSmart(RBRACKET, OrDie)).end;
     stream._pair = 0;
     return start;
   },
@@ -3767,7 +3774,12 @@ class Parser extends EventDispatcher {
       return;
     }
     if (typeof e === 'string') e = {type: e};
-    if (tok && e.offset == null) { e.offset = tok.offset; e.line = tok.line; e.col = tok.col; }
+    if (tok && e.offset == null) {
+      e.offset = tok.offset;
+      e.line = tok.line;
+      e.col = tok.col;
+      e.end = tok.end;
+    }
     if (tok !== false) addEvent(e);
     super.fire(e);
   }
@@ -3788,7 +3800,7 @@ class Parser extends EventDispatcher {
           topCmt = null;
         } else if (ti === COMMENT || (topCmt = null)) {
           if (!topCmt) topCmt = tok;
-          else topCmt.offset2 = tok.offset2;
+          else topCmt.end = tok.end;
         } else if (ti === CDCO) {
           // Skipping cruft
         } else if (!atAny) {
@@ -3924,7 +3936,7 @@ class Parser extends EventDispatcher {
     if (start.id !== LPAREN) stream._failure(LPAREN);
     const feature = stream.matchSmart(TT.mediaValue, OrDie);
     feature.expr = this._expr(stream, RPAREN, true); // TODO: alarm on invalid ops
-    feature.offset2 = stream.token.offset2; // including ")"
+    feature.end = stream.token.end; // including ")"
     stream.matchSmart(RPAREN, OrDieReusing);
     return feature;
   }
@@ -4087,7 +4099,7 @@ class Parser extends EventDispatcher {
     tok.ns = ns;
     tok.elementName = tag || '';
     tok.modifiers = mods;
-    tok.offset2 = (mods[mods.length - 1] || tok).offset2;
+    tok.end = (mods[mods.length - 1] || tok).end;
     return tok;
   }
 
@@ -4220,7 +4232,7 @@ class Parser extends EventDispatcher {
         if (!dumb && ti === LBRACE && parts.length) break;
         tok.expr = this._expr(stream, endParen, dumb);
         if (stream.token.id !== endParen) stream._failure(endParen);
-        tok.offset2 = stream.token.offset2;
+        tok.end = stream.token.end;
         tok.type = 'block';
       } else if (ti === FUNCTION || (dumb2 = ti === DASHED_FUNCTION)) {
         if (tok.type !== 'ie' || this.options.ieFilters && (dumb2 = true)) {
