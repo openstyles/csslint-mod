@@ -350,7 +350,11 @@ export default class TokenStream {
     } else if (a == null) {
       tok.id = EOF;
     }
-    if ((v = src.offset) !== offset + 1) tok.offset2 = v;
+    tok.end = {
+      col: src.col,
+      line: src.line,
+      offset: src.offset,
+    };
     if (text) { PDESC.value = text; define(tok, 'text', PDESC); }
     return tok;
   }

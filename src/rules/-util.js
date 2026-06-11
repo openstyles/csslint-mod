@@ -10,6 +10,11 @@ export function getPropName(prop) {
   return vp ? low.slice(vp) : low;
 }
 
+/** @this {number} */
+function lineInRange(range) {
+  return range[0] <= this && this <= range[1];
+}
+
 export function registerRuleEvents(parser, {start, property, end}) {
   for (const e of [
     'container',
@@ -126,7 +131,7 @@ export class Reporter {
    * @param {String[]} lines - The text lines of the source.
    * @param {Object} ruleset - The set of rules to work with, including if
    *      they are errors or warnings.
-   * @param {Object} allow - explicitly allowed lines
+   * @param {Map<number,{}>} allow - explicitly allowed lines
    * @param {[][]} ignore - list of line ranges to be ignored
    */
   constructor(lines, ruleset, allow, ignore) {
@@ -134,39 +139,51 @@ export class Reporter {
     this.stats = [];
     this.lines = lines;
     this.ruleset = ruleset;
-    this.allow = allow || {};
+    this.allow = allow?.size ? allow : null;
     this.ignore = ignore || [];
   }
 
-  error(message, {line = 1, col = 1}, rule = {}) {
-    this.messages.push({
-      type: 'error',
-      evidence: this.lines[line - 1],
-      line, col,
-      message,
-      rule,
-    });
+  /**
+   * @param {string} message
+   * @param {Token} token
+   * @param {{}} rule
+   */
+  error(message, token, rule = {}) {
+    this.push('error', message, token, rule);
   }
 
-  report(message, {line = 1, col = 1}, rule) {
-    if (line in this.allow && rule.id in this.allow[line] ||
-      this.ignore.some(range => range[0] <= line && line <= range[1])) {
+  /**
+   * @param {string} message
+   * @param {Token} token
+   * @param {{}} rule
+   */
+  report(message, token, rule) {
+    if (this.allow?.get(token.line)?.[rule.id] || this.ignore.some(lineInRange, token.line)) {
       return;
     }
-    this.messages.push({
-      type: this.ruleset[rule.id] === 2 ? 'error' : 'warning',
-      evidence: this.lines[line - 1],
-      line, col,
-      message,
-      rule,
-    });
+    this.push(this.ruleset[rule.id] === 2 ? 'error' : 'warning', message, token, rule);
   }
 
-  info(message, {line = 1, col = 1}, rule) {
+  /**
+   * @param {string} message
+   * @param {Token} token
+   * @param {{}} rule
+   */
+  info(message, token, rule) {
+    this.push('info', message, token, rule);
+  }
+
+  /**
+   * @param {string} message
+   * @param {string} type
+   * @param {Token} token
+   * @param {{}} rule
+   */
+  push(type, message, {line = 1, col = 1, offset, end}, rule) {
     this.messages.push({
-      type: 'info',
+      type,
       evidence: this.lines[line - 1],
-      line, col,
+      line, col, offset, end,
       message,
       rule,
     });

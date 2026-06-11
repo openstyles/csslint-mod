@@ -21,7 +21,7 @@ const SELECTORS = textToTokenMap({
   '.'(stream, tok) {
     const t2 = stream.matchOrDie(IDENT);
     if (isOwn(t2, 'text')) tok.text = '.' + t2.text;
-    tok.offset2 = t2.offset2;
+    tok.end = t2.end;
     tok.type = 'class';
     return tok;
   },
@@ -39,11 +39,10 @@ const SELECTORS = textToTokenMap({
       ns = t1;
     } else if (t1.id === STAR) { // [*
       ns = t1;
-      ns.offset2 = stream.matchOrDie(PIPE).offset2;
-      if (ns.length > 2) ns.text = '*|'; // comment inside
+      ns.end = stream.matchOrDie(PIPE).end;
     } else if ((t2 = stream.get()).id === PIPE) { // [ns|
       ns = t1;
-      ns.offset2++;
+      ns.end = t2.end;
     } else if (isOwn(TT.attrEq, t2.id)) { // [name=, |=, ~=, ^=, *=, $=
       name = t1;
       eq = t2;
@@ -71,7 +70,7 @@ const SELECTORS = textToTokenMap({
       /*4*/ mod || '',
     ];
     start.type = 'attribute';
-    start.offset2 = (end || stream.matchSmart(RBRACKET, OrDie)).offset2;
+    start.end = (end || stream.matchSmart(RBRACKET, OrDie)).end;
     stream._pair = 0;
     return start;
   },

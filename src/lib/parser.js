@@ -67,7 +67,12 @@ class Parser extends EventDispatcher {
       return;
     }
     if (typeof e === 'string') e = {type: e};
-    if (tok && e.offset == null) { e.offset = tok.offset; e.line = tok.line; e.col = tok.col; }
+    if (tok && e.offset == null) {
+      e.offset = tok.offset;
+      e.line = tok.line;
+      e.col = tok.col;
+      e.end = tok.end;
+    }
     if (tok !== false) parserCache.addEvent(e);
     super.fire(e);
   }
@@ -88,7 +93,7 @@ class Parser extends EventDispatcher {
           topCmt = null;
         } else if (ti === COMMENT || (topCmt = null)) {
           if (!topCmt) topCmt = tok;
-          else topCmt.offset2 = tok.offset2;
+          else topCmt.end = tok.end;
         } else if (ti === CDCO) {
           // Skipping cruft
         } else if (!atAny) {
@@ -228,7 +233,7 @@ class Parser extends EventDispatcher {
     if (start.id !== LPAREN) stream._failure(LPAREN);
     const feature = stream.matchSmart(TT.mediaValue, OrDie);
     feature.expr = this._expr(stream, RPAREN, true); // TODO: alarm on invalid ops
-    feature.offset2 = stream.token.offset2; // including ")"
+    feature.end = stream.token.end; // including ")"
     stream.matchSmart(RPAREN, OrDieReusing);
     return feature;
   }
@@ -391,7 +396,7 @@ class Parser extends EventDispatcher {
     tok.ns = ns;
     tok.elementName = tag || '';
     tok.modifiers = mods;
-    tok.offset2 = (mods[mods.length - 1] || tok).offset2;
+    tok.end = (mods[mods.length - 1] || tok).end;
     return tok;
   }
 
@@ -524,7 +529,7 @@ class Parser extends EventDispatcher {
         if (!dumb && ti === LBRACE && parts.length) break;
         tok.expr = this._expr(stream, endParen, dumb);
         if (stream.token.id !== endParen) stream._failure(endParen);
-        tok.offset2 = stream.token.offset2;
+        tok.end = stream.token.end;
         tok.type = 'block';
       } else if (ti === FUNCTION || (dumb2 = ti === DASHED_FUNCTION)) {
         if (tok.type !== 'ie' || this.options.ieFilters && (dumb2 = true)) {

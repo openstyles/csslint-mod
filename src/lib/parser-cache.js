@@ -71,12 +71,12 @@ export function startBlock(start = getToken()) {
   return stack.length;
 }
 
-export function endBlock(end = getToken()) {
+export function endBlock({end} = getToken()) {
   if (!parser || !stream) return;
   const block = stack.pop();
   block.line2 = end.line;
-  block.col2 = end.col + end.offset2 - end.offset;
-  block.offset2 = end.offset2;
+  block.col2 = end.col;
+  block.offset2 = end.offset;
   const {string} = stream.source;
   const start = block.offset;
   const key = string.slice(start, string.indexOf('{', start) + 1);

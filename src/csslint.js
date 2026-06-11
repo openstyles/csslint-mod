@@ -122,7 +122,7 @@ const CSSLint = Object.assign(new parserUtil.EventDispatcher(), {
    * @return {Object} Results of the verification.
    */
   verify(text, ruleset = this.getRuleSet()) {
-    const allow = {};
+    const allow = new Map();
     const ignore = [];
     const emi = rxEmbedded.lastIndex =
       text.lastIndexOf('/*',
@@ -142,7 +142,7 @@ const CSSLint = Object.assign(new parserUtil.EventDispatcher(), {
     const {messages} = reporter;
     const report = {messages};
     // TODO: when ruleset is unchanged we can try to invalidate only line ranges in 'allow' and 'ignore'
-    const newOvr = [ruleset, allow, ignore];
+    const newOvr = [ruleset, ignore, ...allow];
     const reuseCache = !prevOverrides || JSON.stringify(prevOverrides) === JSON.stringify(newOvr);
     prevOverrides = newOvr;
     // always report parsing errors as errors
@@ -218,7 +218,7 @@ function applyEmbeddedOverrides(text, ruleset, allow, ignore) {
       let res;
       for (let name of ovr)
         if ((name = name.trim()) in rules)
-          (res ??= allow[lineno] = {})[name] = true;
+          (res || allow.set(lineno, res = {}) && res)[name] = true;
     } else if (m[2/*ignore*/]) {
       if (!m[3/*end*/]) {
         ignoreStart ||= lineno;

@@ -53,6 +53,7 @@ export class ParseError extends Error {
     this.col = pos.col;
     this.line = pos.line;
     this.offset = pos.offset;
+    this.end = pos.end;
     this.message = message;
   }
 }

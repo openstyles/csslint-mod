@@ -3,6 +3,7 @@ import {DASHED_FUNCTION, IDENT, UVAR, WS} from './tokens';
 import {assign, define, isOwn, parseString, PDESC, toLowAscii} from './util';
 
 /**
+ * @property {{col: number, line: number, offset: number}} end
  * @property {[]} [args] added in selectors
  * @property {string} [atName] lowercase name of @-rule without -vendor- prefix
  * @property {TokenValue} [expr] body of function or block
@@ -28,7 +29,6 @@ export default class Token {
     this.col = col;
     this.line = line;
     this.offset = offset;
-    this.offset2 = offset + 1;
     this.lowText = null;
     this.type = '';
     this.code = toLowAscii(code);
@@ -41,7 +41,7 @@ export default class Token {
   }
 
   get length() {
-    return isOwn(this, 'text') ? this.text.length : this.offset2 - this.offset;
+    return isOwn(this, 'text') ? this.text.length : this.end.offset - this.offset;
   }
 
   get string() {
@@ -56,7 +56,7 @@ export default class Token {
   }
 
   get text() {
-    return this._input.slice(this.offset, this.offset2);
+    return this._input.slice(this.offset, this.end.offset);
   }
 
   set text(val) {
@@ -82,8 +82,10 @@ export class TokenFunc extends Token {
    */
   static from(tok, expr, end) {
     tok = super.from(tok);
-    if (isOwn(tok, 'text')) tok.offsetBody = tok.offset2;
-    if (end) tok.offset2 = end.offset2;
+    if (isOwn(tok, 'text'))
+      tok.offsetBody = tok.end.offset;
+    if (end)
+      tok.end = end.end;
     if (expr) {
       tok.expr = expr;
       let n = tok.name;
@@ -101,8 +103,8 @@ export class TokenFunc extends Token {
   toString() { // FIXME: account for escapes
     const s = this._input;
     return isOwn(this, 'text')
-      ? this.text + s.slice(this.offsetBody + 1, this.offset2)
-      : s.slice(this.offset, this.offset2);
+      ? this.text + s.slice(this.offsetBody + 1, this.end.offset)
+      : s.slice(this.offset, this.end.offset);
   }
 }
 
@@ -123,13 +125,13 @@ export class TokenValue extends Token {
     tok = super.from(tok);
     tok.parts = [];
     tok.id = WS;
-    tok.offset2 = tok.offset;
+    tok.end = {col: tok.col, line: tok.line, offset: tok.offset};
     delete tok.text;
     return tok;
   }
 
   get text() { // FIXME: account for escapes
-    return this._input.slice(this.offset, (this.parts[this.parts.length - 1] || this).offset2);
+    return this._input.slice(this.offset, (this.parts[this.parts.length - 1] || this).end.offset);
   }
 
   set text(val) {
