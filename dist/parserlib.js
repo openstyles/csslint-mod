@@ -3377,13 +3377,15 @@ let generation = null;
 // used for weighted sorting in getBlock()
 let generationBase = null;
 let parser = null;
+let parserId = NaN;
 let stream = null;
 
 /**
 * Caches the results and reuses them on subsequent parsing of the same code
 */
-function init(newParser) {
-  parser = newParser;
+function init(newParser, newId) {
+  parser = (newId ? newId === parserId : !parserId) && newParser;
+  parserId = newId;
   if (!parser) {
     data.clear();
     stack.length = 0;
@@ -3790,7 +3792,7 @@ class Parser extends EventDispatcher {
     const atAny = !opts.globalsOnly && this._unknownAtRule;
     const topDocOnly = opts.topDocOnly && COMMENT;
     const atFuncs = !atAny ? ATS_GLOBAL : topDocOnly ? ATS_TDO : ATS;
-    init(reuseCache && this);
+    init(this, reuseCache);
     this.fire('startstylesheet');
     for (let ti, fn, tok, topCmt; (ti = (tok = stream.get(false, false, topDocOnly)).id);) {
       try {

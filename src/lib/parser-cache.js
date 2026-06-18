@@ -10,13 +10,15 @@ let generation = null;
 // used for weighted sorting in getBlock()
 let generationBase = null;
 let parser = null;
+let parserId = NaN;
 let stream = null;
 
 /**
 * Caches the results and reuses them on subsequent parsing of the same code
 */
-export function init(newParser) {
-  parser = newParser;
+export function init(newParser, newId) {
+  parser = (newId ? newId === parserId : !parserId) && newParser;
+  parserId = newId;
   if (!parser) {
     data.clear();
     stack.length = 0;

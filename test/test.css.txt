@@ -67,6 +67,7 @@ error	532	3	Unexpected "--foo".
 error	533	7	Expected FUNCTION, IDENT but found " ".
 error	534	10	Expected "{" but found ";".
 error	536	1	Expected "{" but found "}".
+error	538	1	Nested selector must be inside a style rule.
 warning	540	19	Non-alphabetical order: "margin".
 warning	545	33	Expected [ [ <url> | conic-gradient() | linear-gradient() | radial-gradient() | repeating-conic-gradient() | repeating-linear-gradient() | repeating-radial-gradient() | image() | -webkit-cross-fade() | <string> ] [ <resolution> || type() ] ]# but found ""foo.png" foo".
 warning	550	32	Expected [ [ root | nearest | self ] || [ block | inline | x | y ] ]? but found "root2 block".

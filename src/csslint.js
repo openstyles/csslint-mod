@@ -38,9 +38,6 @@ import ruleVendorPrefix from './rules/vendor-prefix';
 import ruleWarnings from './rules/warnings';
 import ruleZeroUnits from './rules/zero-units';
 
-// previous CSSLint overrides are used to decide whether the parserlib's cache should be reset
-let prevOverrides;
-
 /**                                     1                        2      3         4 */
 const rxEmbedded = /\/\*\s*csslint\s+(?:(allow)\s*:|ignore\s*:\s*(start|(end))\b)?((?:[^*]+|\*(?!\/))+?)\*\//ig;
 const rxGrammarAbbr = /([-<])(int|len|num|pct|rel-(\w{3}))(?=\W)/g;
@@ -143,8 +140,7 @@ const CSSLint = Object.assign(new parserUtil.EventDispatcher(), {
     const report = {messages};
     // TODO: when ruleset is unchanged we can try to invalidate only line ranges in 'allow' and 'ignore'
     const newOvr = [ruleset, ignore, ...allow];
-    const reuseCache = !prevOverrides || JSON.stringify(prevOverrides) === JSON.stringify(newOvr);
-    prevOverrides = newOvr;
+    const reuseCache = JSON.stringify(newOvr);
     // always report parsing errors as errors
     ruleset.errors = 2;
     for (const [id, mode] of Object.entries(ruleset)) {
