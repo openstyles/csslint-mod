@@ -1,4 +1,6 @@
 /* eslint-disable max-len */
+import {AltMatcher, parse, singleTerm} from './matcher.js';
+
 export const _borderShorthand = '<border-shorthand>';
 const _positionArea = (
   // TODO: fix Matcher::many() so we don't have to reorder || groups to the end of | chain
@@ -41,8 +43,7 @@ const VTComplex = {
   '<blend-mode>': 'normal | multiply | screen | overlay | darken | lighten | color-dodge | ' +
     'color-burn | hard-light | soft-light | difference | exclusion | hue | ' +
     'saturation | color | luminosity | plus-darker | plus-lighter',
-  /** @param {typeof Matcher} M */
-  '<border-image-slice>': M => M.term('<num-pct0+>').braces(1, 4, '', '', M.term('fill')),
+  '<border-image-slice>': () => singleTerm('<num-pct0+>').braces(1, 4, '', '', singleTerm('fill')),
   '<border-radius-round>': 'round <border-radius>',
   '<border-shorthand>': '<line-width> || <line-style> || <color>',
   '<box>': 'padding-box | border-box | content-box',
@@ -63,8 +64,8 @@ const VTComplex = {
   '<coord-box>': '<box> | <box-fsv>',
   '<corner-shape-value>': 'round|scoop|bevel|notch|square|squircle|<fn:cornerShape>',
   '<counter>': '[ <ident-not-none> <int>? ]+ | none',
-  '<dasharray>': M => M.alt([M.term('<len-pct0+>'), M.term('<num0+>')])
-    .braces(1, Infinity, '#', M.term(',').braces(0, 1, '?')),
+  '<dasharray>': () => new AltMatcher(['<len-pct0+>', '<num0+>'].map(singleTerm))
+    .braces(1, Infinity, '#', singleTerm(',').braces(0, 1, '?')),
   '<display-box>': 'contents | none',
   '<display-inside>': 'flow | flow-root | table | flex | grid | ruby',
   '<display-internal>': 'table-row-group | table-header-group | table-footer-group | ' +
@@ -142,10 +143,10 @@ const VTComplex = {
   '<relative-size>': 'smaller | larger',
   '<repeat-style>': 'repeat-x | repeat-y | [ repeat | space | round | no-repeat ]{1,2}',
   '<rectangular-color-space>': '<predefined-rgb>|lab|oklab|<xyz-space>',
-  '<rule-color>': M => _makeGapRule(M, '<color>'),
-  '<rule-style>': M => _makeGapRule(M, '<line-style>'),
-  '<rule-width>': M => _makeGapRule(M, '<line-width>'),
-  '<rule>': M => _makeGapRule(M, _borderShorthand),
+  '<rule-color>': () => _makeGapRule('<color>'),
+  '<rule-style>': () => _makeGapRule('<line-style>'),
+  '<rule-width>': () => _makeGapRule('<line-width>'),
+  '<rule>': () => _makeGapRule(_borderShorthand),
   '<self-position>': 'center | start | end | self-start | self-end | flex-start | flex-end',
   '<shadow>': 'inset? && [ <len>{2,4} && <color>? ]',
   '<shape-box>': '<box> | margin-box',
@@ -168,9 +169,8 @@ const VTComplex = {
     '-moz-available | -webkit-fill-available | anchor-size() | calc-size()',
   '<xyz-space>': 'xyz | xyz-d50 | xyz-d65',
 };
-/** @param {typeof Matcher} M */
-const _makeGapRule = (M, type) =>
-  M.parse(`${type} | repeat( <int1+> , ${type}# )`)
-    .braces(0, Infinity, '#', ',', M.parse(`repeat( auto , ${type}# )`));
+const _makeGapRule = type =>
+  parse(`${type} | repeat( <int1+> , ${type}# )`)
+    .braces(0, Infinity, '#', ',', parse(`repeat( auto , ${type}# )`));
 
 export default VTComplex;

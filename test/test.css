@@ -95,7 +95,7 @@ heading"] {
       container: my-component / inline-size22;
       filter: invert(100%) hue-rotate(180deg);
       object-overflow: visible2;
-      clip-path: path(evenodd, 'M 5 5 h 100 v 100 Z');
+      clip-path: if( --foo: path(evenodd, 'M 5 5 h 100 v 100 Z'); else: path('M 5 5') );
       content: 'string' attr(a);
       content: attr(a) 'string';
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -781,4 +781,19 @@ a {flex-flow: row wr/*incomplete*/}
   content: attr(data-something, "default");
   /* With namespace */
   content: attr(color|myAttr type(*), red);
+}
+
+.color-mix {
+  /* Polar color space */
+  color: color-mix(in hsl, hsl(200 50 80), coral);
+  color: color-mix(in hsl, hsl(200 50 80) 20%, coral 80%);
+  /* Rectangular color space */
+  color: color-mix(in srgb, plum, #123456);
+  color: color-mix(in lab, plum 60%, #123456 50%);
+  /* With hue interpolation method */
+  color: color-mix(in lch increasing hue, hsl(200deg 50% 80%), coral);
+  color: color-mix(in lch longer hue, hsl(200deg 50% 80%) 44%, coral 16%);
+  /* with more than two colors */
+  color: color-mix(in oklab, teal, olive, blue);
+  color: color-mix(in oklab, teal 20%, olive 30%, blue 50%);
 }

@@ -6,10 +6,12 @@ import {PropValueIterator} from './validation';
 import VTComplex from './validation-complex';
 import VTFunctions from './validation-functions';
 import VTSimple from './validation-simple';
+import {COMMA} from './tokens.js';
 
 const rxAltSep = /\s*\|\s*/;
 const rxAndAndSep = /\s*&&\s*/y;
 const rxBraces = /{\s*(\d+)\s*(?:(,)\s*(?:(\d+)\s*)?)?}/y; // {n,} = {n,Infinity}
+const rxComma = /\s*,/y;
 const rxFuncBegin = /([-\w]+)\(\s*(\))?/y;
 const rxFuncEnd = /\s*\)/y;
 const rxGroupBegin = /\[\s*/y;
@@ -23,7 +25,6 @@ const rxTerm = /<[^>\s]+>|"[^"]*"|'[^']*'|[^\s?*+#{}()[\]|&]+/y;
 /**
  * This class implements a combinator library for matcher functions.
  * https://developer.mozilla.org/docs/Web/CSS/Value_definition_syntax#Component_value_combinators
- * @prop {string} [_string]
  * @prop {(expr: PropValueIterator, p: Token) => boolean} [test]
  */
 export default class Matcher {
@@ -32,6 +33,8 @@ export default class Matcher {
    */
   constructor(meta) {
     this._meta = meta;
+    /** original unprocessed grammar */
+    this._string = '';
   }
 
   /**
@@ -40,8 +43,10 @@ export default class Matcher {
    * @return {boolean}
    */
   match(expr, p) {
-    const {i} = expr;
-    if (!p && !(p = expr.parts[i]))
+    const pp = expr.parts;
+    let {i} = expr;
+    p ||= i < pp.length && pp[i];
+    if (!p)
       return (/**@type{BracesMatcher}*/this).min === 0;
     let res = this._meta;
     if (res === ALT) {
@@ -54,10 +59,12 @@ export default class Matcher {
       res = p.isVar ||
         (((res = (/**@type{SimpleMatcher}*/this).fn)) ? !!res(p) : this.test(expr, p)) ||
         expr.tryAttr && p.isAttr;
-      if (res && expr.i < expr.parts.length)
+      if (res && expr.i < pp.length)
         ++expr.i;
     }
-    if (!res) expr.i = i;
+    if (res) i = expr.i; else expr.i = i;
+    if (i < pp.length && (/**@type{BracesMatcher}*/this).eatComma && pp[i].id === COMMA)
+      ++expr.i;
     return res;
   }
 
@@ -65,39 +72,18 @@ export default class Matcher {
     return this._string;
   }
 
-  /** Matcher for one or more juxtaposed words, which all must occur, in the given order.
-   * @param {Matcher[]} ms
-   * @return {Matcher}
-   */
-  static alt(ms) {
-    return !ms[1] ? ms[0] : new AltMatcher(ms);
-  }
-
-  braces(min, max, marker, sep, outlier) {
+  braces(min, max, marker, sep, outlier, eatComma) {
     return new BracesMatcher(this, min, max, marker,
       sep && typeof sep === 'string' ? singleTerm(sep) : sep,
-      outlier,
+      outlier, eatComma,
     );
-  }
-
-  /**
-   * @param {boolean[] | boolean} [req]
-   * @param {Matcher[]} ms
-   * @return {Matcher | ManyMatcher}
-   */
-  static many(req, ms) {
-    return !ms[1] ? ms[0] : new ManyMatcher(req, ms);
-  }
-
-  static seq(ms) {
-    return !ms[1] ? ms[0] : new SeqMatcher(ms);
   }
 }
 
 /**
  * ALT: OROR [ " | " OROR ]*  (exactly one matches)
  */
-class AltMatcher extends Matcher {
+export class AltMatcher extends Matcher {
   /** @param {Matcher[]} ms */
   constructor(ms) {
     super(ALT);
@@ -124,8 +110,9 @@ class BracesMatcher extends Matcher {
    * @param {string} [marker]
    * @param {string|Matcher} [sep]
    * @param {Matcher} [outlier] one optional nonstandard item in the series
+   * @param {boolean} [eatComma] both on miss & hit
    */
-  constructor(m, min, max, marker, sep, outlier) {
+  constructor(m, min, max, marker, sep, outlier, eatComma) {
     super(MOD);
     this.m = m;
     this.min = min;
@@ -133,6 +120,7 @@ class BracesMatcher extends Matcher {
     this.marker = marker;
     this.sep = sep;
     this.outlier = outlier;
+    this.eatComma = eatComma;
   }
 
   /**
@@ -301,7 +289,7 @@ class ManyMatcher extends Matcher {
  */
 class SeqMatcher extends Matcher {
   /**
-   * @param {Matcher[]} ms
+   * @param {Matcher[]} ms - must have at least two items
    * @param {boolean} [some] something must match when everything is optional
    */
   constructor(ms, some) {
@@ -384,7 +372,7 @@ class StringsMatcher extends Matcher {
  * @param {string} str
  * @return {Matcher}
  */
-const parse = Matcher.parse = str => {
+export const parse = Matcher.parse = str => {
   const source = new StringSource(str);
   const res = parseAlt(source);
   if (!source.eof()) {
@@ -425,11 +413,11 @@ const parseAlt = src => {
           do {
             seq.push(parseTerm(src));
           } while (src.readMatch(rxSeqSep));
-          ands.push(!seq[1] ? seq[0] : new SeqMatcher(seq));
+          ands.push(seq.length > 1 ? new SeqMatcher(seq) : seq[0]);
         } while (src.readMatch(rxAndAndSep));
-        ors.push(Matcher.many(null, ands));
+        ors.push(ands.length > 1 ? new ManyMatcher(null, ands) : ands[0]);
       } while (src.readMatch(rxOrOrSep));
-      const single = !ors[1] && ors[0];
+      const single = ors.length === 1 && ors[0];
       if (single && single instanceof StringsMatcher) {
         literals ??= (litIndex = alts.length, []);
         literals.push((/**@type{StringsMatcher}*/single).str);
@@ -439,7 +427,7 @@ const parseAlt = src => {
   } while (src.readMatch(rxOrSep));
   if (literals)
     alts.splice(litIndex, 0, singleTerm(literals.join('|')));
-  return !alts[1] ? alts[0] : new AltMatcher(alts);
+  return alts.length > 1 ? new AltMatcher(alts) : alts[0];
 };
 
 /**
@@ -479,9 +467,8 @@ const parseTerm = src => {
       if (+a === 1) m.min = 0; // modify 1->0 inplace
       else m = m.braces(0, 1, '?');
     }
-    return m;
-  }
-  if (fn === 63 /* ? */) {
+    fn = 0;
+  } else if (fn === 63 /* ? */) {
     m = m.braces(0, 1, '?');
   } else if (fn === 42 /* * */) {
     m = m.braces(0, Infinity, '*');
@@ -496,6 +483,8 @@ const parseTerm = src => {
     (/**@type{SeqMatcher}*/m).some = true;
   } else fn = 0;
   if (fn) src.read();
+  if (m.min === 0 && src.readMatch(rxComma))
+    m.eatComma = true;
   return m;
 };
 
@@ -513,7 +502,7 @@ const parsingFailed = (src, m) => {
  * @param {string} str
  * @return {Matcher}
  */
-const singleTerm = Matcher.term = str => {
+export const singleTerm = Matcher.term = str => {
   const origStr = str;
   let m = cache[str = str.toLowerCase()];
   if (m) return m;

@@ -1,8 +1,8 @@
 /* eslint-disable max-len */
 
-const _conicGradient = '[ [ [ [ from <angle-zero> ]? <at-pos>? ] || <color-interpolation-method> ] , ]? [ <angular-color-stop> [, [ [<angle-pct-zero> ,]? <angular-color-stop> ]# ]? ]';
-const _linearGradient = '[ [ [ [ <angle-zero> | to [[left|right] || [top|bottom]] ] || <color-interpolation-method> ] , ]? <color-stop-list> ]?';
-const _radialGradient = '[ [ [ [ [circle|ellipse] || [<radial-extent> | <len0+> | <len-pct0+>{2}] ]? <at-pos>? ] || <color-interpolation-method> ] , ]? <color-stop-list>';
+const _conicGradient = '[ [ [ from <angle-zero> ]? <at-pos>? ] || <color-interpolation-method> ]? , [ <angular-color-stop> [, [ [<angle-pct-zero> ,]? <angular-color-stop> ]# ]? ]';
+const _linearGradient = '[ [ [ <angle-zero> | to [[left|right] || [top|bottom]] ] || <color-interpolation-method> ]? , <color-stop-list> ]?';
+const _radialGradient = '[ [ [ [circle|ellipse] || [<radial-extent> | <len0+> | <len-pct0+>{2}] ]? <at-pos>? ] || <color-interpolation-method> ]? , <color-stop-list>';
 const grads = {
   'conic-gradient': _conicGradient,
   'linear-gradient': _linearGradient,
@@ -29,7 +29,7 @@ const VTFunctions = {
     __proto__: null,
     circle: '<shape-radius> <at-pos>?',
     ellipse: '<shape-radius>{2}? <at-pos>?',
-    path: '[ <fill-rule> , ]? <string>',
+    path: '<fill-rule>? , <string>',
     polygon: '[ <fill-rule> [ round <len> ]? , ]? [ <len-pct>{2} ]#',
     shape: '[ [from|move|line|hline|vline|curve|smooth|arc] [to|by]? [<ident>|<len-pct>]+ ]#',
     ...rects,
@@ -37,7 +37,7 @@ const VTFunctions = {
   color: {
     __proto__: null,
     'alpha': 'from <color> <alpha>?',
-    'color-mix': '[ <color-interpolation-method> , ]? [ <color> && <pct0-100>? ]#',
+    'color-mix': '<color-interpolation-method>? , [ <color> && <pct0-100>? ]#',
     'color': '[<predefined-rgb>|<xyz-space>] <num-pct-none>{3} <alpha>? | from <color> [[<predefined-rgb> [<num-pct-none>|r|g|b]{3} | <xyz-space> [<num-pct-none>|x|y|z]{3}] | [<dashed-ident> <num-pct-none>+ ]] [/ [alpha|<num-pct-none>]]?',
     'contrast-color': '<color>',
     'hsl': '<hue> , <pct>#{2} [ , <num-pct0+> ]? | ' +
