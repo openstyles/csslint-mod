@@ -761,3 +761,15 @@ a {flex-flow: row wr/*incomplete*/}
 .image-color-func {
   background: image(red), url("./foo.png" cross-origin(anonymous));
 }
+
+@keyframes animate-in-and-out {
+  entry 0% {opacity: 0; transform: translateY(100%);}
+  to {
+    opacity: 0; transform: translateY(-100%);
+  }
+}
+
+.scroller > * {
+  animation: linear animate-in-and-out;
+  animation-timeline: view();
+}

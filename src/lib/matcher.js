@@ -368,7 +368,7 @@ class StringsMatcher extends Matcher {
    * @return {!boolean}
    */
   test(expr, p) {
-    const bu = this.bu ??= (expr = this.str.split(rxAltSep), this.str = '', new Bucket(expr));
+    const bu = this.bu ??= (expr = this.str, this.str = '', new Bucket(expr, rxAltSep));
     return bu.has(p) // the bucket may have -vendor-prefixed-text too
       || p.vendorPos && bu.has(p, undefined, p.vendorPos) || false;
   }

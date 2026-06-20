@@ -8,13 +8,13 @@ const buAlpha = new Bucket('alpha');
 /** https://www.w3.org/TR/css-values-4/#custom-idents */
 export const buGlobalKeywords = new Bucket(GlobalKeywords);
 const buReserved = new Bucket(GlobalKeywords)
-  .addFrom(['default']);
+  .addFrom('default');
 const buReservedAnim = new Bucket(GlobalKeywords)
-  .addFrom(['default', 'will-change', 'auto', 'scroll-position', 'contents']);
+  .addFrom('default will-change auto scroll-position contents');
 const buReservedGrid = new Bucket(GlobalKeywords)
-  .addFrom(['default', 'span', 'auto']);
+  .addFrom('default span auto');
 const buReservedAuto = new Bucket(GlobalKeywords)
-  .addFrom(['default', 'auto']);
+  .addFrom('default auto');
 
 /** @type {{[id: string]: (p: Token) => boolean}} */
 const VTSimple = {
