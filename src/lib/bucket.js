@@ -68,6 +68,7 @@ export const B = {
   calc: 'abs calc calc-size clamp if min max mod progress rem round sign',
   colors: NamedColors,
   containerFn: 'anchored( scroll-state( style(',
+  /** When a value starting from "f" or "t" is added make sure to fix parser.keyframes() */
   keyframe: 'from to contain cover entry entry-crossing exit exit-crossing scroll',
   marginSyms:
     'bottom-center bottom-left-corner bottom-left bottom-right-corner bottom-right ' +

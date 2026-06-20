@@ -185,9 +185,17 @@ const ATS = {
       const keys = [];
       do {
         ti = (tok = stream.grab()).id;
-        if (ti === PCT || ti === IDENT && B.fromTo.has(tok)) keys.push(tok);
-        else if (!keys[0]) break;
-        else stream._failure('percentage%, "from", "to"', tok);
+        if (ti === PCT) {
+          keys.push(tok);
+        } else if (ti === IDENT && (tok.type === '--' || B.keyframe.has(tok))) {
+          if (tok.type === '--' || (ti = tok.code) !== 102/*from*/ && ti !== 116/*to*/)
+            tok.args = [stream.matchSmart(PCT, OrDie)];
+          keys.push(tok);
+        } else if (!keys.length) {
+          break;
+        } else {
+          stream._failure(`percentage%, --name, "${B.keyframe.join('", "')}"`, tok);
+        }
       } while ((ti = (tok = stream.grab()).id) === COMMA);
       if (!keys[0]) break;
       this._block(stream, keys[0], {

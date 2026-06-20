@@ -764,12 +764,6 @@ a {flex-flow: row wr/*incomplete*/}
 
 @keyframes animate-in-and-out {
   entry 0% {opacity: 0; transform: translateY(100%);}
-  to {
-    opacity: 0; transform: translateY(-100%);
-  }
-}
-
-.scroller > * {
-  animation: linear animate-in-and-out;
-  animation-timeline: view();
+  to {opacity: 1;}
+  --foo 25% {opacity: .5;}
 }
