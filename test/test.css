@@ -767,3 +767,18 @@ a {flex-flow: row wr/*incomplete*/}
   to {opacity: 1;}
   --foo 25% {opacity: .5;}
 }
+
+.attrs {
+  content: attr(data-width px);
+  content: attr(data-size rem);
+  content: attr(data-name raw-string);
+  content: attr(id type(<custom-ident>));
+  content: attr(data-count type(<number>));
+  content: attr(data-size type(<length> | <percentage>));
+  /* With fallback */
+  content: attr(data-count type(<number>), 0);
+  content: attr(data-width px, inherit);
+  content: attr(data-something, "default");
+  /* With namespace */
+  content: attr(color|myAttr type(*), red);
+}

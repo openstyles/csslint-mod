@@ -21,9 +21,9 @@ const _width = '<width>';
 const Properties = {
   __proto__: null,
   'accent-color': 'auto | <color>',
-  'align-items': 'normal | stretch | anchor-center | <baseline-position> | <overflow-position>? <self-position>',
+  'align-items': 'normal | stretch | <baseline-position> | <overflow-position>? <self-position>',
   'align-content': 'normal | <baseline-position> | <content-distribution> | <overflow-position>? <content-position>',
-  'align-self': 'auto | <align-items>',
+  'align-self': 'auto | stretch | <baseline-position> | <overflow-position>? [ normal | <self-position> ]',
   'all': GlobalKeywords.join('|'),
   'alignment-baseline': 'auto | baseline | use-script | before-edge | text-before-edge | ' +
     'after-edge | text-after-edge | central | middle | ideographic | alphabetic | ' +
@@ -366,8 +366,8 @@ const Properties = {
 
   'justify-content': 'normal | <content-distribution> | ' +
     '<overflow-position>? [ <content-position> | left | right ]',
-  'justify-items': 'normal | stretch | anchor-center | <baseline-position> | [ <overflow-position>? <self-position> ] | [ legacy || [ left | right | center ] ]',
-  'justify-self': 'auto | normal | stretch | anchor-center | <baseline-position> | <overflow-position>? [ <self-position> | left | right ]',
+  'justify-items': 'normal | stretch | <baseline-position> | <overflow-position>? [ <self-position> | left | right ] | legacy | legacy && [ left | right | center ]',
+  'justify-self': 'auto | <overflow-position>? [ normal | <self-position> | left | right ] | stretch | <baseline-position>',
 
   'left': '<top>',
   'letter-spacing': '<len-pct> | normal',
@@ -489,12 +489,12 @@ const Properties = {
   'pointer-events': 'auto | none | visiblePainted | visibleFill | visibleStroke | visible | ' +
     'painted | fill | stroke | all',
   'position': 'static | relative | absolute | fixed | sticky',
-  'position-anchor': 'auto | <dashed-ident>',
+  'position-anchor': 'normal | none | auto | match-parent | <anchor-name>',
   'position-area': 'auto | <position-area>',
   'position-try': '<position-try-order>? <position-try-fallbacks>',
   'position-try-order': 'normal | most-width | most-height | most-block-size | most-inline-size',
   'position-try-fallbacks': 'none | [[<dashed-ident> || <try-tactic>] | <position-area> ]#',
-  'position-visibility': 'always | [ anchors-valid || anchors-visible || no-overflow ]',
+  'position-visibility': 'always | [ anchor-valid || anchor-visible || no-overflow ]',
   'print-color-adjust': 'economy | exact',
 
   'quotes': 1,
@@ -593,13 +593,14 @@ const Properties = {
   'text-align': '<text-align> | justify-all',
   'text-align-last': '<text-align> | auto',
   'text-anchor': 'start | middle | end',
-  'text-autospace': 'normal | <autospace> | auto',
+  'text-autospace': 'normal | auto | no-autospace | ideograph-alpha||ideograph-numeric||punctuation||[insert|replace]',
   'text-box': 'normal | <text-box-trim> || <text-box-edge>',
   'text-box-edge': 'auto | text | [text|cap|ex] [text|alphabetic]',
   'text-box-trim': 'none | trim-start | trim-end | trim-both',
   'text-combine-upright': 'none | all | [ digits <int2-4>? ]',
   'text-decoration': '<text-decoration-line> || <text-decoration-style> || <color>',
   'text-decoration-color': _color,
+  'text-decoration-inset': '<len>{1,2} | auto',
   'text-decoration-line': 'none | [ underline || overline || line-through || blink ]',
   'text-decoration-skip': 'none | auto',
   'text-decoration-skip-ink': 'none | auto | all',

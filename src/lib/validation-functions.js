@@ -37,7 +37,7 @@ const VTFunctions = {
   color: {
     __proto__: null,
     'alpha': 'from <color> <alpha>?',
-    'color-mix': '[ <color-interpolation-method> , ]? [ <color> && <pct0-100>? ]#{2}',
+    'color-mix': '[ <color-interpolation-method> , ]? [ <color> && <pct0-100>? ]#',
     'color': '[<predefined-rgb>|<xyz-space>] <num-pct-none>{3} <alpha>? | from <color> [[<predefined-rgb> [<num-pct-none>|r|g|b]{3} | <xyz-space> [<num-pct-none>|x|y|z]{3}] | [<dashed-ident> <num-pct-none>+ ]] [/ [alpha|<num-pct-none>]]?',
     'contrast-color': '<color>',
     'hsl': '<hue> , <pct>#{2} [ , <num-pct0+> ]? | ' +
