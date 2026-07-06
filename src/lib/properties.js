@@ -348,6 +348,7 @@ const Properties = {
   'hyphenate-limit-chars': '[ auto | <int> ]{1,3}',
   'hyphens': 'none | manual | auto',
 
+  'image-animation': 'normal | paused | stopped | running',
   'image-orientation': 'from-image | none | [ <angle> || flip ]',
   'image-rendering': 'auto | smooth | high-quality | crisp-edges | pixelated | ' +
     'optimizeSpeed | optimizeQuality | -webkit-optimize-contrast',
@@ -525,6 +526,7 @@ const Properties = {
   'row-rule-visibility-items': _ruleVisibilityItems,
   'row-rule-width': '<rule-width>',
   'ruby-align': 'start | center | space-between | space-around',
+  'ruby-overhang': 'auto | spaces',
   'ruby-position': 'alternate || [over|under] | inter-character',
   'rule': '<rule>',
   'rule-color': '<rule-color>',
@@ -664,6 +666,7 @@ const Properties = {
   'widows': '<int>',
   'width': 'auto | <width-base>',
   'will-change': 'auto | <animateable-feature>#',
+  'window-drag': 'none | move',
   'word-break': 'normal | keep-all | break-all | break-word',
   'word-spacing': '<len-pct> | normal',
   'word-wrap': 'normal | break-word | anywhere',
