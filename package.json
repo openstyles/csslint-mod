@@ -20,13 +20,15 @@
     "build": "rollup -c",
     "watch": "rollup -c -w",
     "lint": "eslint \"**/*.js\" --cache",
-    "test": "pnpm run-p lint self-test",
-    "self-test": "node --import=extensionless/register test/test.js",
-    "preversion": "pnpm test && pnpm run build && git add dist",
+    "test": "pnpm run-p lint test-dev",
+    "test-build": "node test/test.js build",
+    "test-dev": "node --import=extensionless/register test/test.js",
+    "preversion": "pnpm test && pnpm build && pnpm test-build && git add dist",
     "bump": "pnpm version patch",
     "bump2": "pnpm version minor"
   },
   "devDependencies": {
+    "@rollup/plugin-json": "^6.1.0",
     "chalk": "^5.6.2",
     "eslint": "^10.6.0",
     "extensionless": "^2.0.6",

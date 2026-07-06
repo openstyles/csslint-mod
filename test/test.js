@@ -7,6 +7,7 @@ import chalk from 'chalk';
  * Inspect it and either fix the source code or rename it to overwrite test.css.txt.
 */
 
+const BUILD = process.argv[2] === 'build';
 const DIR = import.meta.dirname;
 const TEST_FILE = DIR + '/test.css';
 const REPORT_FILE = TEST_FILE + '.txt';
@@ -33,7 +34,7 @@ function fail(what, str) {
 }
 
 async function testCsslint() {
-  const {default: csslint} = await import('../src/csslint');
+  const {default: csslint} = await import(BUILD ? '../dist/csslint.js' : '../src/csslint');
   const rules = {...csslint.getRuleSet(), 'style-rule-nesting': 0};
   const report = csslint
     .verify(fs.readFileSync(TEST_FILE, 'utf8'), rules)
@@ -52,7 +53,7 @@ async function testCsslint() {
 }
 
 async function testParserlib() {
-  const {default: parserlib} = await import('../src/parserlib');
+  const {default: parserlib} = await import(BUILD ? '../dist/parserlib.js' : '../src/parserlib');
   const {Matcher} = parserlib.util;
   for (const obj of [
     parserlib.css.Properties,

@@ -275,9 +275,9 @@ export default [
   {
     files: ['src/**/*.js'],
     languageOptions: {
-      ecmaVersion: 2024,
+      ecmaVersion: 2025,
       globals: {
-        ...globals.es2024,
+        ...globals.es2025,
         ...globals['shared-node-browser'],
       },
     },
