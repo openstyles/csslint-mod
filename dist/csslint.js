@@ -754,6 +754,7 @@ var ruleKnownPseudos = [{
     'active': 1,
     'active-view-transition': 1,
     'active-view-transition-type': 1 + Func,
+    'animated-image': 1,
     'any-link': 1 + Moz + WK,
     'autofill': 1 + WK,
     'blank': 1,

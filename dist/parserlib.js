@@ -301,926 +301,645 @@ const Combinators = [];
 /*   ~   */ Combinators[126] = 'sibling';
 /*  ||   */ Combinators[124] = 'column';
 
-const GlobalKeywords = [
-  'initial',
-  'inherit',
-  'revert',
-  'revert-layer',
-  'revert-rule',
-  'unset',
-];
-const documentFuncs = {
-  'domain': 1,
-  'regexp': -1, // cannot be a quoteless <uri>
-  'url': 1,
-  'url-prefix': 1,
+var all = "initial|inherit|revert|revert-layer|revert-rule|unset";
+var animation = "[ <time0+> || <timing-function> || <time> || [ infinite | <num0+> ] || <animation-direction> || <animation-fill-mode> || [ running|paused ] || [ none | <custom-ident> | <string> ] || <animation-timeline> ]#";
+var appearance = "none|auto|base|base-select|searchfield|textarea|checkbox|radio|menulist|listbox|meter|progress-bar|button|textfield|menulist-button";
+var background = "[ <bg-layer> , ]* <final-bg-layer>";
+var border = "<border-shorthand>";
+var bottom = "<top>";
+var caret = "<caret-color> || <caret-animation> || <caret-shape>";
+var clear = "none|left|right|both|inline-start|inline-end";
+var clip = "rect() | auto";
+var color = "<color>";
+var columns = "[ <column-width> || <column-count> ] [ / <column-height> ]?";
+var contain = "none|strict|content | [ size || layout || style || paint ]";
+var container = "<container-name> [ / <container-type> ]?";
+var content = "normal|none | <content-list> [ / [ <string> | counter() | counters() | <attr> ]+ ]?";
+var cursor = "[ [ <url> | image-set() ] <num>{2}? , ]* [ auto|default|none|context-menu|help|pointer|progress|wait|cell|crosshair|text|vertical-text|alias|copy|move|no-drop|not-allowed|e-resize|n-resize|ne-resize|nw-resize|s-resize|se-resize|sw-resize|w-resize|ew-resize|ns-resize|nesw-resize|nwse-resize|col-resize|row-resize|all-scroll|zoom-in|zoom-out|grab|grabbing|hand|-webkit-grab|-webkit-grabbing|-webkit-zoom-in|-webkit-zoom-out|-moz-grab|-moz-grabbing|-moz-zoom-in|-moz-zoom-out ]";
+var cx = "<x>";
+var cy = "<x>";
+var d = 1;
+var direction = "ltr|rtl";
+var display = "[ <display-outside> || <display-inside> ] | <display-listitem> | <display-internal> | <display-box> | <display-legacy> | -webkit-box | -webkit-inline-box | -ms-flexbox";
+var fill = "<paint>";
+var filter = "<filter-function-list> | <ie-function> | none";
+var flex = "none | [ <num>{1,2} || <flex-basis> ]";
+var float = "left|right|none|inline-start|inline-end";
+var font = "<font-short-tweak-no-pct>? <font-short-core> | [ <font-short-tweak-no-pct> || <pct> ]? <font-short-core> | caption|icon|menu|message-box|small-caption|status-bar";
+var gap = "<column-gap>{1,2}";
+var grid = "<grid-template> | <grid-template-rows> / [ auto-flow && dense? ] <grid-auto-columns>? | [ auto-flow && dense? ] <grid-auto-rows>? / <grid-template-columns>";
+var height = "<width>";
+var hyphens = "none|manual|auto";
+var inset = "<top>{1,4}";
+var interactivity = "auto|inert";
+var isolation = "auto|isolate";
+var left = "<top>";
+var margin = "<top>{1,4}";
+var marker = "none| <url>";
+var mask = "[ [ none | <image> ] || <position> [ / <bg-size> ]? || <repeat-style> || <geometry-box> || [ <geometry-box> | no-clip ] || <compositing-operator> || <masking-mode> ]#";
+var offset = "[ <offset-position>? <offset-path> [ <len-pct> || <offset-rotate> ]? | <offset-position> ] [ / <offset-anchor> ]?";
+var opacity = "<num0-1> | <pct>";
+var order = "<int>";
+var orphans = "<int>";
+var outline = "[ <color> | invert ] || [ auto | <line-style> ] || <line-width>";
+var overflow = "<overflow>{1,2}";
+var padding = "<len-pct0+>{1,4}";
+var page = "auto | <custom-ident>";
+var perspective = "none | <len0+>";
+var position = "static|relative|absolute|fixed|sticky";
+var quotes = 1;
+var r = 1;
+var resize = "none|both|horizontal|vertical|block|inline";
+var right = "<top>";
+var rotate = "none | [ x|y|z | <num>{3} ]? && <angle>";
+var rule = "<rule>";
+var rx = "<x> | auto";
+var ry = "<rx>";
+var scale = "none | <num-pct>{1,3}";
+var speak = "auto|never|always";
+var stroke = "<paint>";
+var top = "auto | <len-pct> | anchor() | anchor-size()";
+var transform = "none | <fn:transform>+";
+var transition = "[ [ none | [ all | <custom-ident> ]# ] || <time> || <timing-function> || <time> || <txbhv> ]#";
+var translate = "none | <len-pct> [ <len-pct> <len>? ]?";
+var visibility = "<vis-hid> | collapse";
+var widows = "<int>";
+var width = "auto | <width-base>";
+var x = "<len-pct> | <num>";
+var y = "<x>";
+var zoom = "<num0+> | <pct> | normal";
+var Properties = {
+	"accent-color": "auto | <color>",
+	"align-items": "normal|stretch | <baseline-position> | <overflow-position>? <self-position>",
+	"align-content": "normal | <baseline-position> | <content-distribution> | <overflow-position>? <content-position>",
+	"align-self": "auto|stretch | <baseline-position> | <overflow-position>? [ normal | <self-position> ]",
+	all: all,
+	"alignment-baseline": "baseline|text-bottom|alphabetic|ideographic|middle|central|mathematical|hanging|text-top",
+	"anchor-name": "none | <dashed-ident>#",
+	"anchor-scope": "none|all | <dashed-ident>#",
+	animation: animation,
+	"animation-composition": "[ replace|add|accumulate ]#",
+	"animation-delay": "<time>#",
+	"animation-direction": "<animation-direction>#",
+	"animation-duration": "[ auto | <time0+> ]#",
+	"animation-fill-mode": "<animation-fill-mode>#",
+	"animation-iteration-count": "[ <num> | infinite ]#",
+	"animation-name": "[ none | <keyframes-name> ]#",
+	"animation-play-state": "[ running|paused ]#",
+	"animation-range": "[<animation-range-start> <animation-range-end>?]#",
+	"animation-range-end": "[normal|<len-pct>|<timeline-range-name> <len-pct>?]#",
+	"animation-range-start": "[normal|<len-pct>|<timeline-range-name> <len-pct>?]#",
+	"animation-timeline": "<animation-timeline>#",
+	"animation-timing-function": "<timing-function>#",
+	appearance: appearance,
+	"-moz-appearance": "none|button|button-arrow-down|button-arrow-next|button-arrow-previous|button-arrow-up|button-bevel|button-focus|caret|checkbox|checkbox-container|checkbox-label|checkmenuitem|dualbutton|groupbox|listbox|listitem|menuarrow|menubar|menucheckbox|menuimage|menuitem|menuitemtext|menulist|menulist-button|menulist-text|menulist-textfield|menupopup|menuradio|menuseparator|meterbar|meterchunk|progressbar|progressbar-vertical|progresschunk|progresschunk-vertical|radio|radio-container|radio-label|radiomenuitem|range|range-thumb|resizer|resizerpanel|scale-horizontal|scalethumbend|scalethumb-horizontal|scalethumbstart|scalethumbtick|scalethumb-vertical|scale-vertical|scrollbarbutton-down|scrollbarbutton-left|scrollbarbutton-right|scrollbarbutton-up|scrollbarthumb-horizontal|scrollbarthumb-vertical|scrollbartrack-horizontal|scrollbartrack-vertical|searchfield|separator|sheet|spinner|spinner-downbutton|spinner-textfield|spinner-upbutton|splitter|statusbar|statusbarpanel|tab|tabpanel|tabpanels|tab-scroll-arrow-back|tab-scroll-arrow-forward|textfield|textfield-multiline|toolbar|toolbarbutton|toolbarbutton-dropdown|toolbargripper|toolbox|tooltip|treeheader|treeheadercell|treeheadersortarrow|treeitem|treeline|treetwisty|treetwistyopen|treeview|-moz-mac-unified-toolbar|-moz-win-borderless-glass|-moz-win-browsertabbar-toolbox|-moz-win-communicationstext|-moz-win-communications-toolbox|-moz-win-exclude-glass|-moz-win-glass|-moz-win-mediatext|-moz-win-media-toolbox|-moz-window-button-box|-moz-window-button-box-maximized|-moz-window-button-close|-moz-window-button-maximize|-moz-window-button-minimize|-moz-window-button-restore|-moz-window-frame-bottom|-moz-window-frame-left|-moz-window-frame-right|-moz-window-titlebar|-moz-window-titlebar-maximized",
+	"-webkit-appearance": "none|button|button-bevel|caps-lock-indicator|caret|checkbox|default-button|inner-spin-button|listbox|listitem|media-controls-background|media-controls-fullscreen-background|media-current-time-display|media-enter-fullscreen-button|media-exit-fullscreen-button|media-fullscreen-button|media-mute-button|media-overlay-play-button|media-play-button|media-seek-back-button|media-seek-forward-button|media-slider|media-sliderthumb|media-time-remaining-display|media-toggle-closed-captions-button|media-volume-slider|media-volume-slider-container|media-volume-sliderthumb|menulist|menulist-button|menulist-text|menulist-textfield|meter|progress-bar|progress-bar-value|push-button|radio|scrollbarbutton-down|scrollbarbutton-left|scrollbarbutton-right|scrollbarbutton-up|scrollbargripper-horizontal|scrollbargripper-vertical|scrollbarthumb-horizontal|scrollbarthumb-vertical|scrollbartrack-horizontal|scrollbartrack-vertical|searchfield|searchfield-cancel-button|searchfield-decoration|searchfield-results-button|searchfield-results-decoration|slider-horizontal|slider-vertical|sliderthumb-horizontal|sliderthumb-vertical|square-button|textarea|textfield|-apple-pay-button",
+	"aspect-ratio": "auto || <ratio>",
+	"backdrop-filter": "<filter-function-list> | none",
+	"backface-visibility": "<vis-hid>",
+	background: background,
+	"background-attachment": "<attachment>#",
+	"background-blend-mode": "<blend-mode>",
+	"background-clip": "[ <box> | text|border-area ]#",
+	"background-color": "<color>",
+	"background-image": "<bg-image>#",
+	"background-origin": "<box>#",
+	"background-position": "<bg-position>#",
+	"background-position-x": "[ center | [ [left|right|x-start|x-end]? <len-pct>? ]! ]#",
+	"background-position-y": "[ center | [ [top|bottom|y-start|y-end]? <len-pct>? ]! ]#",
+	"background-repeat": "<repeat-style>#",
+	"background-size": "<bg-size>#",
+	"baseline-shift": "baseline|sub|super | <len-pct>",
+	"baseline-source": "auto|first|last",
+	"block-size": "<width>",
+	border: border,
+	"border-block": "<border-shorthand>",
+	"border-block-color": "<color>{1,2}",
+	"border-block-end": "<border-shorthand>",
+	"border-block-end-color": "<color>",
+	"border-block-end-radius": "<border-top-radius>",
+	"border-block-end-style": "<line-style>",
+	"border-block-end-width": "<line-width>",
+	"border-block-start": "<border-shorthand>",
+	"border-block-start-color": "<color>",
+	"border-block-start-radius": "<border-top-radius>",
+	"border-block-start-style": "<line-style>",
+	"border-block-start-width": "<line-width>",
+	"border-block-style": "<line-style>{1,2}",
+	"border-block-width": "<line-width>{1,2}",
+	"border-bottom": "<border-shorthand>",
+	"border-bottom-color": "<color>",
+	"border-bottom-left-radius": "<len-pct>{1,2}",
+	"border-bottom-radius": "<border-top-radius>",
+	"border-bottom-right-radius": "<len-pct>{1,2}",
+	"border-bottom-style": "<line-style>",
+	"border-bottom-width": "<line-width>",
+	"border-collapse": "collapse|separate",
+	"border-color": "<color>{1,4}",
+	"border-end-end-radius": "<len-pct>{1,2}",
+	"border-end-start-radius": "<len-pct>{1,2}",
+	"border-image": "<border-image-source> || <border-image-slice> [ / <border-image-width> | / <border-image-width>? / <border-image-outset> ]? || <border-image-repeat>",
+	"border-image-outset": "[ <len0+> | <num0+> ]{1,4}",
+	"border-image-repeat": "[ stretch|repeat|round|space ]{1,2}",
+	"border-image-slice": "<border-image-slice>",
+	"border-image-source": "<image> | none",
+	"border-image-width": "[ <len-pct0+> | <num0+> | auto ]{1,4}",
+	"border-inline": "<border-shorthand>",
+	"border-inline-color": "<color>{1,2}",
+	"border-inline-end": "<border-shorthand>",
+	"border-inline-end-color": "<color>",
+	"border-inline-end-radius": "<border-top-radius>",
+	"border-inline-end-style": "<line-style>",
+	"border-inline-end-width": "<line-width>",
+	"border-inline-start": "<border-shorthand>",
+	"border-inline-start-color": "<color>",
+	"border-inline-start-radius": "<border-top-radius>",
+	"border-inline-start-style": "<line-style>",
+	"border-inline-start-width": "<line-width>",
+	"border-inline-style": "<line-style>{1,2}",
+	"border-inline-width": "<line-width>{1,2}",
+	"border-left": "<border-shorthand>",
+	"border-left-color": "<color>",
+	"border-left-radius": "<border-top-radius>",
+	"border-left-style": "<line-style>",
+	"border-left-width": "<line-width>",
+	"border-radius": "<len-pct0+>{1,4} [ / <len-pct0+>{1,4} ]?",
+	"border-right": "<border-shorthand>",
+	"border-right-color": "<color>",
+	"border-right-radius": "<border-top-radius>",
+	"border-right-style": "<line-style>",
+	"border-right-width": "<line-width>",
+	"border-shape": "none | [<basic-shape> <geometry-box>?]{1,2}",
+	"border-spacing": "<len>{1,2}",
+	"border-start-end-radius": "<len-pct0+>{1,2}",
+	"border-start-start-radius": "<len-pct0+>{1,2}",
+	"border-style": "<line-style>{1,4}",
+	"border-top": "<border-shorthand>",
+	"border-top-color": "<color>",
+	"border-top-left-radius": "<len-pct0+>{1,2}",
+	"border-top-radius": "<len-pct0+>{1,2} [ / <len-pct0+>{1,2} ]?",
+	"border-top-right-radius": "<len-pct0+>{1,2}",
+	"border-top-style": "<line-style>",
+	"border-top-width": "<line-width>",
+	"border-width": "<line-width>{1,4}",
+	bottom: bottom,
+	"box-decoration-break": "slice|clone",
+	"box-shadow": "none | <shadow>#",
+	"box-sizing": "content-box|border-box",
+	"break-after": "<break-inside> | always|all|left|right|page|recto|region|verso|column",
+	"break-before": "<break-after>",
+	"break-inside": "auto|avoid|avoid-page|avoid-column|avoid-region",
+	"caption-side": "top|bottom",
+	caret: caret,
+	"caret-animation": "auto|manual",
+	"caret-color": "auto | <color>",
+	"caret-shape": "auto|bar|block|underscore",
+	clear: clear,
+	clip: clip,
+	"clip-path": "<url> | [ <basic-shape> || <geometry-box> ] | none",
+	"clip-rule": "<fill-rule>",
+	color: color,
+	"color-interpolation": "auto|sRGB|linearRGB",
+	"color-interpolation-filters": "<color-interpolation>",
+	"color-scheme": "normal | [ light|dark | <custom-ident> ]+ && only?",
+	"column-count": "auto | <int1+>",
+	"column-fill": "auto|balance|balance-all",
+	"column-gap": "normal | <pct0+> | <line-width>",
+	"column-height": "auto | <len0+>",
+	"column-rule": "<rule>",
+	"column-rule-break": "<row-rule-break>",
+	"column-rule-color": "<rule-color>",
+	"column-rule-inset": "<rule-inset>",
+	"column-rule-inset-cap": "<inset-value>{1,2}",
+	"column-rule-inset-cap-end": "<inset-value>",
+	"column-rule-inset-cap-start": "<inset-value>",
+	"column-rule-inset-end": "<inset-value>",
+	"column-rule-inset-junction": "<inset-value>{1,2}",
+	"column-rule-inset-junction-end": "<inset-value>",
+	"column-rule-inset-junction-start": "<inset-value>",
+	"column-rule-inset-start": "<inset-value>",
+	"column-rule-style": "<rule-style>",
+	"column-rule-visibility-items": "all|around|between|normal",
+	"column-rule-width": "<rule-width>",
+	"column-span": "none | <int1+> | all|auto",
+	"column-width": "auto | <len0+>",
+	"column-wrap": "auto|nowrap|wrap",
+	columns: columns,
+	contain: contain,
+	"contain-intrinsic-block-size": "<contain-intrinsic>",
+	"contain-intrinsic-height": "<contain-intrinsic>",
+	"contain-intrinsic-inline-size": "<contain-intrinsic>",
+	"contain-intrinsic-size": "<contain-intrinsic>{1,2}",
+	"contain-intrinsic-width": "<contain-intrinsic>",
+	container: container,
+	"container-name": "none | <custom-ident>+",
+	"container-type": "normal | [ [ size|inline-size ] || scroll-state || anchored ]",
+	content: content,
+	"content-visibility": "auto | <vis-hid>",
+	"corner-block-end-shape": "<corner-shape-value>{1,2}",
+	"corner-block-start-shape": "<corner-shape-value>{1,2}",
+	"corner-bottom-left-shape": "<corner-shape-value>",
+	"corner-bottom-right-shape": "<corner-shape-value>",
+	"corner-bottom-shape": "<corner-shape-value>{1,2}",
+	"corner-end-end-shape": "<corner-shape-value>",
+	"corner-end-start-shape": "<corner-shape-value>",
+	"corner-inline-end-shape": "<corner-shape-value>{1,2}",
+	"corner-inline-start-shape": "<corner-shape-value>{1,2}",
+	"corner-left-shape": "<corner-shape-value>{1,2}",
+	"corner-right-shape": "<corner-shape-value>{1,2}",
+	"corner-shape": "<corner-shape-value>{1,4}",
+	"corner-start-end-shape": "<corner-shape-value>",
+	"corner-start-start-shape": "<corner-shape-value>",
+	"corner-top-left-shape": "<corner-shape-value>",
+	"corner-top-right-shape": "<corner-shape-value>",
+	"corner-top-shape": "<corner-shape-value>{1,2}",
+	"counter-increment": "<counter-set>",
+	"counter-reset": "[ <custom-ident> <int>?| reversed( <custom-ident> ) <int>? ]+|none",
+	"counter-set": "[ <custom-ident> <int>? ]+ | none",
+	cursor: cursor,
+	cx: cx,
+	cy: cy,
+	d: d,
+	direction: direction,
+	display: display,
+	"dominant-baseline": "auto|use-script|no-change|reset-size|ideographic|alphabetic|hanging|mathematical|central|middle|text-after-edge|text-before-edge",
+	"dynamic-range-limit": "<dynamic-range> | <fn:dynaRange>",
+	"empty-cells": "show|hide",
+	"field-sizing": "fixed|content",
+	fill: fill,
+	"fill-opacity": "<opacity>",
+	"fill-rule": "nonzero|evenodd",
+	filter: filter,
+	flex: flex,
+	"flex-basis": "content | <width>",
+	"flex-direction": "row|row-reverse|column|column-reverse",
+	"flex-flow": "<flex-direction> || <flex-wrap>",
+	"flex-grow": "<num>",
+	"flex-shrink": "<num>",
+	"flex-wrap": "nowrap | [ wrap|wrap-reverse ] || balance",
+	float: float,
+	"flood-color": "<color>",
+	"flood-opacity": "<opacity>",
+	font: font,
+	"font-family": "[ <generic-family> | <family-name> ]#",
+	"font-feature-settings": "[ <ascii4> [ <int0+> | on|off ]? ]# | normal",
+	"font-kerning": "auto|normal|none",
+	"font-language-override": "normal | <string>",
+	"font-optical-sizing": "auto|none",
+	"font-palette": "normal|light|dark | <dashed-ident>",
+	"font-size": "<absolute-size> | <relative-size> | <len-pct0+>",
+	"font-size-adjust": "none | [ex-height|cap-height|ch-width|ic-width|ic-height]? [from-font|<num0+>]",
+	"font-stretch": "<font-stretch-named> | <pct>",
+	"font-style": "normal|italic|oblique <angle>?",
+	"font-synthesis": "none | [ weight || style ]",
+	"font-synthesis-small-caps": "auto|none",
+	"font-synthesis-style": "auto|none",
+	"font-synthesis-weight": "auto|none",
+	"font-variant": "normal|none | [ <font-variant-ligatures> || <font-variant-alternates> || <font-variant-caps> || <font-variant-numeric> || <font-variant-east-asian> ]",
+	"font-variant-alternates": "<font-variant-alternates> | normal",
+	"font-variant-caps": "<font-variant-caps> | normal",
+	"font-variant-east-asian": "<font-variant-east-asian> | normal",
+	"font-variant-emoji": "auto|text|emoji|unicode",
+	"font-variant-ligatures": "<font-variant-ligatures> | normal|none",
+	"font-variant-numeric": "<font-variant-numeric> | normal",
+	"font-variant-position": "normal|sub|super",
+	"font-variation-settings": "normal | [ <string> <num> ]#",
+	"font-weight": "normal|bold|bolder|lighter | <num1-1000>",
+	"forced-color-adjust": "auto|none|preserve-parent-color",
+	gap: gap,
+	grid: grid,
+	"grid-area": "<grid-line> [ / <grid-line> ]{0,3}",
+	"grid-auto-columns": "<track-size>+",
+	"grid-auto-flow": "[ row|column ] || dense",
+	"grid-auto-rows": "<track-size>+",
+	"grid-column": "<grid-line> [ / <grid-line> ]?",
+	"grid-column-end": "<grid-line>",
+	"grid-column-gap": -1,
+	"grid-column-start": "<grid-line>",
+	"grid-gap": -1,
+	"grid-row": "<grid-line> [ / <grid-line> ]?",
+	"grid-row-end": "<grid-line>",
+	"grid-row-gap": -1,
+	"grid-row-start": "<grid-line>",
+	"grid-template": "none | [ <grid-template-rows> / <grid-template-columns> ] | [ <line-names>? <string> <track-size>? <line-names>? ]+ [ / <explicit-track-list> ]?",
+	"grid-template-areas": "none | <string>+",
+	"grid-template-columns": "<grid-template-rows>",
+	"grid-template-rows": "none | <track-list> | <auto-track-list> | subgrid [ <line-names> | repeat( [ <int1+> | auto-fill ] , <line-names>+ ) ]*",
+	"hanging-punctuation": "none | [ first || [ force-end|allow-end ] || last ]",
+	height: height,
+	"hyphenate-character": "<string> | auto",
+	"hyphenate-limit-chars": "[ auto | <int> ]{1,3}",
+	hyphens: hyphens,
+	"image-animation": "normal|paused|stopped|running",
+	"image-orientation": "from-image|none | <angle> || flip",
+	"image-rendering": "auto|smooth|high-quality|crisp-edges|pixelated|optimizeSpeed|optimizeQuality | -webkit-optimize-contrast",
+	"inline-size": "<width>",
+	inset: inset,
+	"inset-block": "<top>{1,2}",
+	"inset-block-end": "<top>",
+	"inset-block-start": "<top>",
+	"inset-inline": "<top>{1,2}",
+	"inset-inline-end": "<top>",
+	"inset-inline-start": "<top>",
+	interactivity: interactivity,
+	"interpolate-size": "numeric-only|allow-keywords",
+	isolation: isolation,
+	"justify-content": "normal | <content-distribution> | <overflow-position>? [ <content-position> | left|right ]",
+	"justify-items": "normal|stretch | <baseline-position> | <overflow-position>? [ <self-position> | left|right ] | legacy|legacy && [ left|right|center ]",
+	"justify-self": "auto | <overflow-position>? [ normal | <self-position> | left|right ] | stretch | <baseline-position>",
+	left: left,
+	"letter-spacing": "<len-pct> | normal",
+	"lighting-color": "<color>",
+	"line-break": "auto|loose|normal|strict|anywhere",
+	"line-height": "<num> | <len-pct> | normal",
+	"list-style": "<list-style-position> || <list-style-image> || <list-style-type>",
+	"list-style-image": "<image> | none",
+	"list-style-position": "inside|outside",
+	"list-style-type": "<string> | disc|circle|square|decimal|decimal-leading-zero|lower-roman|upper-roman|lower-greek|lower-latin|upper-latin|armenian|georgian|lower-alpha|upper-alpha|none|symbols()",
+	margin: margin,
+	"margin-block": "<top>{1,2}",
+	"margin-block-end": "<top>",
+	"margin-block-start": "<top>",
+	"margin-bottom": "<top>",
+	"margin-inline": "<top>{1,2}",
+	"margin-inline-end": "<top>",
+	"margin-inline-start": "<top>",
+	"margin-left": "<top>",
+	"margin-right": "<top>",
+	"margin-top": "<top>",
+	marker: marker,
+	"marker-end": "<marker>",
+	"marker-mid": "<marker>",
+	"marker-start": "<marker>",
+	mask: mask,
+	"mask-border": "<mask-border-source> ||<mask-border-slice> [ / <mask-border-width> [ / <mask-border-outset> ]? ]? ||<mask-border-repeat> || <mask-border-mode>",
+	"mask-border-mode": "<mask-type>",
+	"mask-border-outset": "[ <len> | <num> ]{1,4}",
+	"mask-border-repeat": "[ stretch|repeat|round|space ]{1,2}",
+	"mask-border-slice": "<num-pct>{1,4} fill?",
+	"mask-border-source": "none | <image>",
+	"mask-border-width": "[ <x> | auto ]{1,4}",
+	"mask-clip": "[ <coord-box> | no-clip ]#",
+	"mask-composite": "<compositing-operator>#",
+	"mask-image": "[ none | <image> ]#",
+	"mask-mode": "<masking-mode>#",
+	"mask-origin": "<coord-box>#",
+	"mask-position": "<position>#",
+	"mask-repeat": "<repeat-style>#",
+	"mask-size": "<bg-size>#",
+	"mask-type": "luminance|alpha",
+	"math-depth": "auto-add|add(<int>) | <int>",
+	"math-shift": "normal|compact",
+	"math-style": "normal|compact",
+	"max-block-size": "<max-width>",
+	"max-height": "<max-width>",
+	"max-inline-size": "<max-width>",
+	"max-width": "none | <width-base>",
+	"min-block-size": "<width>",
+	"min-height": "<width>",
+	"min-inline-size": "<width>",
+	"min-width": "<width>",
+	"mix-blend-mode": "<blend-mode>",
+	"object-fit": "fill|contain|cover|none|scale-down",
+	"object-position": "<position>",
+	"object-view-box": "none | inset() | rect() | xywh()",
+	offset: offset,
+	"offset-anchor": "auto | <position>",
+	"offset-distance": "<len-pct>",
+	"offset-path": "none | [ ray() | <url> | <basic-shape> ] || <coord-box>",
+	"offset-position": "auto | <position>",
+	"offset-rotate": "[ auto|reverse ] || <angle>",
+	opacity: opacity,
+	order: order,
+	orphans: orphans,
+	outline: outline,
+	"outline-color": "<color> | invert",
+	"outline-offset": "<len>",
+	"outline-style": "<line-style> | auto",
+	"outline-width": "<line-width>",
+	overflow: overflow,
+	"overflow-anchor": "auto|none",
+	"overflow-block": "<overflow>",
+	"overflow-clip-margin": "visual-box | <len0+>",
+	"overflow-inline": "<overflow>",
+	"overflow-wrap": "normal|break-word|anywhere",
+	"overflow-x": "<overflow>",
+	"overflow-y": "<overflow>",
+	"overscroll-behavior": "<overscroll>{1,2}",
+	"overscroll-behavior-block": "<overscroll>",
+	"overscroll-behavior-inline": "<overscroll>",
+	"overscroll-behavior-x": "<overscroll>",
+	"overscroll-behavior-y": "<overscroll>",
+	padding: padding,
+	"padding-block": "<len-pct0+>{1,2}",
+	"padding-block-end": "<len-pct0+>",
+	"padding-block-start": "<len-pct0+>",
+	"padding-bottom": "<len-pct0+>",
+	"padding-inline": "<len-pct0+>{1,2}",
+	"padding-inline-end": "<len-pct0+>",
+	"padding-inline-start": "<len-pct0+>",
+	"padding-left": "<len-pct0+>",
+	"padding-right": "<len-pct0+>",
+	"padding-top": "<len-pct0+>",
+	page: page,
+	"page-break-after": "auto|always|avoid|left|right|recto|verso",
+	"page-break-before": "<page-break-after>",
+	"page-break-inside": "auto|avoid",
+	"paint-order": "normal | [ fill || stroke || markers ]",
+	"path-length": "none | <num0+>",
+	perspective: perspective,
+	"perspective-origin": "<position>",
+	"place-content": "<align-content> <justify-content>?",
+	"place-items": "[ normal|stretch | <baseline-position> | <self-position> ] [ normal|stretch | <baseline-position> | <self-position> ]?",
+	"place-self": "<align-self> <justify-self>?",
+	"pointer-events": "auto|none|visiblePainted|visibleFill|visibleStroke|visible|painted|fill|stroke|all",
+	position: position,
+	"position-anchor": "normal|none|auto|match-parent | <anchor-name>",
+	"position-area": "auto | <position-area>",
+	"position-try": "<position-try-order>? <position-try-fallbacks>",
+	"position-try-fallbacks": "none | [[<dashed-ident> || <try-tactic>] | <position-area> ]#",
+	"position-try-order": "normal|most-width|most-height|most-block-size|most-inline-size",
+	"position-visibility": "always | [ anchor-valid || anchor-visible || no-overflow ]",
+	"print-color-adjust": "economy|exact",
+	quotes: quotes,
+	r: r,
+	"reading-flow": "normal|source-order|flex-visual|flex-flow|grid-rows|grid-columns|grid-order",
+	"reading-order": "<int>",
+	"rendering-intent": 1,
+	resize: resize,
+	right: right,
+	rotate: rotate,
+	"row-gap": "<column-gap>",
+	"row-rule": "<rule>",
+	"row-rule-break": "none|normal|intersection",
+	"row-rule-color": "<rule-color>",
+	"row-rule-inset": "<rule-inset>",
+	"row-rule-inset-cap": "<inset-value>{1,2}",
+	"row-rule-inset-cap-end": "<inset-value>",
+	"row-rule-inset-cap-start": "<inset-value>",
+	"row-rule-inset-end": "<inset-value>",
+	"row-rule-inset-junction": "<inset-value>{1,2}",
+	"row-rule-inset-junction-end": "<inset-value>",
+	"row-rule-inset-junction-start": "<inset-value>",
+	"row-rule-inset-start": "<inset-value>",
+	"row-rule-style": "<rule-style>",
+	"row-rule-visibility-items": "all|around|between|normal",
+	"row-rule-width": "<rule-width>",
+	"ruby-align": "start|center|space-between|space-around",
+	"ruby-overhang": "auto|spaces",
+	"ruby-position": "alternate || [over|under] | inter-character",
+	rule: rule,
+	"rule-color": "<rule-color>",
+	"rule-inset": "<inset-value>{1,2} [ / <inset-value>{1,2}]?",
+	"rule-inset-cap": "<inset-value>{1,2}",
+	"rule-inset-end": "<inset-value>",
+	"rule-inset-junction": "<inset-value>{1,2}",
+	"rule-inset-start": "<inset-value>",
+	"rule-overlap": "row-over-column|column-over-row",
+	"rule-style": "<rule-style>",
+	"rule-visibility-items": "all|around|between|normal",
+	"rule-width": "<rule-width>",
+	rx: rx,
+	ry: ry,
+	scale: scale,
+	"scroll-behavior": "auto|smooth",
+	"scroll-margin": "<len>{1,4}",
+	"scroll-margin-block": "<len>{1,2}",
+	"scroll-margin-block-end": "<len>",
+	"scroll-margin-block-start": "<len>",
+	"scroll-margin-bottom": "<len>",
+	"scroll-margin-inline": "<len>{1,2}",
+	"scroll-margin-inline-end": "<len>",
+	"scroll-margin-inline-start": "<len>",
+	"scroll-margin-left": "<len>",
+	"scroll-margin-right": "<len>",
+	"scroll-margin-top": "<len>",
+	"scroll-padding": "<top>{1,4}",
+	"scroll-padding-block": "<top>{1,2}",
+	"scroll-padding-block-end": "<top>",
+	"scroll-padding-block-start": "<top>",
+	"scroll-padding-bottom": "<top>",
+	"scroll-padding-inline": "<top>{1,2}",
+	"scroll-padding-inline-end": "<top>",
+	"scroll-padding-inline-start": "<top>",
+	"scroll-padding-left": "<top>",
+	"scroll-padding-right": "<top>",
+	"scroll-padding-top": "<top>",
+	"scroll-snap-align": "[ none|start|end|center ]{1,2}",
+	"scroll-snap-stop": "normal|always",
+	"scroll-snap-type": "none | [ x|y|block|inline|both ] [ mandatory|proximity ]?",
+	"scroll-target-group": "none|auto",
+	"scroll-timeline": "[ <scroll-timeline-name> <scroll-timeline-axis>? ]#",
+	"scroll-timeline-axis": "<axis>#",
+	"scroll-timeline-name": "none | <dashed-ident>#",
+	"scrollbar-color": "auto | <color>{2}",
+	"scrollbar-gutter": "auto|stable && both-edges?",
+	"scrollbar-width": "auto|thin|none",
+	"shape-image-threshold": "<opacity>",
+	"shape-margin": "<len-pct>",
+	"shape-outside": "none | [ <basic-shape> || <shape-box> ] | <image>",
+	"shape-rendering": "auto|optimizeSpeed|crispEdges|geometricPrecision",
+	speak: speak,
+	"stop-color": "<color>",
+	"stop-opacity": "<opacity>",
+	stroke: stroke,
+	"stroke-color": "<color>",
+	"stroke-dasharray": "none | <dasharray>",
+	"stroke-dashoffset": "<x>",
+	"stroke-linecap": "butt|round|square",
+	"stroke-linejoin": "miter|round|bevel",
+	"stroke-miterlimit": "<num0+>",
+	"stroke-opacity": "<opacity>",
+	"stroke-width": "<x>",
+	"tab-size": "<num> | <len>",
+	"table-layout": "auto|fixed",
+	"text-align": "<text-align> | justify-all",
+	"text-align-last": "<text-align> | auto",
+	"text-anchor": "start|middle|end",
+	"text-autospace": "normal|auto|no-autospace | ideograph-alpha||ideograph-numeric||insert",
+	"text-box": "normal | <text-box-trim> || <text-box-edge>",
+	"text-box-edge": "auto | <text-ideo> | [ <text-ideo> | cap | ex ] [ <text-ideo> | alphabetic ]",
+	"text-box-trim": "none|trim-start|trim-end|trim-both",
+	"text-combine-upright": "none|all | [ digits <int2-4>? ]",
+	"text-decoration": "<text-decoration-line> || <text-decoration-style> || <color>",
+	"text-decoration-color": "<color>",
+	"text-decoration-inset": "<len>{1,2} | auto",
+	"text-decoration-line": "none | [ underline || overline || line-through || blink ]",
+	"text-decoration-skip": -1,
+	"text-decoration-skip-ink": "none|auto|all",
+	"text-decoration-style": "solid|double|dotted|dashed|wavy",
+	"text-decoration-thickness": "auto|from-font | <len-pct>",
+	"text-emphasis": "<text-emphasis-style> || <color>",
+	"text-emphasis-color": "<color>",
+	"text-emphasis-position": "[ over|under ] && [ right|left ]?",
+	"text-emphasis-style": "none | <string> | [ [ filled|open ] || [ dot|circle|double-circle|triangle|sesame ] ]",
+	"text-fit": "[none|grow|shrink] [consistent|per-line|per-line-all]? <pct>?",
+	"text-indent": "<len-pct> && hanging? && each-line?",
+	"text-justify": "auto|none|inter-word|inter-character",
+	"text-orientation": "mixed|upright|sideways",
+	"text-overflow": "[ clip | ellipsis | <string> | fade | fade( <len-pct> ) ]{1,2}",
+	"text-rendering": "auto|optimizeSpeed|optimizeLegibility|geometricPrecision",
+	"text-shadow": "none | [ <color>? && <len>{2,3} ]#",
+	"text-size-adjust": "auto|none | <pct0+>",
+	"text-spacing-trim": "auto|space-all|normal|space-first|trim-start",
+	"text-transform": "none|math-auto | [ capitalize|uppercase|lowercase ] || full-width || full-size-kana",
+	"text-underline-offset": "<len-pct> | auto",
+	"text-underline-position": "auto | [ under || [ left|right ] ]",
+	"text-wrap": "<text-wrap-mode> || <text-wrap-style>",
+	"text-wrap-mode": "wrap|nowrap",
+	"text-wrap-style": "auto|balance|stable|pretty",
+	"timeline-scope": "none | all | <dashed-ident>#",
+	top: top,
+	"touch-action": "auto|none|[[pan-x|pan-left|pan-right] || [pan-y|pan-up|pan-down] || pinch-zoom]|manipulation",
+	transform: transform,
+	"transform-box": "content-box|border-box|fill-box|stroke-box|view-box",
+	"transform-origin": "[ left|center|right | <len-pct> ] [ top|center|bottom | <len-pct> ] <len>? | [ left|center|right|top|bottom | <len-pct> ] | [ [ center|left|right ] && [ center|top|bottom ] ] <len>?",
+	"transform-style": "flat|preserve-3d",
+	transition: transition,
+	"transition-behavior": "<txbhv>#",
+	"transition-delay": "<time>#",
+	"transition-duration": "<time>#",
+	"transition-property": "none | [ all | <custom-ident> ]#",
+	"transition-timing-function": "<timing-function>#",
+	translate: translate,
+	"unicode-range": "<unicode-range>#",
+	"unicode-bidi": "normal|embed|isolate|bidi-override|isolate-override|plaintext",
+	"user-select": "auto|text|none|contain|all",
+	"vector-effect": "none|non-scaling-stroke|non-scaling-size|non-rotation|fixed-position",
+	"vertical-align": "auto|use-script|baseline|sub|super|top|text-top|central|middle|bottom|text-bottom | <len-pct>",
+	"view-timeline": "[ <view-timeline-name> [ <view-timeline-axis> || <view-timeline-inset> ]? ]#",
+	"view-timeline-axis": "<axis>#",
+	"view-timeline-inset": "[ [ auto | <len-pct> ]{1,2} ]#",
+	"view-timeline-name": "[ none | <dashed-ident> ]#",
+	"view-transition-class": "none | <custom-ident>+",
+	"view-transition-name": "none|auto|match-element | <custom-ident>",
+	visibility: visibility,
+	"white-space": "normal|pre|pre-wrap|pre-line | <white-space-collapse> || <text-wrap-mode>",
+	"white-space-collapse": "collapse|discard|preserve|preserve-breaks|preserve-spaces|break-spaces",
+	widows: widows,
+	width: width,
+	"will-change": "auto | <animateable-feature>#",
+	"window-drag": "none|move",
+	"word-break": "normal|break-all|keep-all|break-word|auto-phrase",
+	"word-spacing": "<len-pct> | normal",
+	"word-wrap": "<overflow-wrap>",
+	"writing-mode": "horizontal-tb|vertical-rl|vertical-lr|sideways-rl|sideways-lr",
+	x: x,
+	y: y,
+	"z-index": "<int> | auto",
+	zoom: zoom,
+	"-webkit-box-reflect": "[ above|below|right|left ]? <len>? <image>?",
+	"-webkit-text-fill-color": "<color>",
+	"-webkit-text-stroke": "<line-width> || <color>",
+	"-webkit-text-stroke-color": "<color>",
+	"-webkit-text-stroke-width": "<line-width>",
+	"-webkit-user-modify": "read-only|read-write|write-only"
 };
-const {assign, defineProperty: define} = Object;
-const PDESC = {configurable: true, enumerable: true, writable: true, value: null};
-const isOwn = Object.call.bind({}.hasOwnProperty);
-const pick = (obj, keys, dst = {}) => {
-  for (const k of keys) dst[k] = obj[k];
-  return dst;
-};
-const rxUnescapeLF = /\\(?:(?:([0-9a-fA-F]{1,6})|(.))[\t ]?|(\n))/g;
-const unescapeLF = (m, code, char, LF) =>
-  LF ? '' : char || String.fromCodePoint(parseInt(code, 16));
-const parseString = str => str.slice(1, -1).replace(rxUnescapeLF, unescapeLF);
-const toLowAscii = c => c >= 65 && c <= 90 ? c + 32 : c;
-
-class EventDispatcher {
-  constructor() {
-    /** @type {Record<string,Set>} */
-    this._listeners = {__proto__: null};
-  }
-  addListener(type, fn) {
-    (this._listeners[type] || (this._listeners[type] = new Set())).add(fn);
-  }
-  fire(event) {
-    const type = typeof event === 'object' && event.type;
-    const list = this._listeners[type || event];
-    if (!list) return;
-    if (!type) event = {type};
-    list.forEach(fn => fn(event));
-  }
-  removeListener(type, fn) {
-    const list = this._listeners[type];
-    if (list) list.delete(fn);
-  }
-}
-
-class ParseError extends Error {
-  constructor(message, pos) {
-    super();
-    this.name = this.constructor.name;
-    this.col = pos.col;
-    this.line = pos.line;
-    this.offset = pos.offset;
-    this.end = pos.end;
-    this.message = message;
-  }
-}
-
-function clipString(s, len = 30) {
-  return (s = `${s}`).length > len ? s.slice(0, len) + '...' : s;
-}
 
 /* eslint-disable max-len */
 
-const _borderShorthand = '<border-shorthand>';
-const _positionArea = (
-  // TODO: fix Matcher::many() so we don't have to reorder || groups to the end of | chain
-  '[%]{1,2}' +
-  ' | [%self-]{1,2}' +
-  ' | [left|right|span-left|span-right|x-start|x-end|span-x-start|span-x-end|%self-x-]' +
-  ' || [top|bottom|span-top|span-bottom|y-start|y-end|span-y-start|span-y-end|%self-y-]' +
-  ' | [%block-] || [%inline-]' +
-  ' | [%self-block-] || [%self-inline-]'
-).replace(/%([-\w]*)/g, '$1start|center|$1end|span-$1start|span-$1end|span-all');
-const VTComplex = {
-  __proto__: null,
-  '<absolute-size>': 'xx-small | x-small | small | medium | large | x-large | xx-large',
-  '<alpha>': '/ <num-pct-none>',
-  '<angular-color-stop>': '<color> <angle-pct-zero>{0,2}',
-  '<animateable-feature>': 'scroll-position | contents | <animateable-feature-name>',
-  '<animation-direction>': 'normal | reverse | alternate | alternate-reverse',
-  '<animation-fill-mode>': 'none | forwards | backwards | both',
-  '<animation-timeline>': 'auto | none | <custom-ident> | ' +
-    'scroll( [ [ root | nearest | self ] || <axis> ]? ) | ' +
-    'view( [ <axis> || [ [ auto | <len-pct> ]{1,2} ]# ]? )',
-  '<at-pos>': 'at <position>',
-  '<attachment>': 'scroll | fixed | local',
-  '<auto-repeat>':
-    'repeat( [ auto-fill | auto-fit ] , [ <line-names>? <fixed-size> ]+ <line-names>? )',
-  '<auto-track-list>':
-    '[ <line-names>? [ <fixed-size> | <fixed-repeat> ] ]* <line-names>? <auto-repeat> ' +
-    '[ <line-names>? [ <fixed-size> | <fixed-repeat> ] ]* <line-names>?',
-  '<axis>': 'block | inline | x | y',
-  '<baseline-position>': '[ first | last ]? baseline',
-  '<basic-shape>': '<fn:basicShape>',
-  '<bg-image>': '<image> | none',
-  '<bg-layer>': '<bg-image> || <bg-position> [ / <bg-size> ]? || <repeat-style> || ' +
-    '<attachment> || <box>{1,2}',
-  '<bg-position>':
-    '[ center | [ left | right ] <len-pct>? ] && [ center | [ top | bottom ] <len-pct>? ] | ' +
-    '[ left | center | right | <len-pct> ] [ top | center | bottom | <len-pct> ] | ' +
-    '[ left | center | right | top | bottom | <len-pct> ]',
-  '<bg-size>': '[ <len-pct> | auto ]{1,2} | cover | contain',
-  '<blend-mode>': 'normal | multiply | screen | overlay | darken | lighten | color-dodge | ' +
-    'color-burn | hard-light | soft-light | difference | exclusion | hue | ' +
-    'saturation | color | luminosity | plus-darker | plus-lighter',
-  '<border-image-slice>': () => singleTerm('<num-pct0+>').braces(1, 4, '', '', singleTerm('fill')),
-  '<border-radius-round>': 'round <border-radius>',
-  '<border-shorthand>': '<line-width> || <line-style> || <color>',
-  '<box>': 'padding-box | border-box | content-box',
-  '<box-fsv>': 'fill-box | stroke-box | view-box',
-  '<color>': '<named-or-hex-color> | <fn:color>',
-  '<color-interpolation-method>': 'in [ <rectangular-color-space> | <polar-color-space> <hue-interpolation-method>? ]',
-  '<color-stop-list>': '<linear-color-stop> [, [ [<len-pct> ,]? <linear-color-stop> ]# ]?',
-  '<compositing-operator>': 'add | subtract | intersect | exclude',
-  '<contain-intrinsic>': 'auto? [ none | <len> ]',
-  '<content-distribution>': 'space-between | space-around | space-evenly | stretch',
-  '<content-list>':
-    '[ <string> | <image> | <attr> | ' +
-    'content( text | before | after | first-letter | marker ) | ' +
-    'counter() | counters() | leader() | ' +
-    'open-quote | close-quote | no-open-quote | no-close-quote | ' +
-    'target-counter() | target-counters() | target-text() ]+',
-  '<content-position>': 'center | start | end | flex-start | flex-end',
-  '<coord-box>': '<box> | <box-fsv>',
-  '<corner-shape-value>': 'round|scoop|bevel|notch|square|squircle|<fn:cornerShape>',
-  '<counter>': '[ <ident-not-none> <int>? ]+ | none',
-  '<dasharray>': () => new AltMatcher(['<len-pct0+>', '<num0+>'].map(singleTerm))
-    .braces(1, Infinity, '#', singleTerm(',').braces(0, 1, '?')),
-  '<display-box>': 'contents | none',
-  '<display-inside>': 'flow | flow-root | table | flex | grid | ruby',
-  '<display-internal>': 'table-row-group | table-header-group | table-footer-group | ' +
-    'table-row | table-cell | table-column-group | table-column | table-caption | ' +
-    'ruby-base | ruby-text | ruby-base-container | ruby-text-container',
-  '<display-legacy>': 'inline-block | inline-table | inline-flex | inline-grid',
-  '<display-listitem>': '<display-outside>? && [ flow | flow-root ]? && list-item',
-  '<display-outside>': 'block | inline | run-in',
-  '<dynamic-range>': 'standard | no-limit | constrained',
-  '<explicit-track-list>': '[ <line-names>? <track-size> ]+ <line-names>?',
-  '<family-name>': '<string> | <custom-ident>+',
-  // https://drafts.fxtf.org/filter-effects/#supported-filter-functions
-  // Value may be omitted in which case the default is used
-  '<filter-function-list>': '[ <fn:filter> | <url> ]+',
-  '<final-bg-layer>': '<color> || <bg-image> || <bg-position> [ / <bg-size> ]? || ' +
-    '<repeat-style> || <attachment> || <box>{1,2}',
-  '<fixed-repeat>': 'repeat( [ <int1+> ] , [ <line-names>? <fixed-size> ]+ <line-names>? )',
-  '<fixed-size>':
-    '<len-pct> | minmax( <len-pct> , <track-breadth> | <inflexible-breadth> , <len-pct> )',
-  '<flex-direction>': 'row | row-reverse | column | column-reverse',
-  '<flex-wrap>': 'nowrap | wrap | wrap-reverse',
-  '<font-short-core>': '<font-size> [ / <line-height> ]? <font-family>',
-  '<font-short-tweak-no-pct>':
-    '<font-style> || [ normal | small-caps ] || <font-weight> || <font-stretch-named>',
-  '<font-stretch-named>': 'normal | ultra-condensed | extra-condensed | condensed | ' +
-    'semi-condensed | semi-expanded | expanded | extra-expanded | ultra-expanded',
-  '<font-variant-alternates>': 'stylistic() || historical-forms || styleset() || ' +
-    'character-variant() || swash() || ornaments() || annotation()',
-  '<font-variant-caps>':
-    'small-caps | all-small-caps | petite-caps | all-petite-caps | unicase | titling-caps',
-  '<font-variant-east-asian>': '[ jis78|jis83|jis90|jis04|simplified|traditional ] || ' +
-    '[ full-width | proportional-width ] || ruby',
-  '<font-variant-ligatures>': '[ common-ligatures | no-common-ligatures ] || ' +
-    '[ discretionary-ligatures | no-discretionary-ligatures ] || ' +
-    '[ historical-ligatures | no-historical-ligatures ] || ' +
-    '[ contextual | no-contextual ]',
-  '<font-variant-numeric>': '[ lining-nums | oldstyle-nums ] || ' +
-    '[ proportional-nums | tabular-nums ] || ' +
-    '[ diagonal-fractions | stacked-fractions ] || ' +
-    'ordinal || slashed-zero',
-  '<generic-family>': 'serif | sans-serif | cursive | fantasy | monospace | system-ui | ' +
-    'emoji | math | fangsong | ui-serif | ui-sans-serif | ui-monospace | ui-rounded',
-  '<geometry-box>': '<shape-box> | <box-fsv>',
-  '<grid-line>': 'auto | [ <int> && <ident-for-grid>? ] | <ident-for-grid> | ' +
-    '[ span && [ <int> || <ident-for-grid> ] ]',
-  '<hue-interpolation-method>': '[shorter|longer|increasing|decreasing] hue',
-  '<image>': '<image-no-set> | image-set( <image-set># )',
-  '<image-no-set>': '<url> | <fn:gradients> | image( <color> ) | -webkit-cross-fade()',
-  '<image-set>': '[ <image-no-set> | <string> ] [ <resolution> || type( <string> ) ]',
-  '<inflexible-breadth>': '<len-pct> | min-content | max-content | auto',
-  '<inset-value>': '<len-pct> | overlap-join',
-  '<line-height>': '<num> | <len-pct> | normal',
-  '<line-names>': '"[" <ident-for-grid> "]"',
-  '<line-style>': 'none | hidden | dotted | dashed | solid | double | groove | ridge | inset | outset',
-  '<line-width>': '<len0+> | thin | medium | thick',
-  '<linear-color-stop>': '<color> <len-pct>{0,2}',
-  '<masking-mode>': 'alpha | luminance | match-source',
-  '<overflow-position>': 'unsafe | safe',
-  '<overflow>': '<vis-hid> | clip | scroll | auto | overlay', // TODO: warning about `overlay`
-  '<overscroll>': 'contain | none | auto | chain',
-  '<paint>': 'none | <color> | <url> [ none | <color> ]? | context-fill | context-stroke',
-  '<polar-color-space>': 'hsl | hwb | lch | oklch',
-  // Because our `alt` combinator is ordered, we need to test these
-  // in order from longest possible match to shortest.
-  '<position>':
-    '[ [ left | right ] <len-pct> ] && [ [ top | bottom ] <len-pct> ] | ' +
-    '[ left | center | right | <len-pct> ] ' +
-    '[ top | center | bottom | <len-pct> ]? | ' +
-    '[ left | center | right ] || [ top | center | bottom ]',
-  '<position-area>': _positionArea,
-  '<position-area-query>': _positionArea.replace(/]/g, '|any]'),
-  '<predefined-rgb>': 'srgb|srgb-linear|display-p3|display-p3-linear|a98-rgb|prophoto-rgb|rec2020',
-  '<ratio>': '<num0+> [ / <num0+> ]?',
-  '<radial-extent>': 'closest-corner | closest-side | farthest-corner | farthest-side',
-  '<relative-size>': 'smaller | larger',
-  '<repeat-style>': 'repeat-x | repeat-y | [ repeat | space | round | no-repeat ]{1,2}',
-  '<rectangular-color-space>': '<predefined-rgb>|lab|oklab|<xyz-space>',
-  '<rule-color>': () => _makeGapRule('<color>'),
-  '<rule-style>': () => _makeGapRule('<line-style>'),
-  '<rule-width>': () => _makeGapRule('<line-width>'),
-  '<rule>': () => _makeGapRule(_borderShorthand),
-  '<self-position>': 'center | start | end | self-start | self-end | flex-start | flex-end',
-  '<shadow>': 'inset? && [ <len>{2,4} && <color>? ]',
-  '<shape-box>': '<box> | margin-box',
-  '<shape-radius>': '<len-pct0+> | closest-side | farthest-side',
-  '<timing-function>': 'linear|ease|ease-in|ease-out|ease-in-out|step-start|step-end | ' +
-    'cubic-bezier( <num0-1> , <num> , <num0-1> , <num> ) | ' +
-    'linear( [ <num> && <pct>{0,2} ]# ) | ' +
-    'steps( <int> [ , [ jump-start | jump-end | jump-none | jump-both | start | end ] ]? )',
-  '<text-align>': 'start | end | left | right | center | justify | match-parent',
-  '<track-breadth>': '<len-pct> | <flex> | min-content | max-content | auto',
-  '<track-list>': '[ <line-names>? [ <track-size> | <track-repeat> ] ]+ <line-names>?',
-  '<track-repeat>': 'repeat( [ <int1+> ] , [ <line-names>? <track-size> ]+ <line-names>? )',
-  '<track-size>': '<track-breadth> | minmax( <inflexible-breadth> , <track-breadth> ) | ' +
-    'fit-content( <len-pct> )',
-  '<try-tactic>': 'flip-block || flip-inline || flip-start || flip-x || flip-y',
-  '<txbhv>': 'normal | allow-discrete',
-  '<url>': '<uri> | url( <string> <fn:urlModifier>* ) | src( <string> <fn:urlModifier>* )',
-  '<vis-hid>': 'visible | hidden',
-  '<width-base>': '<len-pct> | min-content | max-content | fit-content | stretch | contain | ' +
-    '-moz-available | -webkit-fill-available | anchor-size() | calc-size()',
-  '<xyz-space>': 'xyz | xyz-d50 | xyz-d65',
-};
-const _makeGapRule = type =>
-  parse(`${type} | repeat( <int1+> , ${type}# )`)
-    .braces(0, Infinity, '#', ',', parse(`repeat( auto , ${type}# )`));
+Object.setPrototypeOf(Properties, null);
 
-/* eslint-disable max-len */
-
-const _autoNone = 'auto | none';
-const _borderTopRadius = '<border-top-radius>';
-const _color = '<color>';
-const _cornerShapeValue = '<corner-shape-value>';
-const _cornerTop = '<corner-top>';
-const _cornerTopLeft = '<corner-top-left>';
-const _cornerTopShape = '<corner-top-shape>';
-const _insetValue = '<inset-value>';
-const _insetValue1or2 = _insetValue + '{1,2}';
-const _lenPct0plus = '<len-pct0+>';
-const _lenPct1or2 = '<len-pct>{1,2}';
-const _lineStyle = '<line-style>';
-const _lineWidth = '<line-width>';
-const _ruleVisibilityItems = 'all | around | between | normal';
-const _width = '<width>';
-
-const Properties = {
-  __proto__: null,
-  'accent-color': 'auto | <color>',
-  'align-items': 'normal | stretch | <baseline-position> | <overflow-position>? <self-position>',
-  'align-content': 'normal | <baseline-position> | <content-distribution> | <overflow-position>? <content-position>',
-  'align-self': 'auto | stretch | <baseline-position> | <overflow-position>? [ normal | <self-position> ]',
-  'all': GlobalKeywords.join('|'),
-  'alignment-baseline': 'auto | baseline | use-script | before-edge | text-before-edge | ' +
-    'after-edge | text-after-edge | central | middle | ideographic | alphabetic | ' +
-    'hanging | mathematical',
-  'anchor-name': 'none | <dashed-ident>#',
-  'anchor-scope': 'none | all | <dashed-ident>#',
-  'animation': '[ <time0+> || <timing-function> || <time> || [ infinite | <num0+> ] || ' +
-    '<animation-direction> || <animation-fill-mode> || ' +
-    '[ running | paused ] || [ none | <custom-ident> | <string> ] || <animation-timeline> ]#',
-  'animation-composition': '[ replace | add | accumulate ]#',
-  'animation-delay': '<time>#',
-  'animation-direction': '<animation-direction>#',
-  'animation-duration': '[ auto | <time0+> ]#',
-  'animation-fill-mode': '<animation-fill-mode>#',
-  'animation-iteration-count': '[ <num> | infinite ]#',
-  'animation-name': '[ none | <keyframes-name> ]#',
-  'animation-play-state': '[ running | paused ]#',
-  'animation-timeline': '<animation-timeline>#',
-  'animation-timing-function': '<timing-function>#',
-  'appearance': 'none | auto',
-  '-moz-appearance': 'none | button | button-arrow-down | button-arrow-next | button-arrow-previous | button-arrow-up | button-bevel | button-focus | caret | checkbox | checkbox-container | checkbox-label | checkmenuitem | dualbutton | groupbox | listbox | listitem | menuarrow | menubar | menucheckbox | menuimage | menuitem | menuitemtext | menulist | menulist-button | menulist-text | menulist-textfield | menupopup | menuradio | menuseparator | meterbar | meterchunk | progressbar | progressbar-vertical | progresschunk | progresschunk-vertical | radio | radio-container | radio-label | radiomenuitem | range | range-thumb | resizer | resizerpanel | scale-horizontal | scalethumbend | scalethumb-horizontal | scalethumbstart | scalethumbtick | scalethumb-vertical | scale-vertical | scrollbarbutton-down | scrollbarbutton-left | scrollbarbutton-right | scrollbarbutton-up | scrollbarthumb-horizontal | scrollbarthumb-vertical | scrollbartrack-horizontal | scrollbartrack-vertical | searchfield | separator | sheet | spinner | spinner-downbutton | spinner-textfield | spinner-upbutton | splitter | statusbar | statusbarpanel | tab | tabpanel | tabpanels | tab-scroll-arrow-back | tab-scroll-arrow-forward | textfield | textfield-multiline | toolbar | toolbarbutton | toolbarbutton-dropdown | toolbargripper | toolbox | tooltip | treeheader | treeheadercell | treeheadersortarrow | treeitem | treeline | treetwisty | treetwistyopen | treeview | -moz-mac-unified-toolbar | -moz-win-borderless-glass | -moz-win-browsertabbar-toolbox | -moz-win-communicationstext | -moz-win-communications-toolbox | -moz-win-exclude-glass | -moz-win-glass | -moz-win-mediatext | -moz-win-media-toolbox | -moz-window-button-box | -moz-window-button-box-maximized | -moz-window-button-close | -moz-window-button-maximize | -moz-window-button-minimize | -moz-window-button-restore | -moz-window-frame-bottom | -moz-window-frame-left | -moz-window-frame-right | -moz-window-titlebar | -moz-window-titlebar-maximized',
-  '-webkit-appearance': 'auto | none | button | button-bevel | caps-lock-indicator | caret | checkbox | default-button | listbox | listitem | media-fullscreen-button | media-mute-button | media-play-button | media-seek-back-button | media-seek-forward-button | media-slider | media-sliderthumb | menulist | menulist-button | menulist-text | menulist-textfield | push-button | radio | searchfield | searchfield-cancel-button | searchfield-decoration | searchfield-results-button | searchfield-results-decoration | slider-horizontal | slider-vertical | sliderthumb-horizontal | sliderthumb-vertical | square-button | textarea | textfield | scrollbarbutton-down | scrollbarbutton-left | scrollbarbutton-right | scrollbarbutton-up | scrollbargripper-horizontal | scrollbargripper-vertical | scrollbarthumb-horizontal | scrollbarthumb-vertical | scrollbartrack-horizontal | scrollbartrack-vertical',
-  'aspect-ratio': 'auto || <ratio>',
-
-  'backdrop-filter': '<filter-function-list> | none',
-  'backface-visibility': '<vis-hid>',
-  'background': '[ <bg-layer> , ]* <final-bg-layer>',
-  'background-attachment': '<attachment>#',
-  'background-blend-mode': '<blend-mode>',
-  'background-clip': '[ <box> | text | border-area ]#',
-  'background-color': _color,
-  'background-image': '<bg-image>#',
-  'background-origin': '<box>#',
-  'background-position': '<bg-position>#',
-  'background-position-x': '[ center | [ [left|right|x-start|x-end]? <len-pct>? ]! ]#',
-  'background-position-y': '[ center | [ [top|bottom|y-start|y-end]? <len-pct>? ]! ]#',
-  'background-repeat': '<repeat-style>#',
-  'background-size': '<bg-size>#',
-  'baseline-shift': 'baseline | sub | super | <len-pct>',
-  'baseline-source': 'auto | first | last',
-  'block-size': _width,
-  'border-collapse': 'collapse | separate',
-  'border-image': '<border-image-source> || <border-image-slice> ' +
-    '[ / <border-image-width> | / <border-image-width>? / <border-image-outset> ]? || ' +
-    '<border-image-repeat>',
-  'border-image-outset': '[ <len0+> | <num0+> ]{1,4}',
-  'border-image-repeat': '[ stretch | repeat | round | space ]{1,2}',
-  'border-image-slice': '<border-image-slice>',
-  'border-image-source': '<image> | none',
-  'border-image-width': '[ <len-pct0+> | <num0+> | auto ]{1,4}',
-  'border-shape': 'none | [<basic-shape> <geometry-box>?]{1,2}',
-  'border-spacing': '<len>{1,2}',
-  //#region border shorthand
-  'border': _borderShorthand,
-  'border-block': _borderShorthand,
-  'border-block-end': _borderShorthand,
-  'border-block-start': _borderShorthand,
-  'border-bottom': _borderShorthand,
-  'border-inline': _borderShorthand,
-  'border-inline-end': _borderShorthand,
-  'border-inline-start': _borderShorthand,
-  'border-left': _borderShorthand,
-  'border-right': _borderShorthand,
-  'border-top': _borderShorthand,
-  //#endregion
-  //#region border color
-  'border-color': _color + '{1,4}',
-  'border-block-color': _color + '{1,2}',
-  'border-block-end-color': _color,
-  'border-block-start-color': _color,
-  'border-bottom-color': _color,
-  'border-inline-color': _color + '{1,2}',
-  'border-inline-end-color': _color,
-  'border-inline-start-color': _color,
-  'border-left-color': _color,
-  'border-right-color': _color,
-  'border-top-color': _color,
-  //#endregion
-  //#region border style
-  'border-block-end-style': _lineStyle,
-  'border-block-start-style': _lineStyle,
-  'border-block-style': _lineStyle + '{1,2}',
-  'border-bottom-style': _lineStyle,
-  'border-inline-end-style': _lineStyle,
-  'border-inline-start-style': _lineStyle,
-  'border-inline-style': _lineStyle + '{1,2}',
-  'border-left-style': _lineStyle,
-  'border-right-style': _lineStyle,
-  'border-style': _lineStyle + '{1,4}',
-  'border-top-style': _lineStyle,
-  //#endregion
-  //#region border width
-  'border-width': _lineWidth + '{1,4}',
-  'border-block-end-width': _lineWidth,
-  'border-block-start-width': _lineWidth,
-  'border-block-width': _lineWidth + '{1,2}',
-  'border-bottom-width': _lineWidth,
-  'border-inline-end-width': _lineWidth,
-  'border-inline-start-width': _lineWidth,
-  'border-inline-width': _lineWidth + '{1,2}',
-  'border-left-width': _lineWidth,
-  'border-right-width': _lineWidth,
-  'border-top-width': _lineWidth,
-  //#endregion
-  //#region border radius (shorthands)
-  'border-radius': '<len-pct0+>{1,4} [ / <len-pct0+>{1,4} ]?',
-  'border-block-end-radius': _borderTopRadius,
-  'border-block-start-radius': _borderTopRadius,
-  'border-bottom-radius': _borderTopRadius,
-  'border-inline-end-radius': _borderTopRadius,
-  'border-inline-start-radius': _borderTopRadius,
-  'border-left-radius': _borderTopRadius,
-  'border-right-radius': _borderTopRadius,
-  'border-top-radius': '<len-pct0+>{1,2} [ / <len-pct0+>{1,2} ]?',
-  //#endregion
-  //#region border radius (single)
-  'border-bottom-left-radius': _lenPct1or2,
-  'border-bottom-right-radius': _lenPct1or2,
-  'border-end-end-radius': _lenPct1or2,
-  'border-end-start-radius': _lenPct1or2,
-  'border-start-end-radius': _lenPct1or2,
-  'border-start-start-radius': _lenPct1or2,
-  'border-top-left-radius': _lenPct1or2,
-  'border-top-right-radius': _lenPct1or2,
-  //#endregion
-  'bottom': '<top>',
-  'box-decoration-break': 'slice | clone',
-  'box-shadow': 'none | <shadow>#',
-  'box-sizing': 'content-box | border-box',
-  'break-after': '<break-inside> | always | left | right | page | column',
-  'break-before': '<break-after>',
-  'break-inside': 'auto | avoid | avoid-page | avoid-column',
-
-  'caret': '<caret-color> || <caret-animation> || <caret-shape>',
-  'caret-animation': 'auto | manual',
-  'caret-color': 'auto | <color>',
-  'caret-shape': 'auto | bar | block | underscore',
-  'caption-side': 'top | bottom | inline-start | inline-end',
-  'clear': 'none | right | left | both | inline-start | inline-end',
-  'clip': 'rect() | auto',
-  'clip-path': '<url> | [ <basic-shape> || <geometry-box> ] | none',
-  'clip-rule': '<fill-rule>',
-  'color': _color,
-  'color-interpolation': 'auto | sRGB | linearRGB',
-  'color-interpolation-filters': '<color-interpolation>',
-  'color-profile': 1,
-  'color-rendering': 'auto | optimizeSpeed | optimizeQuality',
-  'color-scheme': 'normal | [ light | dark | <custom-ident> ]+ && only?',
-  'column-count': 'auto | <int1+>',
-  'column-fill': 'auto | balance | balance-all',
-  'column-gap': 'normal | <len-pct0+> | <line-width>',
-  'column-height': 'auto | <len0+>',
-  'column-rule': '<rule>',
-  'column-rule-break': '<row-rule-break>',
-  'column-rule-color': '<rule-color>',
-  'column-rule-inset': '<rule-inset>',
-  'column-rule-inset-cap': _insetValue1or2,
-  'column-rule-inset-cap-start': _insetValue,
-  'column-rule-inset-cap-end': _insetValue,
-  'column-rule-inset-junction': _insetValue1or2,
-  'column-rule-inset-junction-start': _insetValue,
-  'column-rule-inset-junction-end': _insetValue,
-  'column-rule-inset-start': _insetValue,
-  'column-rule-inset-end': _insetValue,
-  'column-rule-style': '<rule-style>',
-  'column-rule-visibility-items': _ruleVisibilityItems,
-  'column-rule-width': '<rule-width>',
-  'column-span': 'none | <int1+> | all | auto',
-  'column-width': 'auto | <len0+>',
-  'columns': '[ <column-width> || <column-count> ] [ / <column-height> ]?',
-  'contain': 'none | strict | content | [ size || layout || style || paint ]',
-  'contain-intrinsic-block-size': '<contain-intrinsic>',
-  'contain-intrinsic-height': '<contain-intrinsic>',
-  'contain-intrinsic-inline-size': '<contain-intrinsic>',
-  'contain-intrinsic-size': '<contain-intrinsic>{1,2}',
-  'contain-intrinsic-width': '<contain-intrinsic>',
-  'container': '<container-name> [ / <container-type> ]?',
-  'container-name': 'none | <ident-not-none>+',
-  'container-type': 'normal | [ [ size | inline-size ] || scroll-state || anchored ]',
-  'content': 'normal | none | <content-list> [ / <string> ]?',
-  'content-visibility': 'auto | <vis-hid>',
-  //#region corner (shorthands)
-  'corner': '<border-radius> || <corner-shape>',
-  'corner-top': '<border-top-radius> || <corner-top-shape>',
-  'corner-bottom': _cornerTop,
-  'corner-left': _cornerTop,
-  'corner-right': _cornerTop,
-  'corner-block-start': _cornerTop,
-  'corner-block-end': _cornerTop,
-  'corner-inline-start': _cornerTop,
-  'corner-inline-end': _cornerTop,
-  //#endregion
-  //#region corner (single)
-  'corner-top-left': '<border-top-left-radius> || <corner-top-left-shape>',
-  'corner-top-right': _cornerTopLeft,
-  'corner-bottom-left': _cornerTopLeft,
-  'corner-bottom-right': _cornerTopLeft,
-  'corner-end-end': _cornerTopLeft,
-  'corner-end-start': _cornerTopLeft,
-  'corner-start-end': _cornerTopLeft,
-  'corner-start-start': _cornerTopLeft,
-  //#endregion
-  //#region corner shape (shorthands)
-  'corner-shape': '<corner-shape-value>{1,4}',
-  'corner-top-shape': '<corner-shape-value>{1,2}',
-  'corner-block-end-shape': _cornerTopShape,
-  'corner-block-start-shape': _cornerTopShape,
-  'corner-bottom-shape': _cornerTopShape,
-  'corner-inline-end-shape': _cornerTopShape,
-  'corner-inline-start-shape': _cornerTopShape,
-  'corner-left-shape': _cornerTopShape,
-  'corner-right-shape': _cornerTopShape,
-  //#endregion
-  //#region corner shape (single)
-  'corner-bottom-left-shape': _cornerShapeValue,
-  'corner-bottom-right-shape': _cornerShapeValue,
-  'corner-end-end-shape': _cornerShapeValue,
-  'corner-end-start-shape': _cornerShapeValue,
-  'corner-start-end-shape': _cornerShapeValue,
-  'corner-start-start-shape': _cornerShapeValue,
-  'corner-top-left-shape': _cornerShapeValue,
-  'corner-top-right-shape': _cornerShapeValue,
-  //#endregion
-  'counter-increment': '<counter>',
-  'counter-reset': '<counter>',
-  'counter-set': '<counter>',
-  'cursor': '[ [ <url> | image-set() ] [ <num> <num> ]? , ]* ' +
-    '[ auto | default | none | context-menu | help | pointer | progress | wait | ' +
-    'cell | crosshair | text | vertical-text | alias | copy | move | no-drop | ' +
-    'not-allowed | grab | grabbing | e-resize | n-resize | ne-resize | nw-resize | ' +
-    's-resize | se-resize | sw-resize | w-resize | ew-resize | ns-resize | ' +
-    'nesw-resize | nwse-resize | col-resize | row-resize | all-scroll | ' +
-    'zoom-in | zoom-out ]',
-  'cx': '<x>',
-  'cy': '<x>',
-
-  'd': 1,
-  'direction': 'ltr | rtl',
-  'display': '[ <display-outside> || <display-inside> ] | ' +
-    '<display-listitem> | <display-internal> | <display-box> | <display-legacy> | ' +
-    '-webkit-box | -webkit-inline-box | -ms-flexbox', // deprecated and nonstandard
-  'dominant-baseline': 'auto | text-bottom | alphabetic | ideographic | middle | central | ' +
-    'mathematical | hanging | text-top',
-  'dynamic-range-limit': '<dynamic-range> | <fn:dynaRange>',
-
-  'empty-cells': 'show | hide',
-
-  'field-sizing': 'fixed | content',
-  'fill': '<paint>',
-  'fill-opacity': '<num0-1>',
-  'fill-rule': 'nonzero | evenodd',
-  'filter': '<filter-function-list> | <ie-function> | none',
-  'flex': 'none | [ <num>{1,2} || <flex-basis> ]',
-  'flex-basis': 'content | <width>',
-  'flex-direction': 'row | row-reverse | column | column-reverse',
-  'flex-flow': '<flex-direction> || <flex-wrap>',
-  'flex-grow': '<num>',
-  'flex-shrink': '<num>',
-  'flex-wrap': 'nowrap | [ wrap | wrap-reverse ] || balance',
-  'float': 'left | right | none | inline-start | inline-end',
-  'flood-color': 1,
-  'flood-opacity': '<num0-1>',
-  // matching no-pct first because Matcher doesn't retry for a longer match in nested definitions
-  'font': '<font-short-tweak-no-pct>? <font-short-core> | ' +
-    '[ <font-short-tweak-no-pct> || <pct> ]? <font-short-core> | ' +
-    'caption | icon | menu | message-box | small-caption | status-bar',
-  'font-family': '[ <generic-family> | <family-name> ]#',
-  'font-feature-settings': '[ <ascii4> [ <int0+> | on | off ]? ]# | normal',
-  'font-kerning': 'auto | normal | none',
-  'font-language-override': 'normal | <string>',
-  'font-optical-sizing': _autoNone,
-  'font-palette': 'none | normal | light | dark | <custom-ident>',
-  'font-size': '<absolute-size> | <relative-size> | <len-pct0+>',
-  'font-size-adjust': 'none | [ex-height|cap-height|ch-width|ic-width|ic-height]? [from-font|<num0+>]',
-  'font-stretch': '<font-stretch-named> | <pct>',
-  'font-style': 'normal | italic | oblique <angle>?',
-  'font-synthesis': 'none | [ weight || style ]',
-  'font-synthesis-style': _autoNone,
-  'font-synthesis-weight': _autoNone,
-  'font-synthesis-small-caps': _autoNone,
-  'font-variant': 'normal | none | [ ' +
-    '<font-variant-ligatures> || <font-variant-alternates> || ' +
-    '<font-variant-caps> || <font-variant-numeric> || <font-variant-east-asian> ]',
-  'font-variant-alternates': '<font-variant-alternates> | normal',
-  'font-variant-caps': '<font-variant-caps> | normal',
-  'font-variant-east-asian': '<font-variant-east-asian> | normal',
-  'font-variant-emoji': 'auto | text | emoji | unicode',
-  'font-variant-ligatures': '<font-variant-ligatures> | normal | none',
-  'font-variant-numeric': '<font-variant-numeric> | normal',
-  'font-variant-position': 'normal | sub | super',
-  'font-variation-settings': 'normal | [ <string> <num> ]#',
-  'font-weight': 'normal | bold | bolder | lighter | <num1-1000>',
-  'forced-color-adjust': 'auto | none | preserve-parent-color',
-
-  'gap': '<column-gap>{1,2}',
-  'grid':
-    '<grid-template> | <grid-template-rows> / [ auto-flow && dense? ] <grid-auto-columns>? | ' +
-    '[ auto-flow && dense? ] <grid-auto-rows>? / <grid-template-columns>',
-  'grid-area': '<grid-line> [ / <grid-line> ]{0,3}',
-  'grid-auto-columns': '<track-size>+',
-  'grid-auto-flow': '[ row | column ] || dense',
-  'grid-auto-rows': '<track-size>+',
-  'grid-column': '<grid-line> [ / <grid-line> ]?',
-  'grid-column-end': '<grid-line>',
-  'grid-column-gap': -1,
-  'grid-column-start': '<grid-line>',
-  'grid-gap': -1,
-  'grid-row': '<grid-line> [ / <grid-line> ]?',
-  'grid-row-end': '<grid-line>',
-  'grid-row-gap': -1,
-  'grid-row-start': '<grid-line>',
-  'grid-template': 'none | [ <grid-template-rows> / <grid-template-columns> ] | ' +
-    '[ <line-names>? <string> <track-size>? <line-names>? ]+ [ / <explicit-track-list> ]?',
-  'grid-template-areas': 'none | <string>+',
-  'grid-template-columns': '<grid-template-rows>',
-  'grid-template-rows': 'none | <track-list> | <auto-track-list> | ' +
-    'subgrid [ <line-names> | repeat( [ <int1+> | auto-fill ] , <line-names>+ ) ]*',
-
-  'hanging-punctuation': 'none | [ first || [ force-end | allow-end ] || last ]',
-  'height': _width,
-  'hyphenate-character': '<string> | auto',
-  'hyphenate-limit-chars': '[ auto | <int> ]{1,3}',
-  'hyphens': 'none | manual | auto',
-
-  'image-orientation': 'from-image | none | [ <angle> || flip ]',
-  'image-rendering': 'auto | smooth | high-quality | crisp-edges | pixelated | ' +
-    'optimizeSpeed | optimizeQuality | -webkit-optimize-contrast',
-  'image-resolution': 1,
-  'inline-size': _width,
-  'inset': '<top>{1,4}',
-  'inset-block': '<top>{1,2}',
-  'inset-block-end': '<top>',
-  'inset-block-start': '<top>',
-  'inset-inline': '<top>{1,2}',
-  'inset-inline-end': '<top>',
-  'inset-inline-start': '<top>',
-  'interactivity': 'auto | inert',
-  'interpolate-size': 'numeric-only | allow-keywords',
-  'isolation': 'auto | isolate',
-
-  'justify-content': 'normal | <content-distribution> | ' +
-    '<overflow-position>? [ <content-position> | left | right ]',
-  'justify-items': 'normal | stretch | <baseline-position> | <overflow-position>? [ <self-position> | left | right ] | legacy | legacy && [ left | right | center ]',
-  'justify-self': 'auto | <overflow-position>? [ normal | <self-position> | left | right ] | stretch | <baseline-position>',
-
-  'left': '<top>',
-  'letter-spacing': '<len-pct> | normal',
-  'lighting-color': _color,
-  'line-height': '<line-height>',
-  'line-break': 'auto | loose | normal | strict | anywhere',
-  'list-style': '<list-style-position> || <list-style-image> || <list-style-type>',
-  'list-style-image': '<image> | none',
-  'list-style-position': 'inside | outside',
-  'list-style-type': '<string> | disc | circle | square | decimal | decimal-leading-zero | ' +
-    'lower-roman | upper-roman | lower-greek | lower-latin | upper-latin | armenian | ' +
-    'georgian | lower-alpha | upper-alpha | none | symbols()',
-
-  'math-depth': 'auto-add | add(<int>) | <int>',
-  'math-shift': '<math-style>',
-  'math-style': 'normal | compact',
-  'margin': '<top>{1,4}',
-  'margin-top': '<top>',
-  'margin-bottom': '<top>',
-  'margin-left': '<top>',
-  'margin-right': '<top>',
-  'margin-block': '<top>{1,2}',
-  'margin-block-end': '<top>',
-  'margin-block-start': '<top>',
-  'margin-inline': '<top>{1,2}',
-  'margin-inline-end': '<top>',
-  'margin-inline-start': '<top>',
-  'marker': -1,
-  'marker-end': 1,
-  'marker-mid': 1,
-  'marker-start': 1,
-  'mask': '[ [ none | <image> ] || <position> [ / <bg-size> ]? || <repeat-style> || ' +
-    '<geometry-box> || [ <geometry-box> | no-clip ] || ' +
-    '<compositing-operator> || <masking-mode> ]#',
-  'mask-border': '<mask-border-source> ||' +
-    '<mask-border-slice> [ / <mask-border-width> [ / <mask-border-outset> ]? ]? ||' +
-    '<mask-border-repeat> || <mask-border-mode>',
-  'mask-border-mode': '<mask-type>',
-  'mask-border-outset': '[ <len> | <num> ]{1,4}',
-  'mask-border-repeat': '[ stretch | repeat | round | space ]{1,2}',
-  'mask-border-slice': '<num-pct>{1,4} fill?',
-  'mask-border-source': 'none | <image>',
-  'mask-border-width': '[ <len-pct> | <num> | auto ]{1,4}',
-  'mask-clip': '[ <coord-box> | no-clip ]#',
-  'mask-composite': '<compositing-operator>#',
-  'mask-image': '[ none | <image> ]#',
-  'mask-mode': '<masking-mode>#',
-  'mask-origin': '<coord-box>#',
-  'mask-position': '<position>#',
-  'mask-repeat': '<repeat-style>#',
-  'mask-size': '<bg-size>#',
-  'mask-type': 'luminance | alpha',
-  'max-height': '<max-width>',
-  'max-width': 'none | <width-base>',
-  'min-height': _width,
-  'min-width': _width,
-  'max-block-size': '<max-width>',
-  'max-inline-size': '<max-width>',
-  'min-block-size': _width,
-  'min-inline-size': _width,
-  'mix-blend-mode': '<blend-mode>',
-
-  'object-fit': 'fill | contain | cover | none | scale-down',
-  'object-position': '<position>',
-  'object-view-box': 'none | inset() | rect() | xywh()',
-  'offset':
-    '[ <offset-position>? <offset-path> [<len-pct> || <offset-rotate>]? | <offset-position> ] ' +
-    '[ / <offset-anchor> ]?',
-  'offset-anchor': 'auto | <position>',
-  'offset-distance': '<len-pct>',
-  'offset-path': 'none | [ ray() | <url> | <basic-shape> ] || <coord-box>',
-  'offset-position': 'auto | <position>',
-  'offset-rotate': '[ auto | reverse ] || <angle>',
-  'opacity': '<num0-1> | <pct>',
-  'order': '<int>',
-  'orphans': '<int>',
-  'outline': '[ <color> | invert ] || [ auto | <line-style> ] || <line-width>',
-  'outline-color': '<color> | invert',
-  'outline-offset': '<len>',
-  'outline-style': '<line-style> | auto',
-  'outline-width': _lineWidth,
-  'overflow': '<overflow>{1,2}',
-  'overflow-anchor': _autoNone,
-  'overflow-block': '<overflow>',
-  'overflow-clip-margin': 'visual-box | <len0+>',
-  'overflow-inline': '<overflow>',
-  'overflow-wrap': 'normal | break-word | anywhere',
-  'overflow-x': '<overflow>',
-  'overflow-y': '<overflow>',
-  'overscroll-behavior': '<overscroll>{1,2}',
-  'overscroll-behavior-block': '<overscroll>',
-  'overscroll-behavior-inline': '<overscroll>',
-  'overscroll-behavior-x': '<overscroll>',
-  'overscroll-behavior-y': '<overscroll>',
-
-  'padding': '<len-pct0+>{1,4}',
-  'padding-block': '<len-pct0+>{1,2}',
-  'padding-block-end': _lenPct0plus,
-  'padding-block-start': _lenPct0plus,
-  'padding-bottom': _lenPct0plus,
-  'padding-inline': '<len-pct0+>{1,2}',
-  'padding-inline-end': _lenPct0plus,
-  'padding-inline-start': _lenPct0plus,
-  'padding-left': _lenPct0plus,
-  'padding-right': _lenPct0plus,
-  'padding-top': _lenPct0plus,
-  'page': 'auto | <custom-ident>',
-  'page-break-after': 'auto | always | avoid | left | right | recto | verso',
-  'page-break-before': '<page-break-after>',
-  'page-break-inside': 'auto | avoid',
-  'paint-order': 'normal | [ fill || stroke || markers ]',
-  'path-length': 'none | <num0+>',
-  'perspective': 'none | <len0+>',
-  'perspective-origin': '<position>',
-  'place-content': '<align-content> <justify-content>?',
-  'place-items': '[ normal | stretch | <baseline-position> | <self-position> ] ' +
-    '[ normal | stretch | <baseline-position> | <self-position> ]?',
-  'place-self': '<align-self> <justify-self>?',
-  'pointer-events': 'auto | none | visiblePainted | visibleFill | visibleStroke | visible | ' +
-    'painted | fill | stroke | all',
-  'position': 'static | relative | absolute | fixed | sticky',
-  'position-anchor': 'normal | none | auto | match-parent | <anchor-name>',
-  'position-area': 'auto | <position-area>',
-  'position-try': '<position-try-order>? <position-try-fallbacks>',
-  'position-try-order': 'normal | most-width | most-height | most-block-size | most-inline-size',
-  'position-try-fallbacks': 'none | [[<dashed-ident> || <try-tactic>] | <position-area> ]#',
-  'position-visibility': 'always | [ anchor-valid || anchor-visible || no-overflow ]',
-  'print-color-adjust': 'economy | exact',
-
-  'quotes': 1,
-
-  'r': 1, // SVG
-  'rx': '<x> | auto', // SVG
-  'ry': '<rx>', // SVG
-  'reading-flow': 'normal|source-order|flex-visual|flex-flow|grid-rows|grid-columns|grid-order',
-  'reading-order': '<int>',
-  'rendering-intent': 1, // SVG
-  'resize': 'none | both | horizontal | vertical | block | inline',
-  'right': '<top>',
-  'rotate': 'none | [ x | y | z | <num>{3} ]? && <angle>',
-  'row-gap': '<column-gap>',
-  'row-rule': '<rule>',
-  'row-rule-break': 'none | normal | intersection',
-  'row-rule-color': '<rule-color>',
-  'row-rule-inset': '<rule-inset>',
-  'row-rule-inset-cap': _insetValue1or2,
-  'row-rule-inset-cap-start': _insetValue,
-  'row-rule-inset-cap-end': _insetValue,
-  'row-rule-inset-junction': _insetValue1or2,
-  'row-rule-inset-junction-start': _insetValue,
-  'row-rule-inset-junction-end': _insetValue,
-  'row-rule-inset-start': _insetValue,
-  'row-rule-inset-end': _insetValue,
-  'row-rule-style': '<rule-style>',
-  'row-rule-visibility-items': _ruleVisibilityItems,
-  'row-rule-width': '<rule-width>',
-  'ruby-align': 'start | center | space-between | space-around',
-  'ruby-position': 'alternate || [over|under] | inter-character',
-  'rule': '<rule>',
-  'rule-color': '<rule-color>',
-  'rule-inset': `${_insetValue1or2} [ / ${_insetValue1or2}]?`,
-  'rule-inset-cap': _insetValue1or2,
-  'rule-inset-junction': _insetValue1or2,
-  'rule-inset-start': _insetValue,
-  'rule-inset-end': _insetValue,
-  'rule-overlap': 'row-over-column | column-over-row',
-  'rule-style': '<rule-style>',
-  'rule-visibility-items': _ruleVisibilityItems,
-  'rule-width': '<rule-width>',
-
-  'scale': 'none | <num-pct>{1,3}',
-  'scroll-behavior': 'auto | smooth',
-  'scroll-margin': '<len>{1,4}',
-  'scroll-margin-bottom': '<len>',
-  'scroll-margin-left': '<len>',
-  'scroll-margin-right': '<len>',
-  'scroll-margin-top': '<len>',
-  'scroll-margin-block': '<len>{1,2}',
-  'scroll-margin-block-end': '<len>',
-  'scroll-margin-block-start': '<len>',
-  'scroll-margin-inline': '<len>{1,2}',
-  'scroll-margin-inline-end': '<len>',
-  'scroll-margin-inline-start': '<len>',
-  'scroll-padding': '<top>{1,4}',
-  'scroll-padding-left': '<top>',
-  'scroll-padding-right': '<top>',
-  'scroll-padding-top': '<top>',
-  'scroll-padding-bottom': '<top>',
-  'scroll-padding-block': '<top>{1,2}',
-  'scroll-padding-block-end': '<top>',
-  'scroll-padding-block-start': '<top>',
-  'scroll-padding-inline': '<top>{1,2}',
-  'scroll-padding-inline-end': '<top>',
-  'scroll-padding-inline-start': '<top>',
-  'scroll-snap-align': '[ none | start | end | center ]{1,2}',
-  'scroll-snap-stop': 'normal | always',
-  'scroll-snap-type': 'none | [ x | y | block | inline | both ] [ mandatory | proximity ]?',
-  'scroll-target-group': 'none | auto',
-  'scroll-timeline': '[ <scroll-timeline-name> <scroll-timeline-axis>? ]#',
-  'scroll-timeline-axis': '<axis>#',
-  'scroll-timeline-name': 'none | <dashed-ident>#',
-  'scrollbar-color': 'auto | dark | light | <color>{2}',
-  'scrollbar-gutter': 'auto | stable && both-edges?',
-  'scrollbar-width': 'auto | thin | none',
-  'shape-image-threshold': '<num-pct>',
-  'shape-margin': '<len-pct>',
-  'shape-rendering': 'auto | optimizeSpeed | crispEdges | geometricPrecision',
-  'shape-outside': 'none | [ <basic-shape> || <shape-box> ] | <image>',
-  'speak': 'auto | never | always',
-  'stop-color': 1,
-  'stop-opacity': '<num0-1>',
-  'stroke': '<paint>',
-  'stroke-dasharray': 'none | <dasharray>',
-  'stroke-dashoffset': '<len-pct> | <num>',
-  'stroke-linecap': 'butt | round | square',
-  'stroke-linejoin': 'miter | miter-clip | round | bevel | arcs',
-  'stroke-miterlimit': '<num0+>',
-  'stroke-opacity': '<num0-1>',
-  'stroke-width': '<len-pct> | <num>',
-
-  'table-layout': 'auto | fixed',
-  'tab-size': '<num> | <len>',
-  'text-align': '<text-align> | justify-all',
-  'text-align-last': '<text-align> | auto',
-  'text-anchor': 'start | middle | end',
-  'text-autospace': 'normal | auto | no-autospace | ideograph-alpha||ideograph-numeric||punctuation||[insert|replace]',
-  'text-box': 'normal | <text-box-trim> || <text-box-edge>',
-  'text-box-edge': 'auto | text | [text|cap|ex] [text|alphabetic]',
-  'text-box-trim': 'none | trim-start | trim-end | trim-both',
-  'text-combine-upright': 'none | all | [ digits <int2-4>? ]',
-  'text-decoration': '<text-decoration-line> || <text-decoration-style> || <color>',
-  'text-decoration-color': _color,
-  'text-decoration-inset': '<len>{1,2} | auto',
-  'text-decoration-line': 'none | [ underline || overline || line-through || blink ]',
-  'text-decoration-skip': 'none | auto',
-  'text-decoration-skip-ink': 'none | auto | all',
-  'text-decoration-style': 'solid | double | dotted | dashed | wavy',
-  'text-decoration-thickness': 'auto | from-font | <len-pct>',
-  'text-emphasis': '<text-emphasis-style> || <color>',
-  'text-emphasis-color': _color,
-  'text-emphasis-style': 'none | <string> | ' +
-    '[ [ filled | open ] || [ dot | circle | double-circle | triangle | sesame ] ]',
-  'text-emphasis-position': '[ over | under ] && [ right | left ]?',
-  'text-fit': '[none|grow|shrink] [consistent|per-line|per-line-all]? <pct>?',
-  'text-indent': '<len-pct> && hanging? && each-line?',
-  'text-justify': 'auto | none | inter-word | inter-character',
-  'text-orientation': 'mixed | upright | sideways',
-  'text-overflow': 'clip | ellipsis',
-  'text-rendering': 'auto | optimizeSpeed | optimizeLegibility | geometricPrecision',
-  'text-shadow': 'none | [ <color>? && <len>{2,3} ]#',
-  'text-size-adjust': 'auto | none | <pct0+>',
-  'text-spacing-trim': 'auto|space-all|normal|space-first|trim-start|trim-both|trim-all',
-  'text-transform': 'none | math-auto | ' +
-    '[ capitalize|uppercase|lowercase ] || full-width || full-size-kana',
-  'text-underline-offset': '<len-pct> | auto',
-  'text-underline-position': 'auto | [ under || [ left | right ] ]',
-  'text-wrap': 'wrap | nowrap | balance | stable | pretty',
-  'text-wrap-mode': 'wrap | nowrap',
-  'text-wrap-style': 'auto | balance | stable | pretty',
-  'timeline-scope': 'none | all | <dashed-ident>#',
-  'top': 'auto | <len-pct> | anchor() | anchor-size()',
-  'touch-action': 'auto|none|pan-x|pan-y|pan-left|pan-right|pan-up|pan-down|manipulation',
-  'transform': 'none | <fn:transform>+',
-  'transform-box': 'content-box | border-box | fill-box | stroke-box | view-box',
-  'transform-origin': '[ left | center | right | <len-pct> ] ' +
-    '[ top | center | bottom | <len-pct> ] <len>? | ' +
-    '[ left | center | right | top | bottom | <len-pct> ] | ' +
-    '[ [ center | left | right ] && [ center | top | bottom ] ] <len>?',
-  'transform-style': 'flat | preserve-3d',
-  'transition': '[ [ none | [ all | <custom-ident> ]# ] || <time> || <timing-function> || <time> || <txbhv> ]#',
-  'transition-behavior': '<txbhv>#',
-  'transition-delay': '<time>#',
-  'transition-duration': '<time>#',
-  'transition-property': 'none | [ all | <custom-ident> ]#',
-  'transition-timing-function': '<timing-function>#',
-  'translate': 'none | <len-pct> [ <len-pct> <len>? ]?',
-
-  'unicode-range': '<unicode-range>#',
-  'unicode-bidi': 'normal | embed | isolate | bidi-override | isolate-override | plaintext',
-  'user-select': 'auto | text | none | contain | all',
-
-  'vertical-align': 'auto | use-script | baseline | sub | super | top | text-top | ' +
-    'central | middle | bottom | text-bottom | <len-pct>',
-  'view-timeline': '[ <view-timeline-name> [ <view-timeline-axis> || <view-timeline-inset> ]? ]#',
-  'view-timeline-axis': '<axis>#',
-  'view-timeline-inset': '[ [ auto | <len-pct> ]{1,2} ]#',
-  'view-timeline-name': '[ none | <dashed-ident> ]#',
-  'view-transition-class': 'none | <ident-not-none>+',
-  'view-transition-name': 'none | auto | match-element | <custom-ident>',
-  'visibility': '<vis-hid> | collapse',
-
-  'white-space': 'normal | pre | pre-wrap | pre-line | <white-space-collapse> || <text-wrap-mode>',
-  'white-space-collapse': 'collapse|discard|preserve|preserve-breaks|preserve-spaces|break-spaces',
-  'widows': '<int>',
-  'width': 'auto | <width-base>',
-  'will-change': 'auto | <animateable-feature>#',
-  'word-break': 'normal | keep-all | break-all | break-word',
-  'word-spacing': '<len-pct> | normal',
-  'word-wrap': 'normal | break-word | anywhere',
-  'writing-mode': 'horizontal-tb | vertical-rl | vertical-lr | sideways-rl | sideways-lr',
-
-  'x': '<len-pct> | <num>',
-  'y': '<x>',
-  'z-index': '<int> | auto',
-  'zoom': '<num> | <pct> | normal',
-
-  // nonstandard https://compat.spec.whatwg.org/
-  '-webkit-box-reflect': '[ above | below | right | left ]? <len>? <image>?',
-  '-webkit-text-fill-color': _color,
-  '-webkit-text-stroke': '<line-width> || <color>',
-  '-webkit-text-stroke-color': _color,
-  '-webkit-text-stroke-width': _lineWidth,
-  '-webkit-user-modify': 'read-only | read-write | write-only',
-};
 Properties['-ms-appearance'] = 'icon | ' + (
   Properties['-o-appearance'] = 'none | window | desktop | workspace | document | tooltip | dialog | button | push-button | hyperlink | radio | radio-button | checkbox | menu-item | tab | menu | menubar | pull-down-menu | pop-up-menu | list-menu | radio-group | checkbox-group | outline-tree | range | field | combo-box | signature | password | normal'
 );
@@ -1332,6 +1051,70 @@ class StringSource {
   }
 }
 
+const GlobalKeywords = [
+  'initial',
+  'inherit',
+  'revert',
+  'revert-layer',
+  'revert-rule',
+  'unset',
+];
+const documentFuncs = {
+  'domain': 1,
+  'regexp': -1, // cannot be a quoteless <uri>
+  'url': 1,
+  'url-prefix': 1,
+};
+const {assign, defineProperty: define} = Object;
+const PDESC = {configurable: true, enumerable: true, writable: true, value: null};
+const isOwn = Object.call.bind({}.hasOwnProperty);
+const pick = (obj, keys, dst = {}) => {
+  for (const k of keys) dst[k] = obj[k];
+  return dst;
+};
+const rxUnescapeLF = /\\(?:(?:([0-9a-fA-F]{1,6})|(.))[\t ]?|(\n))/g;
+const unescapeLF = (m, code, char, LF) =>
+  LF ? '' : char || String.fromCodePoint(parseInt(code, 16));
+const parseString = str => str.slice(1, -1).replace(rxUnescapeLF, unescapeLF);
+const toLowAscii = c => c >= 65 && c <= 90 ? c + 32 : c;
+
+class EventDispatcher {
+  constructor() {
+    /** @type {Record<string,Set>} */
+    this._listeners = {__proto__: null};
+  }
+  addListener(type, fn) {
+    (this._listeners[type] || (this._listeners[type] = new Set())).add(fn);
+  }
+  fire(event) {
+    const type = typeof event === 'object' && event.type;
+    const list = this._listeners[type || event];
+    if (!list) return;
+    if (!type) event = {type};
+    list.forEach(fn => fn(event));
+  }
+  removeListener(type, fn) {
+    const list = this._listeners[type];
+    if (list) list.delete(fn);
+  }
+}
+
+class ParseError extends Error {
+  constructor(message, pos) {
+    super();
+    this.name = this.constructor.name;
+    this.col = pos.col;
+    this.line = pos.line;
+    this.offset = pos.offset;
+    this.end = pos.end;
+    this.message = message;
+  }
+}
+
+function clipString(s, len = 30) {
+  return (s = `${s}`).length > len ? s.slice(0, len) + '...' : s;
+}
+
 const containerDir = '|x|y|block|inline';
 const containerStuck = 'none|top|right|bottom|left|block-start|inline-start|block-end|inline-end';
 const containerScroll = containerStuck + containerDir;
@@ -1439,6 +1222,155 @@ const ScopedProperties = {
     'types': 'none | <ident-not-none>+',
   },
 };
+
+/* eslint-disable max-len */
+
+const _borderShorthand = '<border-shorthand>';
+const _positionArea = (
+  // TODO: fix Matcher::many() so we don't have to reorder || groups to the end of | chain
+  '[%]{1,2}' +
+  ' | [%self-]{1,2}' +
+  ' | [left|right|span-left|span-right|x-start|x-end|span-x-start|span-x-end|%self-x-]' +
+  ' || [top|bottom|span-top|span-bottom|y-start|y-end|span-y-start|span-y-end|%self-y-]' +
+  ' | [%block-] || [%inline-]' +
+  ' | [%self-block-] || [%self-inline-]'
+).replace(/%([-\w]*)/g, '$1start|center|$1end|span-$1start|span-$1end|span-all');
+const VTComplex = {
+  __proto__: null,
+  '<absolute-size>': 'xx-small | x-small | small | medium | large | x-large | xx-large',
+  '<alpha>': '/ <num-pct-none>',
+  '<angular-color-stop>': '<color> <angle-pct-zero>{0,2}',
+  '<animateable-feature>': 'scroll-position | contents | <animateable-feature-name>',
+  '<animation-direction>': 'normal | reverse | alternate | alternate-reverse',
+  '<animation-fill-mode>': 'none | forwards | backwards | both',
+  '<animation-timeline>': 'auto | none | <custom-ident> | scroll( [ [ root | nearest | self ] || <axis> ]? ) | view( [ <axis> || [ [ auto | <len-pct> ]{1,2} ]# ]? )',
+  '<at-pos>': 'at <position>',
+  '<attachment>': 'scroll | fixed | local',
+  '<auto-repeat>': 'repeat( [ auto-fill | auto-fit ] , [ <line-names>? <fixed-size> ]+ <line-names>? )',
+  '<auto-track-list>': '[ <line-names>? [ <fixed-size> | <fixed-repeat> ] ]* <line-names>? <auto-repeat> [ <line-names>? [ <fixed-size> | <fixed-repeat> ] ]* <line-names>?',
+  '<axis>': 'block | inline | x | y',
+
+  '<baseline-position>': '[ first | last ]? baseline',
+  '<basic-shape>': '<fn:basicShape>',
+  '<bg-image>': '<image> | none',
+  '<bg-layer>': '<bg-image> || <bg-position> [ / <bg-size> ]? || <repeat-style> || <attachment> || <box>{1,2}',
+  '<bg-position>': '[ center | [ left | right ] <len-pct>? ] && [ center | [ top | bottom ] <len-pct>? ] | [ left | center | right | <len-pct> ] [ top | center | bottom | <len-pct> ] | [ left | center | right | top | bottom | <len-pct> ]',
+  '<bg-size>': '[ <len-pct> | auto ]{1,2} | cover | contain',
+  '<blend-mode>': 'normal | multiply | screen | overlay | darken | lighten | color-dodge | color-burn | hard-light | soft-light | difference | exclusion | hue | saturation | color | luminosity | plus-darker | plus-lighter',
+  '<border-image-slice>': () => singleTerm('<num-pct0+>').braces(1, 4, '', '', singleTerm('fill')),
+  '<border-radius-round>': 'round <border-radius>',
+  '<border-shorthand>': '<line-width> || <line-style> || <color>',
+  '<box>': 'padding-box | border-box | content-box',
+  '<box-fsv>': 'fill-box | stroke-box | view-box',
+
+  '<color>': '<named-or-hex-color> | <fn:color>',
+  '<color-interpolation-method>': 'in [ <rectangular-color-space> | <polar-color-space> <hue-interpolation-method>? ]',
+  '<color-stop-list>': '<linear-color-stop> [, [ [<len-pct> ,]? <linear-color-stop> ]# ]?',
+  '<compositing-operator>': 'add | subtract | intersect | exclude',
+  '<contain-intrinsic>': 'auto? [ none | <len> ]',
+  '<content-distribution>': 'space-between | space-around | space-evenly | stretch',
+  '<content-list>': '[ <string> | <image> | <attr> | content( text | before | after | first-letter | marker ) | counter() | counters() | leader() | open-quote | close-quote | no-open-quote | no-close-quote | target-counter() | target-counters() | target-text() ]+',
+  '<content-position>': 'center | start | end | flex-start | flex-end',
+  '<coord-box>': '<box> | <box-fsv>',
+  '<corner-shape-value>': 'round|scoop|bevel|notch|square|squircle|<fn:cornerShape>',
+
+  '<dasharray>': () => new AltMatcher(['<len-pct0+>', '<num0+>'].map(singleTerm))
+    .braces(1, Infinity, '#', singleTerm(',').braces(0, 1, '?')),
+  '<display-box>': 'contents | none',
+  '<display-inside>': 'flow | flow-root | table | flex | grid | ruby',
+  '<display-internal>': 'table-row-group | table-header-group | table-footer-group | table-row | table-cell | table-column-group | table-column | table-caption | ruby-base | ruby-text | ruby-base-container | ruby-text-container',
+  '<display-legacy>': 'inline-block | inline-table | inline-flex | inline-grid',
+  '<display-listitem>': '<display-outside>? && [ flow | flow-root ]? && list-item',
+  '<display-outside>': 'block | inline | run-in',
+  '<dynamic-range>': 'standard | no-limit | constrained',
+
+  '<explicit-track-list>': '[ <line-names>? <track-size> ]+ <line-names>?',
+
+  '<family-name>': '<string> | <custom-ident>+',
+  '<filter-function-list>': '[ <fn:filter> | <url> ]+',
+  '<final-bg-layer>': '<color> || <bg-image> || <bg-position> [ / <bg-size> ]? || <repeat-style> || <attachment> || <box>{1,2}',
+  '<fixed-repeat>': 'repeat( [ <int1+> ] , [ <line-names>? <fixed-size> ]+ <line-names>? )',
+  '<fixed-size>': '<len-pct> | minmax( <len-pct> , <track-breadth> | <inflexible-breadth> , <len-pct> )',
+  '<flex-direction>': 'row | row-reverse | column | column-reverse',
+  '<flex-wrap>': 'nowrap | wrap | wrap-reverse',
+  '<font-short-core>': '<font-size> [ / <line-height> ]? <font-family>',
+  '<font-short-tweak-no-pct>': '<font-style> || [ normal | small-caps ] || <font-weight> || <font-stretch-named>',
+  '<font-stretch-named>': 'normal | ultra-condensed | extra-condensed | condensed | semi-condensed | semi-expanded | expanded | extra-expanded | ultra-expanded',
+  '<font-variant-alternates>': 'stylistic() || historical-forms || styleset() || character-variant() || swash() || ornaments() || annotation()',
+  '<font-variant-caps>': 'small-caps | all-small-caps | petite-caps | all-petite-caps | unicase | titling-caps',
+  '<font-variant-east-asian>': '[ jis78|jis83|jis90|jis04|simplified|traditional ] || [ full-width | proportional-width ] || ruby',
+  '<font-variant-ligatures>': '[ common-ligatures | no-common-ligatures ] || [ discretionary-ligatures | no-discretionary-ligatures ] || [ historical-ligatures | no-historical-ligatures ] || [ contextual | no-contextual ]',
+  '<font-variant-numeric>': '[ lining-nums | oldstyle-nums ] || [ proportional-nums | tabular-nums ] || [ diagonal-fractions | stacked-fractions ] || ordinal || slashed-zero',
+
+  '<generic-family>': 'serif | sans-serif | cursive | fantasy | monospace | system-ui | emoji | math | fangsong | ui-serif | ui-sans-serif | ui-monospace | ui-rounded',
+  '<geometry-box>': '<shape-box> | <box-fsv>',
+  '<grid-line>': 'auto | [ <int> && <ident-for-grid>? ] | <ident-for-grid> | [ span && [ <int> || <ident-for-grid> ] ]',
+
+  '<hue-interpolation-method>': '[shorter|longer|increasing|decreasing] hue',
+
+  '<image>': '<image-no-set> | image-set( <image-set># )',
+  '<image-no-set>': '<url> | <fn:gradients> | image( <color> ) | -webkit-cross-fade()',
+  '<image-set>': '[ <image-no-set> | <string> ] [ <resolution> || type( <string> ) ]',
+  '<inflexible-breadth>': '<len-pct> | min-content | max-content | auto',
+  '<inset-value>': '<len-pct> | overlap-join',
+
+  '<line-names>': '"[" <ident-for-grid> "]"',
+  '<line-style>': 'none | hidden | dotted | dashed | solid | double | groove | ridge | inset | outset',
+  '<line-width>': '<len0+> | thin | medium | thick',
+  '<linear-color-stop>': '<color> <len-pct>{0,2}',
+
+  '<masking-mode>': 'alpha | luminance | match-source',
+
+  '<overflow-position>': 'unsafe | safe',
+  '<overflow>': '<vis-hid> | clip | scroll | auto | overlay',
+  '<overscroll>': 'contain | none | auto | chain', // TODO: warning about `overlay`
+
+  '<paint>': 'none | <color> | <url> [ none | <color> ]? | context-fill | context-stroke',
+  '<polar-color-space>': 'hsl | hwb | lch | oklch',
+  // Because our `alt` combinator is ordered, we need to test these
+  // in order from longest possible match to shortest.
+  '<position>': '[ [ left | right ] <len-pct> ] && [ [ top | bottom ] <len-pct> ] | [ left | center | right | <len-pct> ] [ top | center | bottom | <len-pct> ]? | [ left | center | right ] || [ top | center | bottom ]',
+  '<position-area>': _positionArea,
+  '<position-area-query>': _positionArea.replace(/]/g, '|any]'),
+  '<predefined-rgb>': 'srgb|srgb-linear|display-p3|display-p3-linear|a98-rgb|prophoto-rgb|rec2020',
+
+  '<radial-extent>': 'closest-corner | closest-side | farthest-corner | farthest-side',
+  '<ratio>': '<num0+> [ / <num0+> ]?',
+  '<rectangular-color-space>': '<predefined-rgb>|lab|oklab|<xyz-space>',
+  '<relative-size>': 'smaller | larger',
+  '<repeat-style>': 'repeat-x | repeat-y | [ repeat | space | round | no-repeat ]{1,2}',
+  '<rule-color>': () => _makeGapRule('<color>'),
+  '<rule-style>': () => _makeGapRule('<line-style>'),
+  '<rule-width>': () => _makeGapRule('<line-width>'),
+  '<rule>': () => _makeGapRule(_borderShorthand),
+
+  '<self-position>': 'center | start | end | self-start | self-end | flex-start | flex-end',
+  '<shadow>': 'inset? && [ <len>{2,4} && <color>? ]',
+  '<shape-box>': '<box> | margin-box',
+  '<shape-radius>': '<len-pct0+> | closest-side | farthest-side',
+
+  '<text-align>': 'start | end | left | right | center | justify | match-parent',
+  '<text-ideo>': 'text | ideographic | ideographic-ink',
+  '<timeline-range-name>': 'cover|contain|entry|exit|entry-crossing|exit-crossing',
+  '<timing-function>': 'linear|ease|ease-in|ease-out|ease-in-out|step-start|step-end | cubic-bezier( <num0-1> , <num> , <num0-1> , <num> ) | linear( [ <num> && <pct>{0,2} ]# ) | steps( <int> [ , [ jump-start | jump-end | jump-none | jump-both | start | end ] ]? )',
+  '<track-breadth>': '<len-pct> | <flex> | min-content | max-content | auto',
+  '<track-list>': '[ <line-names>? [ <track-size> | <track-repeat> ] ]+ <line-names>?',
+  '<track-repeat>': 'repeat( [ <int1+> ] , [ <line-names>? <track-size> ]+ <line-names>? )',
+  '<track-size>': '<track-breadth> | minmax( <inflexible-breadth> , <track-breadth> ) | fit-content( <len-pct> )',
+  '<try-tactic>': 'flip-block || flip-inline || flip-start || flip-x || flip-y',
+  '<txbhv>': 'normal | allow-discrete',
+
+  '<url>': '<uri> | url( <string> <fn:urlModifier>* ) | src( <string> <fn:urlModifier>* )',
+
+  '<vis-hid>': 'visible | hidden',
+
+  '<width-base>': '<len-pct> | min-content | max-content | fit-content | stretch | contain | -moz-available | -webkit-fill-available | anchor-size() | calc-size()',
+
+  '<xyz-space>': 'xyz | xyz-d50 | xyz-d65',
+};
+const _makeGapRule = type =>
+  parse(`${type} | repeat( <int1+> , ${type}# )`)
+    .braces(0, Infinity, '#', ',', parse(`repeat( auto , ${type}# )`));
 
 let i;
 /**
@@ -1722,6 +1654,7 @@ const VTFunctions = {
     __proto__: null,
     'anchor': '<dashed-ident>? && [inside|outside|top|left|right|bottom|start|end|self-start|self-end|center|<pct>] [, <len-pct>]?',
     'anchor-size': '[<dashed-ident> || [width|height|block|inline|self-block|self-inline] ]? [, <len-pct>]?',
+    'palette-mix': '<color-interpolation-method> , [ [ <font-palette> | palette-mix() ] && <pct>? ]#{2}',
     'ray': '<angle> && [<radial-extent> | sides]? && contain? && [at <position>]?',
     ...grads,
     ...rects,
