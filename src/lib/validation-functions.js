@@ -21,6 +21,7 @@ const VTFunctions = {
     __proto__: null,
     'anchor': '<dashed-ident>? && [inside|outside|top|left|right|bottom|start|end|self-start|self-end|center|<pct>] [, <len-pct>]?',
     'anchor-size': '[<dashed-ident> || [width|height|block|inline|self-block|self-inline] ]? [, <len-pct>]?',
+    'palette-mix': '<color-interpolation-method> , [ [ <font-palette> | palette-mix() ] && <pct>? ]#{2}',
     'ray': '<angle> && [<radial-extent> | sides]? && contain? && [at <position>]?',
     ...grads,
     ...rects,
