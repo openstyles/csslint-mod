@@ -1,5 +1,6 @@
 import fse from 'fs-extra';
 import pluginJson from '@rollup/plugin-json';
+import pluginRe from 'rollup-plugin-re';
 
 const DST = 'dist/';
 const OUTPUT = {
@@ -19,13 +20,16 @@ export default [{
   input: 'src/parserlib.js',
   output: {...OUTPUT, name: 'parserlib'},
   plugins: [
-    function trimSpacesInGrammar() {
-      return {
-        name: trimSpacesInGrammar.name,
-        transform: (code, id) => !id.endsWith('properties.json') ? null :
-          JSON.stringify(JSON.parse(code)).replace(/(?<=[|&[])\s+|\s+(?=[|&\]])/g, ''),
-      };
-    },
-    pluginJson(),
+    pluginRe({
+      patterns: [{
+        match: '**/properties.json',
+        test: /(?<=[|&[])\s+|\s+(?=[|&\]])/g,
+        replace: '',
+      }],
+    }),
+    pluginJson({
+      indent: '  ',
+      namedExports: false,
+    }),
   ],
 }];

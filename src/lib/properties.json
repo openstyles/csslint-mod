@@ -1,4 +1,5 @@
 {
+  "__proto__": null,
   "accent-color": "auto | <color>",
   "align-items": "normal|stretch | <baseline-position> | <overflow-position>? <self-position>",
   "align-content": "normal | <baseline-position> | <content-distribution> | <overflow-position>? <content-position>",
