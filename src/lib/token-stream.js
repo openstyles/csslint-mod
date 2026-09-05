@@ -213,10 +213,12 @@ export default class TokenStream {
       goal instanceof Bucket ? `"${goal.join('", "')}"` :
         (+goal ? [goal] : goal).reduce((res, v, id) => res + (res ? ', ' : '') +
           ((v = Tokens[v === true ? id : v]).text ? `"${v.text}"` : v.name), '');
-    goal = goal ? `Expected ${goal} but found` : 'Unexpected';
-    goal = new ParseError(`${goal} "${clipString(tok)}".`, tok);
-    if (throwIt) throw goal;
-    return goal;
+    const found = tok.id ? `"${clipString(tok)}"` : '';
+    const str = goal ? `Expected ${goal}${found && ` but found ${found}`}.`
+      : `Unexpected ${found || 'end of file'}.`;
+    const err = new ParseError(str, tok);
+    if (throwIt) throw err;
+    return err;
   }
 
   /**
