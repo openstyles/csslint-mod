@@ -450,6 +450,7 @@
   "ry": "<rx>",
 
   "scale": "none | <num-pct>{1,3}",
+  "scroll-axis-lock": "auto | none",
   "scroll-behavior": "auto|smooth",
   "scroll-margin": "<len>{1,4}",
   "scroll-margin-block": "<len>{1,2}",
