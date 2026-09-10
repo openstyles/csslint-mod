@@ -1,4 +1,5 @@
 import globals from 'globals';
+import {getInlineConsts} from './rollup.util.mjs';
 
 export default [
   //#region Global exclusions
@@ -279,6 +280,7 @@ export default [
       globals: {
         ...globals.es2025,
         ...globals['shared-node-browser'],
+        ...getInlineConsts(false),
       },
     },
   },

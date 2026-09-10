@@ -4,7 +4,6 @@ import ScopedProperties from './scoped-properties';
 import {clipString} from './util';
 import VTComplex from './validation-complex';
 import {buGlobalKeywords} from './validation-simple';
-import {COLON, IDENT, RPAREN, SEMICOLON} from './tokens.js';
 
 const validationCache = new Map();
 

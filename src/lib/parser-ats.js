@@ -1,9 +1,6 @@
 import {B} from './bucket';
 import {TokenFunc, TokenValue} from './token';
 import {OrDie, OrDieReusing, TT} from './token-stream';
-import {
-  COLON, COMMA, DASHED_FUNCTION, IDENT, LBRACE, LPAREN, PCT, RBRACE, RPAREN, SEMICOLON, STRING,
-} from './tokens';
 import {documentFuncs, pick} from './util';
 
 /** Functions for @ symbols */

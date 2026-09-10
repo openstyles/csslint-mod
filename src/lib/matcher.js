@@ -6,7 +6,6 @@ import {PropValueIterator} from './validation';
 import VTComplex from './validation-complex';
 import VTFunctions from './validation-functions';
 import VTSimple from './validation-simple';
-import {COMMA} from './tokens.js';
 
 const rxAltSep = /\s*\|\s*/;
 const rxAndAndSep = /\s*&&\s*/y;

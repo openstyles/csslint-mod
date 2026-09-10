@@ -1,5 +1,6 @@
 import fs from 'fs';
 import chalk from 'chalk';
+import {getInlineConsts} from '../rollup.util.mjs';
 
 /**
  * Usage notes:
@@ -15,6 +16,7 @@ const FAILED_FILE = REPORT_FILE + '.tmp';
 
 (async () => {
   let res;
+  if (!BUILD) Object.assign(global, getInlineConsts());
   for (const [fn, msg] of [
     [testParserlib, 'Testing parserlib internals...'],
     [testCsslint, 'Testing csslint...'],

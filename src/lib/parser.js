@@ -7,11 +7,6 @@ import SELECTORS from './parser-selector';
 import ScopedProperties from './scoped-properties.js';
 import Token, {TokenFunc, TokenValue} from './token';
 import TokenStream, {OrDie, OrDieReusing, TT} from './token-stream';
-import {
-  AMP, AT, CDCO, COLON, COMMA, COMMENT, DASHED_FUNCTION, DELIM, DIV, DOT, FUNCTION, HASH, IDENT,
-  LBRACE, LBRACKET, LPAREN, NUMBER, PIPE, RBRACE, RBRACKET, RPAREN, SEMICOLON, STAR, STRING, UVAR,
-  WS,
-} from './tokens';
 import {assign, clipString, define, EventDispatcher, isOwn, ParseError, PDESC} from './util';
 import {validateProperty} from './validation';
 

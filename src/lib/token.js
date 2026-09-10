@@ -1,5 +1,4 @@
 import {B} from './bucket.js';
-import {DASHED_FUNCTION, IDENT, UVAR, WS} from './tokens';
 import {assign, define, isOwn, parseString, PDESC, toLowAscii} from './util';
 
 /**

@@ -2,12 +2,7 @@
 import Bucket from './bucket';
 import StringSource from './string-source';
 import Token from './token';
-import Tokens, {
-  AMP, AT, ATTR_EQ, CDCO, CHAR, COLON, COMBINATOR, COMMENT, DASHED_FUNCTION, DELIM, DIMENSION, DIV,
-  DOT, EOF, EQ_CMP, EQUALS, FUNCTION, GT, HASH, IDENT, INVALID, LBRACE, LBRACKET, LENGTH, LPAREN,
-  LT, MINUS, NUMBER, PCT, PIPE, PLUS, RBRACE, RBRACKET, RPAREN, SEMICOLON, STAR, STRING,
-  TokenIdByCode, URANGE, URI, UVAR, WS,
-} from './tokens';
+import Tokens, {TokenIdByCode} from './tokens';
 import Units, {UnitTypeIds} from './units';
 import {
   clipString, define, documentFuncs, isOwn, ParseError, PDESC, rxUnescapeLF, toLowAscii,

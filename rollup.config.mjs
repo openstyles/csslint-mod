@@ -1,6 +1,8 @@
 import fse from 'fs-extra';
 import pluginJson from '@rollup/plugin-json';
+import pluginDefine from 'rollup-plugin-define';
 import pluginRe from 'rollup-plugin-re';
+import {getInlineConsts} from './rollup.util.mjs';
 
 const DST = 'dist/';
 const OUTPUT = {
@@ -10,16 +12,24 @@ const OUTPUT = {
   externalLiveBindings: false,
   freeze: false,
 };
+const PLUGINS = [
+  pluginDefine({
+    replacements: getInlineConsts(String),
+  }),
+];
+
 fse.emptyDir(DST);
 
 export default [{
   input: 'src/csslint.js',
   output: {...OUTPUT, name: 'CSSLint'},
   external: ['./parserlib.js', '../parserlib.js'],
+  plugins: PLUGINS,
 }, {
   input: 'src/parserlib.js',
   output: {...OUTPUT, name: 'parserlib'},
   plugins: [
+    ...PLUGINS,
     pluginRe({
       patterns: [{
         match: '**/properties.json',

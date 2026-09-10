@@ -1,7 +1,7 @@
 import {B} from './bucket';
 import {TokenFunc} from './token';
 import {OrDie, OrDieReusing, TT} from './token-stream';
-import {COLON, IDENT, PIPE, RBRACKET, RPAREN, STAR, TokenIdByCode, WS} from './tokens';
+import {TokenIdByCode} from './tokens';
 import {assign, isOwn} from './util';
 
 const textToTokenMap = obj => Object.keys(obj).reduce((res, k) =>

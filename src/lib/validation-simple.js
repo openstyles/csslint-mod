@@ -1,8 +1,5 @@
 import Bucket from './bucket';
 import {GlobalKeywords} from './util';
-import {
-  ANGLE, FUNCTION, IDENT, LENGTH, NUMBER, PCT, RESOLUTION, STRING, TIME, URANGE, URI,
-} from './tokens';
 
 const buAlpha = new Bucket('alpha');
 /** https://www.w3.org/TR/css-values-4/#custom-idents */

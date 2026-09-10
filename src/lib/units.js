@@ -1,4 +1,4 @@
-import Tokens, {ANGLE, FLEX, FREQUENCY, LENGTH, RESOLUTION, TIME} from './tokens';
+import Tokens from './tokens';
 
 const Units = {__proto__: null};
 export const UnitTypeIds = {__proto__: null};
