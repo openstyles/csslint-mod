@@ -20,7 +20,7 @@ export default class Bucket {
   addFrom(src, separator = ' ') {
     for (let str of typeof src === 'string' ? src.split(separator) : src) {
       let c = (str = str.toLowerCase()).charCodeAt(0);
-      if (c === 34 /* " */) c = (str = str.slice(1, -1)).charCodeAt(0);
+      if (c === CC`"`) c = (str = str.slice(1, -1)).charCodeAt(0);
       src = this.map.get(c = c * 100 + str.length);
       if (src == null) this.map.set(c, str);
       else if (typeof src === 'string') this.map.set(c, [src, str]);

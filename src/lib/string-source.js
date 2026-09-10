@@ -45,7 +45,7 @@ export default class StringSource {
   /** @param {number} code */
   readMatchCode(code) {
     if (code === this.string.charCodeAt(this.offset)) {
-      if (code === 10)
+      if (code === CC`\n`)
         return this.read(1, '\n');
       this.col++; this.offset++;
       return String.fromCharCode(code);
@@ -91,7 +91,7 @@ export default class StringSource {
   /** @return {number|undefined} */
   readCode() {
     const c = this.string.charCodeAt(this.offset++);
-    if (c === 10) {
+    if (c === CC`\n`) {
       this.col = 1;
       this.line++;
       this._break = this.string.indexOf('\n', this.offset);

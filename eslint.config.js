@@ -281,6 +281,7 @@ export default [
         ...globals.es2025,
         ...globals['shared-node-browser'],
         ...getInlineConsts(false),
+        CC: false,
       },
     },
   },

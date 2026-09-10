@@ -16,7 +16,10 @@ const FAILED_FILE = REPORT_FILE + '.tmp';
 
 (async () => {
   let res;
-  if (!BUILD) Object.assign(global, getInlineConsts());
+  if (!BUILD) {
+    global.CC = strs => strs[0].charCodeAt(0);
+    Object.assign(global, getInlineConsts());
+  }
   for (const [fn, msg] of [
     [testParserlib, 'Testing parserlib internals...'],
     [testCsslint, 'Testing csslint...'],

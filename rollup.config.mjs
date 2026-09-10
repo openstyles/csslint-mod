@@ -35,6 +35,11 @@ export default [{
         match: '**/properties.json',
         test: /(?<=[|&[])\s+|\s+(?=[|&\]])/g,
         replace: '',
+      }, {
+        match: 'src/**/*.js',
+        test: /\bCC`(\\(.)|([^`]+))`/g,
+        replace: (_, src, esc, b) =>
+          (esc === 't' ? 9 : esc === 'n' ? 10 : (esc || b).charCodeAt(0)) + `/*${src}*/`,
       }],
     }),
     pluginJson({

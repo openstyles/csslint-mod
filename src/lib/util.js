@@ -23,7 +23,7 @@ export const rxUnescapeLF = /\\(?:(?:([0-9a-fA-F]{1,6})|(.))[\t ]?|(\n))/g;
 const unescapeLF = (m, code, char, LF) =>
   LF ? '' : char || String.fromCodePoint(parseInt(code, 16));
 export const parseString = str => str.slice(1, -1).replace(rxUnescapeLF, unescapeLF);
-export const toLowAscii = c => c >= 65 && c <= 90 ? c + 32 : c;
+export const toLowAscii = c => c >= CC`A` && c <= CC`Z` ? c + 32 : c;
 
 export class EventDispatcher {
   constructor() {

@@ -425,7 +425,7 @@ class Parser extends EventDispatcher {
     const isCust = tok.type === '--';
     const hack = tok.hack
       ? (tok = stream.match(IDENT), tok.col--, tok.offset--, '*')
-      : tok.code === 95/*_*/ && opts.underscoreHack && tok.id === IDENT && '_';
+      : tok.code === CC`_` && opts.underscoreHack && tok.id === IDENT && '_';
     const t2mark = !colon && stream.source.mark();
     const t2raw = colon || stream.get();
     const t2WS = t2raw.id === WS;
@@ -570,7 +570,8 @@ class Parser extends EventDispatcher {
       else ({_input: text, offset} = tok);
       for (i = 1; i < len; i++) {
         c = text.charCodeAt(offset + i); // 2-5x faster than slicing+parseInt or regexp
-        if ((c < 48 || c > 57) && (c < 65 || c > 70) && (c < 97 || c > 102)) break;
+        if ((c < CC`0` || c > CC`9`) && (c < CC`A` || c > CC`F`) && (c < CC`a` || c > CC`f`))
+          break;
       }
     }
     if (i === len) tok.type = 'color';

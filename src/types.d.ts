@@ -47,9 +47,13 @@ declare const PCT = 44;
 declare const RESOLUTION = 45;
 declare const TIME = 46;
 
+// token.is bit masks
 declare const IS_0 = 1;
 declare const IS_ATTR = 2;
 declare const IS_CALC = 4;
 declare const IS_INT = 8;
 /** var(), env(), /*[[var]]*_/ */
 declare const IS_VAR = 16;
+
+/** Replaced with a literal character code of the string at build time */
+declare function CC(str: string): number;

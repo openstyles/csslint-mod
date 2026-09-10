@@ -400,7 +400,8 @@ const parseAlt = src => {
   let litIndex;
   do {
     let s = src.peek();
-    if ((/* a-z - */ s >= 97 && s <= 122 || s === 45) && (s = src.readMatch(rxPlainTextAlt))) {
+    /* a-z - */
+    if ((s >= CC`a` && s <= CC`z` || s === CC`-`) && (s = src.readMatch(rxPlainTextAlt))) {
       literals ??= (litIndex = alts.length, []);
       literals.push(s);
     } else {
@@ -441,7 +442,7 @@ const parseTerm = src => {
     if (!src.readMatch(rxGroupEnd))
       parsingFailed(src, rxGroupEnd);
   } else if (/* a-z - */
-    (fn >= 97 && fn <= 122 || fn === 45) &&
+    (fn >= CC`a` && fn <= CC`z` || fn === CC`-`) &&
     (fn = src.readMatch(rxFuncBegin, true))
   ) {
     m = new FuncMatcher(
@@ -456,27 +457,27 @@ const parseTerm = src => {
     m = singleTerm(src.readMatch(rxTerm) || parsingFailed(src, rxTerm));
   }
   fn = src.peek();
-  if (fn === 123/* { */ || fn === 35/* # */ && src.peek(2) === 123) {
-    const hash = fn === 35 ? src.read() : '';
+  if (fn === CC`{` || fn === CC`#` && src.peek(2) === CC`{`) {
+    const hash = fn === CC`#` ? src.read() : '';
     const [, a, comma, b = comma ? Infinity : a] = src.readMatch(rxBraces, true)
       || parsingFailed(src, rxBraces);
     m = m.braces(+a, +b, hash, hash && ',');
-    if (src.peek() === 63 /* ? */) {
+    if (src.peek() === CC`?`) {
       src.read();
       if (+a === 1) m.min = 0; // modify 1->0 inplace
       else m = m.braces(0, 1, '?');
     }
     fn = 0;
-  } else if (fn === 63 /* ? */) {
+  } else if (fn === CC`?`) {
     m = m.braces(0, 1, '?');
-  } else if (fn === 42 /* * */) {
+  } else if (fn === CC`*`) {
     m = m.braces(0, Infinity, '*');
-  } else if (fn === 43 /* + */) {
+  } else if (fn === CC`+`) {
     m = m.braces(1, Infinity, '+');
-  } else if (fn === 35 /* # */) {
-    fn = src.peek(2) !== 63 /* ? */ ? 1 : (src.read(2), 0);
+  } else if (fn === CC`#`) {
+    fn = src.peek(2) !== CC`?` ? 1 : (src.read(2), 0);
     m = m.braces(fn, Infinity, '#', ',');
-  } else if (fn === 33 /* ! */) {
+  } else if (fn === CC`!`) {
     if (!(m instanceof SeqMatcher))
       parsingFailed(src, '"!" is only allowed after "]"');
     (/**@type{SeqMatcher}*/m).some = true;
@@ -505,7 +506,7 @@ export const singleTerm = Matcher.term = str => {
   const origStr = str;
   let m = cache[str = str.toLowerCase()];
   if (m) return m;
-  if (str.charCodeAt(0) !== 60 /* < */) {
+  if (str.charCodeAt(0) !== CC`<`) {
     m = new StringsMatcher(str);
     m._string = origStr;
   } else if (str.startsWith('<fn:')) {
