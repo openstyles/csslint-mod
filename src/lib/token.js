@@ -6,11 +6,6 @@ import {assign, define, isOwn, parseString, PDESC, toLowAscii} from './util';
  * @property {[]} [args] added in selectors
  * @property {string} [atName] lowercase name of @-rule without -vendor- prefix
  * @property {TokenValue} [expr] body of function or block
- * @property {boolean} [is0] number is an integer 0 without units
- * @property {boolean} [isAttr] = attr()
- * @property {boolean} [isCalc] = calc()
- * @property {boolean} [isInt] = integer without units
- * @property {boolean} [isVar] = var(), env(), /*[[var]]* /
  * @property {'*'|'_'} [hack] for property name in IE mode
  * @property {string} [lowText] text.toLowerCase() added on demand
  * @property {string} [name] name of function
@@ -25,6 +20,7 @@ export default class Token {
   constructor(id, col, line, offset, input, code) {
     /** @type {number} */
     this.id = id;
+    this.is = 0;
     this.col = col;
     this.line = line;
     this.offset = offset;
@@ -88,13 +84,11 @@ export class TokenFunc extends Token {
     if (expr) {
       tok.expr = expr;
       let n = tok.name;
-      if (B.calc.has(tok, n)) {
-        tok.isCalc = true;
-      } else if (n === 'var' || n === 'env' || tok.id === DASHED_FUNCTION) {
-        tok.isVar = true;
-      } else if (n === 'attr' && (n = expr.parts[0]) && (n.id === IDENT || n.id === UVAR)) {
-        tok.isAttr = true;
-      }
+      n = B.calc.has(tok, n) ? IS_CALC
+        : n === 'var' || n === 'env' || tok.id === DASHED_FUNCTION ? IS_VAR
+        : n === 'attr' && (n = expr.parts[0]) && (n.id === IDENT || n.id === UVAR) ? IS_ATTR
+        : 0;
+      if (n) tok.is = n;
     }
     return tok;
   }

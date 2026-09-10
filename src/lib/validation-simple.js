@@ -13,50 +13,53 @@ const buReservedGrid = new Bucket(GlobalKeywords)
 const buReservedAuto = new Bucket(GlobalKeywords)
   .addFrom('default auto');
 
+const IS_CALC_0 = IS_CALC | IS_0;
+const IS_CALC_INT = IS_CALC | IS_INT;
+
 /** @type {{[id: string]: (p: Token) => boolean}} */
 const VTSimple = {
   __proto__: null,
   '<animateable-feature-name>': p => p.id === IDENT && !buReservedAnim.has(p),
-  '<angle>': p => p.isCalc || p.id === ANGLE,
-  '<angle-pct-zero>': p => p.isCalc || p.is0 || p.id === ANGLE || p.id === PCT,
-  '<angle-zero>': p => p.isCalc || p.is0 || p.id === ANGLE,
+  '<angle>': p => !!(p.is & IS_CALC) || p.id === ANGLE,
+  '<angle-pct-zero>': p => !!(p.is & IS_CALC_0) || p.id === ANGLE || p.id === PCT,
+  '<angle-zero>': p => !!(p.is & IS_CALC_0) || p.id === ANGLE,
   '<ascii4>': p => p.id === STRING && (p = p.string).length === 4 && !/[^\x20-\x7E]/.test(p),
-  '<attr>': p => p.isAttr,
+  '<attr>': p => !!(p.is & IS_ATTR),
   '<custom-ident>': p => p.id === IDENT && !buReserved.has(p),
   '<dashed-ident>': p => p.type === '--' && p.id === IDENT,
-  '<flex>': p => p.isCalc || p.units === 'fr' && p.number >= 0,
+  '<flex>': p => !!(p.is & IS_CALC) || p.units === 'fr' && p.number >= 0,
   '<func>': p => p.id === FUNCTION,
-  '<hue>': p => p.isCalc || p.id === NUMBER || p.id === ANGLE,
+  '<hue>': p => !!(p.is & IS_CALC) || p.id === NUMBER || p.id === ANGLE,
   '<ident>': p => p.id === IDENT,
   '<ident-for-grid>': p => p.id === IDENT && !buReservedGrid.has(p),
   '<ident-not-none>': p => p.id === IDENT && p.type !== 'none' && !buReserved.has(p),
   '<ident-not-auto-none>': p => p.id === IDENT && p.type !== 'none' && !buReservedAuto.has(p),
   '<ie-function>': p => p.id === FUNCTION && p.type === 'ie',
-  '<int>': p => p.isCalc || p.isInt,
-  '<int0-1>': p => p.isCalc || p.is0 || p.isInt && p.number === 1,
-  '<int0+>': p => p.isCalc || p.isInt && p.number >= 0,
-  '<int1+>': p => p.isCalc || p.isInt && p.number > 0,
-  '<int2-4>': p => p.isCalc || p.isInt && (p = p.number) >= 2 && p <= 4,
-  '<len>': p => p.isCalc || p.is0 || p.id === LENGTH,
-  '<len0+>': p => p.isCalc || p.is0 || p.id === LENGTH && p.number >= 0,
-  '<len-pct>': p => p.isCalc || p.is0 || p.id === LENGTH || p.id === PCT,
-  '<len-pct0+>': p => p.isCalc || p.is0 || p.number >= 0 && (p.id === PCT || p.id === LENGTH),
+  '<int>': p => !!(p.is & IS_CALC_INT),
+  '<int0-1>': p => !!(p.is & (IS_0 | IS_CALC_INT)) && p.number === 1,
+  '<int0+>': p => !!(p.is & IS_CALC_INT) && p.number >= 0,
+  '<int1+>': p => !!(p.is & IS_CALC_INT) && p.number > 0,
+  '<int2-4>': p => !!(p.is & IS_CALC_INT) && (p = p.number) >= 2 && p <= 4,
+  '<len>': p => !!(p.is & IS_CALC_0) || p.id === LENGTH,
+  '<len0+>': p => !!(p.is & IS_CALC_0) || p.id === LENGTH && p.number >= 0,
+  '<len-pct>': p => !!(p.is & IS_CALC_0) || p.id === LENGTH || p.id === PCT,
+  '<len-pct0+>': p => !!(p.is & IS_CALC_0) || p.number >= 0 && (p.id === PCT || p.id === LENGTH),
   '<named-or-hex-color>': p => p.type === 'color',
-  '<num>': p => p.isCalc || p.id === NUMBER,
-  '<num0+>': p => p.isCalc || p.id === NUMBER && p.number >= 0,
-  '<num0-1>': p => p.isCalc || p.id === NUMBER && (p = p.number) >= 0 && p <= 1,
-  '<num1-1000>': p => p.isCalc || p.id === NUMBER && (p = p.number) >= 1 && p <= 1000,
-  '<num-pct>': p => p.isCalc || p.id === NUMBER || p.id === PCT,
-  '<num-pct0+>': p => p.isCalc || p.number >= 0 && (p.id === NUMBER || p.id === PCT),
-  '<num-pct-none>': p => p.isCalc || p.type === 'none' || p.id === NUMBER || p.id === PCT,
-  '<pct>': p => p.isCalc || p.is0 || p.id === PCT,
-  '<pct0+>': p => p.isCalc || p.is0 || p.number >= 0 && p.id === PCT,
-  '<pct0-100>': p => p.isCalc || p.is0 || p.id === PCT && (p = p.number) >= 0 && p <= 100,
+  '<num>': p => !!(p.is & IS_CALC) || p.id === NUMBER,
+  '<num0+>': p => !!(p.is & IS_CALC) || p.id === NUMBER && p.number >= 0,
+  '<num0-1>': p => !!(p.is & IS_CALC) || p.id === NUMBER && (p = p.number) >= 0 && p <= 1,
+  '<num1-1000>': p => !!(p.is & IS_CALC) || p.id === NUMBER && (p = p.number) >= 1 && p <= 1000,
+  '<num-pct>': p => !!(p.is & IS_CALC) || p.id === NUMBER || p.id === PCT,
+  '<num-pct0+>': p => !!(p.is & IS_CALC) || p.number >= 0 && (p.id === NUMBER || p.id === PCT),
+  '<num-pct-none>': p => !!(p.is & IS_CALC) || p.type === 'none' || p.id === NUMBER || p.id === PCT,
+  '<pct>': p => !!(p.is & IS_CALC_0) || p.id === PCT,
+  '<pct0+>': p => !!(p.is & IS_CALC_0) || p.number >= 0 && p.id === PCT,
+  '<pct0-100>': p => !!(p.is & IS_CALC_0) || p.id === PCT && (p = p.number) >= 0 && p <= 100,
   '<keyframes-name>': p => p.id === STRING || p.id === IDENT && !buReserved.has(p),
   '<resolution>': p => p.id === RESOLUTION,
   '<string>': p => p.id === STRING,
-  '<time>': p => p.isCalc || p.id === TIME,
-  '<time0+>': p => p.isCalc || p.id === TIME && p.number >= 0,
+  '<time>': p => !!(p.is & IS_CALC) || p.id === TIME,
+  '<time0+>': p => !!(p.is & IS_CALC) || p.id === TIME && p.number >= 0,
   '<unicode-range>': p => p.id === URANGE,
   '<uri>': p => p.id === URI,
 };
@@ -68,7 +71,7 @@ for (const type of ['hsl', 'hwb', 'lab', 'lch', 'rgb']) {
   VTSimple[`<rel-${type}>`] = p => p.type === 'none'
     || (p.length === 1 ? letters[p.code - 97] : p.length === 5 && buAlpha.has(p));
   VTSimple[`<rel-${type}-num-pct>`] = p => p.type === 'none'
-    || p.isCalc || p.id === NUMBER || p.id === PCT
+    || !!(p.is & IS_CALC) || p.id === NUMBER || p.id === PCT
     || (p.length === 1 ? letters[p.code - 97] : p.length === 5 && buAlpha.has(p));
 }
 

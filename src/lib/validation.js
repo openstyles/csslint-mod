@@ -59,7 +59,7 @@ export function validateProperty(tok, value, stream, Props) {
     prop = Props === Properties || !Properties[prop] ? 'Unknown' : 'Misplaced';
     return new ValidationError(`${prop} property "${tok}".`, tok);
   }
-  if (value.isVar) {
+  if (value.is & IS_VAR) {
     return;
   }
   if (p0.id === IDENT && buGlobalKeywords.has(p0)) {
@@ -92,7 +92,7 @@ export function validateProperty(tok, value, stream, Props) {
         expr.tryAttr = true;
         res = m.match(expr);
       }
-      for (let i, epp = expr.parts; (i = expr.i) < epp.length && epp[i].isAttr;) {
+      for (let i, epp = expr.parts; (i = expr.i) < epp.length && epp[i].is & IS_ATTR;) {
         expr.next();
       }
     }
@@ -115,7 +115,7 @@ export function vtExplode(text) {
 }
 
 function vtFailure(unit, what) {
-  if (!what || what === true ? (what = 'end of value') : !unit.isVar) {
+  if (!what || what === true ? (what = 'end of value') : !(unit.is & IS_VAR)) {
     return new ValidationError(`Expected ${what} but found "${clipString(unit)}".`, unit);
   }
 }

@@ -299,7 +299,7 @@ class Parser extends EventDispatcher {
     let comma;
     while ((tok = this._selector(stream, tok, relative)) || lax) {
       if (tok) selectors.push(tok);
-      if ((tok = stream.token).isVar) tok = stream.grab();
+      if ((tok = stream.token).is & IS_VAR) tok = stream.grab();
       if (!(comma = tok.id === COMMA)) break;
       tok = null;
     }
@@ -316,7 +316,7 @@ class Parser extends EventDispatcher {
    */
   _selector(stream, tok, relative) {
     const sel = [];
-    if (!tok || tok.isVar) {
+    if (!tok || tok.is & IS_VAR) {
       tok = stream.grab();
     }
     if (!relative || !isOwn(TT.combinator, tok.id)) {
@@ -332,7 +332,7 @@ class Parser extends EventDispatcher {
         sel.push(this._simpleSelectorSequence(stream) || stream._failure());
         continue;
       }
-      while (tok.isVar) tok = stream.get();
+      while (tok.is & IS_VAR) tok = stream.get();
       ws = tok.id === WS && tok; if (!ws) break;
       tok = stream.grab(); if (tok.id === LBRACE) break;
       combinator = isOwn(TT.combinator, tok.id) && this._combinator(stream, tok);
@@ -430,7 +430,7 @@ class Parser extends EventDispatcher {
     const t2raw = colon || stream.get();
     const t2WS = t2raw.id === WS;
     const t2 = colon
-      || (t2WS || t2raw.isVar) && stream.grab()
+      || (t2WS || t2raw.is & IS_VAR) && stream.grab()
       || t2raw;
     let ti3;
     if (hack) {
@@ -441,7 +441,7 @@ class Parser extends EventDispatcher {
     if (t2.id !== COLON || (ti3 = stream.get(UVAR).id) === COLON) {
       while (stream.token !== tok) stream.unget();
       if (!inParens && (ti3 || !isCust || isOwn(TT.nestSelBlock, t2.id))) return;
-      if (tok.isVar) return true;
+      if (tok.is & IS_VAR) return true;
       stream.source.reset(t2mark);
       stream._resetBuf();
       stream._failure('":"', t2raw);
@@ -473,7 +473,7 @@ class Parser extends EventDispatcher {
       if (t.id === RBRACE) stream.unget();
       stream._failure('');
     }
-    const invalid = !isCust && !tok.isVar && !opts.noValidation &&
+    const invalid = !isCust && !(tok.is & IS_VAR) && !opts.noValidation &&
       validateProperty(tok, value, stream, scope);
     const important = t.id === DELIM &&
       stream.matchSmart(IDENT, {must: 1, text: B.important});
@@ -529,7 +529,7 @@ class Parser extends EventDispatcher {
       } else if (ti === FUNCTION || (dumb2 = ti === DASHED_FUNCTION)) {
         if (tok.type !== 'ie' || this.options.ieFilters && (dumb2 = true)) {
           tok = this._function(stream, tok, dumb || dumb2);
-          isVar = isVar || tok.isVar;
+          isVar = isVar || tok.is & IS_VAR;
         }
       } else if (ti === UVAR) {
         isVar = true;
@@ -544,7 +544,7 @@ class Parser extends EventDispatcher {
     }
     if (parts[0]) {
       const res = TokenValue.from(parts);
-      if (isVar) res.isVar = true;
+      if (isVar) res.is = IS_VAR;
       return res;
     }
   }

@@ -55,9 +55,9 @@ export default class Matcher {
     } else if (res) {
       res = this.test(expr, p);
     } else {
-      res = p.isVar ||
+      res = p.is & IS_VAR ||
         (((res = (/**@type{SimpleMatcher}*/this).fn)) ? !!res(p) : this.test(expr, p)) ||
-        expr.tryAttr && p.isAttr;
+        expr.tryAttr && p.is & IS_ATTR;
       if (res && expr.i < pp.length)
         ++expr.i;
     }
@@ -185,7 +185,7 @@ class FuncMatcher extends Matcher {
     if (!m)
       return m != null; // true = no check if `body` is false i.e. no specs for params
     if ((e = p.expr)) {
-      if (e.isVar) return true;
+      if (e.is & IS_VAR) return true;
       else vi = new PropValueIterator(e);
     }
     if (!(m instanceof Matcher)) {

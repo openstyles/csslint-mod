@@ -4,7 +4,7 @@ export default [{
 }, (rule, parser, reporter) => {
   parser.addListener('property', event => {
     for (const p of event.value.parts) {
-      if (p.is0 && p.units && p.type !== 'time') {
+      if (p.is & IS_0 && p.units && p.type !== 'time') {
         reporter.report('"0" value with redundant units.', p, rule);
       }
     }

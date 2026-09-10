@@ -182,7 +182,7 @@ export default class TokenStream {
     const ws = typeof what === 'object' ? WS in what : what === WS;
     let uvp = !ws && !text && (typeof what === 'object' ? what.isUvp : isOwn(UVAR_PROXY, what));
     tok = tok && (tok.id != null ? tok : this.token) || this.get(uvp, ws);
-    uvp = uvp && tok.isVar;
+    uvp = uvp && tok.is & IS_VAR;
     return this.match(what, text, tok, uvp ? UVAR : opts) ||
       uvp && (this.match(what, text, this.grab()) || tok) ||
       false;
@@ -242,7 +242,7 @@ export default class TokenStream {
     }
     const tok = new Token(v || CHAR, col, line, offset, src.string, a);
     if (v) {
-      if (v === UVAR) tok.isVar = true;
+      if (v === UVAR) tok.is = IS_VAR;
     // [0-9]
     } else if (a >= 48 && a <= 57) {
       v = b >= 48 && b <= 57 || b === 46/*.*/ ||
@@ -446,8 +446,7 @@ export default class TokenStream {
     }
     tok.units = units || '';
     tok.number = a = +numStr;
-    tok.is0 = b = !units && !a;
-    tok.isInt = b || !units && !isFloat;
+    tok.is = !units && !a ? IS_0 | IS_INT : !units && !isFloat ? IS_INT : 0;
     return ovrText;
   }
 

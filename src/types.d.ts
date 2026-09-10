@@ -46,3 +46,10 @@ declare const NUMBER = 43;
 declare const PCT = 44;
 declare const RESOLUTION = 45;
 declare const TIME = 46;
+
+declare const IS_0 = 1;
+declare const IS_ATTR = 2;
+declare const IS_CALC = 4;
+declare const IS_INT = 8;
+/** var(), env(), /*[[var]]*_/ */
+declare const IS_VAR = 16;
