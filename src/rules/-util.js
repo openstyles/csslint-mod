@@ -6,8 +6,8 @@ export let shorthands, shorthandsFor;
 /** Gets the lower-cased text without vendor prefix */
 export function getPropName(prop) {
   const low = prop.lowText ??= prop.text.toLowerCase();
-  const vp = prop.vendorPos;
-  return vp ? low.slice(vp) : low;
+  const vp = prop.vendor;
+  return vp ? low.slice(vp >> 16) : low;
 }
 
 /** @this {number} */

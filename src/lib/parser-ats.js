@@ -173,7 +173,7 @@ const ATS = {
    * @param {Token} start
    */
   keyframes(stream, start) {
-    const prefix = start.vendorPos ? start.text.slice(0, start.vendorPos) : '';
+    const prefix = start.vendor ? start.text.slice(0, start.vendor >> 16) : '';
     const name = stream.matchSmart(TT.identString, OrDie);
     stream.matchSmart(LBRACE, OrDie);
     this.fire({type: 'startkeyframes', name, prefix}, start);

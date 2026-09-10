@@ -51,7 +51,7 @@ export default class Bucket {
     let len = (low ?? tok).length;
     if (len >= 100 || (val =
       this.map.get(
-        (vendorPos ? tok.vendorCode : tok.code) * 100 +
+        (vendorPos ? tok.vendor & 0xFFFF : tok.code) * 100 +
         (vendorPos ? len -= vendorPos : len))
     ) == null) return false;
     if (len === 1) return true;

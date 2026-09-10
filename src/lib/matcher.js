@@ -174,7 +174,7 @@ class FuncMatcher extends Matcher {
    */
   test(expr, p) {
     const name = p.name;
-    if (!name || p.vendorPos)
+    if (!name || p.vendor)
       return !!name;
     let e, m, vi;
     const {list} = this;
@@ -357,7 +357,7 @@ class StringsMatcher extends Matcher {
   test(expr, p) {
     const bu = this.bu ??= (expr = this.str, this.str = '', new Bucket(expr, rxAltSep));
     return bu.has(p) // the bucket may have -vendor-prefixed-text too
-      || p.vendorPos && bu.has(p, undefined, p.vendorPos) || false;
+      || p.vendor && bu.has(p, undefined, p.vendor >> 16) || false;
   }
 
   toString(prec) {

@@ -51,7 +51,7 @@ export function validateProperty(tok, value, stream, Props) {
   let prop = tok.lowText ??= tok.text.toLowerCase();
   do {
     spec = Props[prop] || Props['<all>'] && (Props = Properties)[prop];
-  } while (!spec && !res && (vp = tok.vendorPos) && (res = prop = prop.slice(vp)));
+  } while (!spec && !res && (vp = tok.vendor) && (res = prop = prop.slice(vp >> 16)));
   if (typeof spec === 'number' || !spec && vp) {
     return;
   }

@@ -13,8 +13,8 @@ import {assign, define, isOwn, parseString, PDESC, toLowAscii} from './util';
  * @property {string} [prefix] lowercase `-vendor-` prefix
  * @property {string} [units] lowercase units of a number
  * @property {string} [uri] parsed uri string
- * @property {number} [vendorCode] char code of vendor name i.e. 102 for "f" in -moz-foo
- * @property {number} [vendorPos] position of vendor name i.e. 5 for "f" in -moz-foo
+ * @property {number} [vendor] low 16bit: char code of vendor name i.e. 102 for "f" in -moz-foo,
+ * high 16bit: position of vendor name i.e. 5 for "f" in -moz-foo
  */
 export default class Token {
   constructor(id, col, line, offset, input, code) {

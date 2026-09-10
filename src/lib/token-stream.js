@@ -416,8 +416,7 @@ export default class TokenStream {
       }
     }
     if (vpLen) {
-      tok.vendorCode = lc ? lc.charCodeAt(vpLen) : toLowAscii(name.charCodeAt(vpLen));
-      tok.vendorPos = vpLen;
+      tok.vendor = (lc ? lc.charCodeAt(vpLen) : toLowAscii(name.charCodeAt(vpLen))) + (vpLen << 16);
     }
     return ovrValue;
   }
