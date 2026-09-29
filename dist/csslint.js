@@ -6,8 +6,8 @@ let shorthands, shorthandsFor;
 /** Gets the lower-cased text without vendor prefix */
 function getPropName(prop) {
   const low = prop.lowText ??= prop.text.toLowerCase();
-  const vp = prop.vendorPos;
-  return vp ? low.slice(vp) : low;
+  const vp = prop.vendor;
+  return vp ? low.slice(vp >> 16) : low;
 }
 
 /** @this {number} */
@@ -1409,7 +1409,7 @@ var ruleZeroUnits = [{
 }, (rule, parser, reporter) => {
   parser.addListener('property', event => {
     for (const p of event.value.parts) {
-      if (p.is0 && p.units && p.type !== 'time') {
+      if (p.is & 1 && p.units && p.type !== 'time') {
         reporter.report('"0" value with redundant units.', p, rule);
       }
     }
