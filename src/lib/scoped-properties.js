@@ -49,6 +49,7 @@ const ScopedProperties = {
     'font-stretch': 'auto | <font-stretch>{1,2}',
     'font-style': 'auto | normal | italic | oblique <angle>{0,2}',
     'font-weight': 'auto | [ normal | bold | <num1-1000> ]{1,2}',
+    'font-width': 'auto | <font-stretch>{1,2}',
     'line-gap-override': '[ normal | <pct0+> ]{1,2}',
     'size-adjust': '<pct0+>',
     'src': '[ url() [ format( <string># ) ]? | local( <family-name> ) ]#',

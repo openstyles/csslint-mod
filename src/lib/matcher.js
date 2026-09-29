@@ -417,16 +417,17 @@ const parseAlt = src => {
         } while (src.readMatch(rxAndAndSep));
         ors.push(ands.length > 1 ? new ManyMatcher(null, ands) : ands[0]);
       } while (src.readMatch(rxOrOrSep));
-      const single = ors.length === 1 && ors[0];
-      if (single && single instanceof StringsMatcher) {
+      let single;
+      if (ors.length === 1 && (single = ors[0]) && single instanceof StringsMatcher) {
         literals ??= (litIndex = alts.length, []);
         literals.push((/**@type{StringsMatcher}*/single).str);
+      } else {
+        alts.push(single || new ManyMatcher(false, ors));
       }
-      alts.push(single || new ManyMatcher(false, ors));
     }
   } while (src.readMatch(rxOrSep));
   if (literals)
-    alts.splice(litIndex, 0, singleTerm(literals.join('|')));
+    alts.splice(litIndex, 0, singleTerm(literals.join(' | ')));
   return alts.length > 1 ? new AltMatcher(alts) : alts[0];
 };
 

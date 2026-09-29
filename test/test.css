@@ -27,7 +27,7 @@ heading"] {
         text-shadow: 0 1px 1px rgba(220, 220, 220, .25), 0 1px 25px rgba(27, 31, 35, .75);
       	padding: 0px 4px;
         filter: drop-shadow(0px 0px 2px black);
-        font-size: x-large;
+        font-size: x-large; font-width: condensed2;
         filter: brightness(50%) ! /*foo*/ I\m portant;
         font-synthesis-style: auto !important !important;
         font-synthesis-weight: auto;
@@ -72,7 +72,7 @@ heading"] {
     src: local("Helvetica Neue Bold"),
          local("HelveticaNeue-Bold"),
          url(MgOpenModernaBold.ttf);
-    font-weight: bold;
+    font-weight: bold; font-width: auto; font-width: 100%; font-width: 100% condensed;
     unicode-range: U+0?00-5FF, U+1e00-1???, U+222000-2300;
     unicode-range: U+000-49F, U+2000-27FF, U+2900-2BFF, U+1D400-1D7FF;
     unicode-range: U+3000???-9FFF, U+ffz??;

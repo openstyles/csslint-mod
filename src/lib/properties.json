@@ -226,7 +226,7 @@
   "font-palette": "normal|light|dark | <dashed-ident>",
   "font-size": "<absolute-size> | <relative-size> | <len-pct0+>",
   "font-size-adjust": "none | [ex-height|cap-height|ch-width|ic-width|ic-height]? [from-font|<num0+>]",
-  "font-stretch": "<font-stretch-named> | <pct>",
+  "font-stretch": "<font-stretch-named> | <pct0+>",
   "font-style": "normal|italic|oblique <angle>?",
   "font-synthesis": "none | [ weight || style ]",
   "font-synthesis-small-caps": "auto|none",
@@ -242,6 +242,7 @@
   "font-variant-position": "normal|sub|super",
   "font-variation-settings": "normal | [ <string> <num> ]#",
   "font-weight": "normal|bold|bolder|lighter | <num1-1000>",
+  "font-width": "<font-stretch>",
   "forced-color-adjust": "auto|none|preserve-parent-color",
 
   "gap": "<column-gap>{1,2}",
