@@ -3586,7 +3586,7 @@ const toStringPropHack = function () { return this.hack + this.text; };
 //#region Parser public API
 
 class Parser extends EventDispatcher {
-  static 2 = ATS;
+  static ats = ATS;
   /**
    * @param {Object} [options]
    * @param {TokenStream} [options.stream]
