@@ -64,8 +64,10 @@ export default class Bucket {
 
 /** @type {{[key:string]: Bucket}} */
 export const B = {
-  attrIS: 'i s ]', // "" is to improve the error message,
-  calc: 'abs calc calc-size clamp if min max mod progress rem round sign',
+  attrIS: 'i s ]', // "]" is to improve the error message,
+  calc: 'calc calc-size clamp if min max progress random ' +
+    'asin atan atan2 cos exp hypot log pow sin sqrt tan ' +
+    'abs mod rem round sign sibling-count sibling-index',
   colors: NamedColors,
   containerFn: 'anchored( scroll-state( style(',
   /** When a value starting from "f" or "t" is added make sure to fix parser.keyframes() */
