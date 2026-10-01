@@ -295,8 +295,8 @@ for (const k in B)
 const Combinators = [];
 Combinators[9/*\t*/] =
 Combinators[10/*\n*/] =
-Combinators[102/*\f*/] =
-Combinators[114/*\r*/] =
+Combinators[12/*\f*/] =
+Combinators[13/*\r*/] =
 Combinators[32/* */] = 'descendant';
 Combinators[62/*>*/] = 'child';
 Combinators[43/*+*/] = 'adjacent-sibling';

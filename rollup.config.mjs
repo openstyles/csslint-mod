@@ -17,6 +17,7 @@ const PLUGINS = [
     replacements: getInlineConsts(String),
   }),
 ];
+const ESC = {__proto__: null, t: 9, n: 10, f: 12, r: 13};
 
 fse.emptyDir(DST);
 
@@ -38,8 +39,7 @@ export default [{
       }, {
         match: 'src/**/*.js',
         test: /\bCC`(\\(.)|([^`]+))`/g,
-        replace: (_, src, esc, b) =>
-          (esc === 't' ? 9 : esc === 'n' ? 10 : (esc || b).charCodeAt(0)) + `/*${src}*/`,
+        replace: (_, src, esc, b) => (ESC[esc] || (esc || b).charCodeAt(0)) + `/*${src}*/`,
       }],
     }),
     pluginJson({
