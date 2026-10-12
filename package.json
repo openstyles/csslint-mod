@@ -1,6 +1,6 @@
 {
   "name": "csslint-mod",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "A CSSLint fork supporting modern CSS, primarily used in the Stylus extension",
   "author": "Stylus Team",
   "license": "MIT",
@@ -29,15 +29,15 @@
   },
   "devDependencies": {
     "@rollup/plugin-json": "^6.1.0",
-    "chalk": "^5.6.2",
-    "eslint": "^10.6.0",
+    "chalk": "^6.0.1",
+    "eslint": "^10.12.0",
     "extensionless": "^2.0.6",
-    "fs-extra": "^11.3.6",
-    "globals": "^17.7.0",
-    "npm-run-all2": "^9.0.2",
-    "rollup": "^4.62.2",
+    "fs-extra": "^11.4.1",
+    "globals": "^17.13.0",
+    "npm-run-all2": "^9.0.3",
+    "rollup": "^4.64.5",
     "rollup-plugin-define": "^1.0.1",
     "rollup-plugin-re": "^1.0.7"
   },
-  "packageManager": "pnpm@11.10.0+sha512.0b7f8b98060031904c017e3a41eb187a16d40eeb829b95c4f8cb03681761fc4ab53dd219115b9b447f4dce1a05a214764461e7d3703392a9f32f9511ce8c86c8"
+  "packageManager": "pnpm@12.12.1+sha512.b7f98934c0b1f29a65f5da52f2d7f994e7faad573ffdddea1497fb4dcb5aec051590ee7c7d95a38172b4bfae103a5b83edf2ee866e11731c2cafa96063610ac5"
 }
