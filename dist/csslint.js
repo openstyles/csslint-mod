@@ -794,6 +794,7 @@ var ruleKnownPseudos = [{
     'local-link': 1,
     'modal': 1,
     'muted': 1,
+    'navigation-source': 1,
     'not': 1 + Func,
     'nth-child': 1 + Func,
     'nth-col': 1 + Func,
