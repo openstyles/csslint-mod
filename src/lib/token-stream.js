@@ -30,6 +30,7 @@ export const TT = {
 };
 export const OrDie = {must: true};
 export const OrDieReusing = {must: true, reuse: true};
+export const IsDashed = {/** @param {Token} tok */ has: tok => tok.type === '--'};
 /** For these tokens stream.match() will return a UVAR unless the next token is a direct match */
 const UVAR_PROXY = [PCT, ...TT.mediaValue, ...TT.identString]
   .reduce((res, id) => (res[id] = true) && res, []);
@@ -144,10 +145,10 @@ export default class TokenStream {
 
   /**
    * Consumes the next token if it matches the condition(s).
-   * @param {Token|TokenMap} what
+   * @param {Token|TokenMap|number} what
    * @param {Bucket} [text]
    * @param {Token} [tok]
-   * @param {{must?: boolean}} [opts]
+   * @param {{must?: boolean} | Number} [opts]
    * @return {Token|false}
    */
   match(what, text, tok = this.get(), opts) {
@@ -169,7 +170,7 @@ export default class TokenStream {
 
   /**
    * Skips whitespace and consumes the next token if it matches the condition(s).
-   * @param {Token|TokenMap} what
+   * @param {Token|TokenMap|number} what
    * @param {{}|Bucket} [opts]
    * @param {Token|boolean} [opts.reuse]
    * @param {boolean} [opts.must]

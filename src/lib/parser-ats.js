@@ -1,7 +1,10 @@
-import {B} from './bucket';
+import Bucket, {B} from './bucket';
 import {TokenFunc, TokenValue} from './token';
-import {OrDie, OrDieReusing, TT} from './token-stream';
+import {IsDashed, OrDie, OrDieReusing, TT} from './token-stream';
 import {documentFuncs, pick} from './util';
+import ScopedProperties from './scoped-properties.js';
+
+let fontFeatureSyms, marginSyms;
 
 /** Functions for @ symbols */
 const ATS = {
@@ -124,26 +127,34 @@ const ATS = {
    * @param {TokenStream} stream
    * @param {Token} start
    */
-  'font-face'(stream, start) {
-    this._block(stream, start, {
-      decl: true,
-      event: ['fontface', {}],
-      scoped: true,
-    });
-  },
+  'font-face': declBlock,
 
   /**
    * @this {Parser}
    * @param {TokenStream} stream
    * @param {Token} start
    */
-  'font-palette-values'(stream, start) {
+  'font-feature-values'(stream, start) {
+    let name = [];
+    let tok;
+    while ((tok = stream.grab()).id === IDENT)
+      name.push(tok);
+    if (tok.id === STRING && !name.length)
+      name.push(tok);
+    else
+      stream.unget();
+    if (!name.length)
+      stream._failure([IDENT, STRING], tok);
+    name = TokenValue.from(name);
     this._block(stream, start, {
       decl: true,
-      event: ['fontpalettevalues', {id: stream.matchSmart(IDENT, OrDie)}],
-      scoped: true,
+      ats: fontFeatureSyms ||=
+        new Bucket('annotation character-variant ornaments styleset stylistic swash'),
+      event: ['fontfeaturevalues', {name}],
     });
   },
+
+  'font-palette-values': namedDeclBlock,
 
   /**
    * @this {Parser}
@@ -267,22 +278,21 @@ const ATS = {
     this._block(stream, start, {
       decl: true,
       event: ['page', {id, pseudo}],
-      margins: true,
+      ats: marginSyms ||= new Bucket('bottom-center bottom-left-corner bottom-left bottom-right-corner bottom-right left-bottom left-middle left-top right-bottom right-middle right-top top-center top-left-corner top-left top-right-corner top-right'), // eslint-disable-line max-len
       scoped: true,
     });
   },
+
+  property: namedDeclBlock,
 
   /**
    * @this {Parser}
    * @param {TokenStream} stream
    * @param {Token} start
    */
-  property(stream, start) {
-    const name = stream.matchSmart(IDENT, OrDie);
-    this._block(stream, start, {
-      decl: true,
-      event: ['property', {name}],
-      scoped: true,
+  'position-try'(stream, start) {
+    declBlock.call(this, stream, start, {
+      id: stream.matchSmart(IDENT, {text: IsDashed, ...OrDie}),
     });
   },
 
@@ -325,9 +335,8 @@ const ATS = {
    * @param {TokenStream} stream
    * @param {Token} start
    */
-  supports(stream, start) {
-    this._condition(stream, undefined, this._supportsCondition);
-    this._block(stream, start, {event: ['supports']});
+  'starting-style'(stream, start) {
+    this._block(stream, start, {decl: this._inStyle, event: ['startingstyle', {}]});
   },
 
   /**
@@ -335,18 +344,41 @@ const ATS = {
    * @param {TokenStream} stream
    * @param {Token} start
    */
-  'view-transition'(stream, start) {
-    this._block(stream, start, {decl: true, event: ['view-transition'], scoped: true});
+  supports(stream, start) {
+    this._condition(stream, undefined, this._supportsCondition);
+    this._block(stream, start, {event: ['supports']});
   },
+
+  'view-transition': declBlock,
 };
 
-ATS.function = ATS.mixin = ATS.apply;
-ATS['position-try'] = stream => stream.skipDeclBlock();
+/**
+ * @this {Parser}
+ * @param {TokenStream} stream
+ * @param {Token} start
+ * @param {{}} [eventOpts]
+ */
+function declBlock(stream, start, eventOpts) {
+  const atName = start.atName;
+  this._block(stream, start, {
+    decl: true,
+    event: [atName.replace(/-/g, ''), eventOpts],
+    scoped: !!ScopedProperties[atName],
+  });
+}
 
+/**
+ * @this {Parser}
+ * @param {TokenStream} stream
+ * @param {Token} start
+ */
+function namedDeclBlock(stream, start) {
+  declBlock.call(this, stream, start, {id: stream.matchSmart(IDENT, OrDie)});
+}
+
+ATS.function = ATS.mixin = ATS.apply;
 /** topDocOnly mode */
 export const ATS_TDO = pick(ATS, ['document']);
-
 /** @-rules at the top level of the stylesheet */
 export const ATS_GLOBAL = pick(ATS, ['charset', 'import', 'layer', 'namespace']);
-
 export default ATS;

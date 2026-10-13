@@ -596,7 +596,7 @@ class Parser extends EventDispatcher {
    * @prop {Token} [brace]
    * @prop {boolean} [decl] - can contain prop:value declarations
    * @prop {Array|{}} [event] - ['name', {...props}?]
-   * @prop {boolean} [margins] - check for the margin @-rules.
+   * @prop {Bucket} [ats] - check for @-rules.
    * @prop {boolean} [scoped] - use ScopedProperties for the start token's name
    * @typedef {{}} RuleBlockOpts
    */
@@ -649,7 +649,7 @@ class Parser extends EventDispatcher {
     const env = /** @type {RuleBlockOpts} */ {...this._stack[this._stack.length - 1], start};
     const {brace = stream.matchSmart(LBRACE, OrDie), event = []} = opts;
     const decl = env.decl || opts.decl;
-    const margins = env.margins || opts.margins;
+    const ats = env.ats || opts.ats;
     const sNew = opts.scoped && ScopedProperties[start.atName];
     const sOld = env.scope;
     const scope = env.scope = sNew ? {...sOld, ...sNew} : sOld;
@@ -672,7 +672,7 @@ class Parser extends EventDispatcher {
       try {
         if (ti === AT) {
           fn = tok.atName;
-          fn = margins && B.marginSyms.has(fn) && this._margin ||
+          fn = ats && ats.has(fn) && this._margin ||
             ATS[fn] ||
             this._unknownAtRule;
           fn.call(this, stream, tok);

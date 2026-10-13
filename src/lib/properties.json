@@ -486,6 +486,7 @@
   "scroll-margin-left": "<len>",
   "scroll-margin-right": "<len>",
   "scroll-margin-top": "<len>",
+  "scroll-marker-group": "none | [ [before|after] || [links|tabs] ]",
   "scroll-padding": "<top>{1,4}",
   "scroll-padding-block": "<top>{1,2}",
   "scroll-padding-block-end": "<top>",
