@@ -1,6 +1,7 @@
 import * as B from './bucket';
 import {TokenFunc, TokenValue} from './token';
-import {IsDashed, OrDie, OrDieReusing, TT} from './token-stream';
+import {IsDashed, OrDie, OrDieReusing} from './token-stream';
+import * as TT from './token-types.js';
 import {documentFuncs, pick} from './util';
 import ScopedProperties from './scoped-properties.js';
 

@@ -1,6 +1,7 @@
 import * as B from './bucket';
 import {TokenFunc} from './token';
-import {OrDie, OrDieReusing, TT} from './token-stream';
+import {OrDie, OrDieReusing} from './token-stream';
+import * as TT from './token-types.js';
 import {TokenIdByCode} from './tokens';
 import {assign, isOwn} from './util';
 

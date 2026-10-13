@@ -6,7 +6,8 @@ import * as parserCache from './parser-cache';
 import SELECTORS from './parser-selector';
 import ScopedProperties from './scoped-properties.js';
 import Token, {TokenFunc, TokenValue} from './token';
-import TokenStream, {OrDie, OrDieReusing, TT} from './token-stream';
+import TokenStream, {OrDie, OrDieReusing} from './token-stream';
+import * as TT from './token-types.js';
 import {assign, clipString, define, EventDispatcher, isOwn, ParseError, PDESC} from './util';
 import {validateProperty} from './validation';
 

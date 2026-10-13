@@ -3,37 +3,15 @@ import Bucket from './bucket';
 import StringSource from './string-source';
 import Token from './token';
 import Tokens, {TokenIdByCode} from './tokens';
+import {UVAR_PROXY} from './token-types.js';
 import Units, {UnitTypeIds} from './units';
 import {
   clipString, define, documentFuncs, isOwn, ParseError, PDESC, rxUnescapeLF, toLowAscii,
 } from './util';
 
-export const TT = {
-  attrEq: [ATTR_EQ, EQUALS],
-  attrEqEnd: [ATTR_EQ, EQUALS, RBRACKET],
-  attrStart: [PIPE, IDENT, STAR],
-  attrNameEnd: [RBRACKET, UVAR, WS],
-  combinator: [PLUS, GT, COMBINATOR],
-  condition: [FUNCTION, IDENT, LPAREN],
-  declEnd: [SEMICOLON, RBRACE],
-  docFunc: [FUNCTION, IDENT/* while typing a new func */, URI],
-  identStar: [IDENT, STAR],
-  identString: [IDENT, STRING],
-  mediaList: [IDENT, LPAREN],
-  mediaOp: [COLON, EQUALS, EQ_CMP, LT, GT, LPAREN],
-  mediaValue: [IDENT, NUMBER, DIMENSION, LENGTH],
-  propCustomEnd: [DELIM, SEMICOLON, RBRACE, RBRACKET, RPAREN, INVALID],
-  propValEnd: [DELIM, SEMICOLON, RBRACE],
-  propValEndParen: [DELIM, SEMICOLON, RBRACE, RPAREN],
-  pseudo: [FUNCTION, IDENT],
-  selectorStart: [AMP, PIPE, IDENT, STAR, HASH, DOT, LBRACKET, COLON],
-};
 export const OrDie = {must: true};
 export const OrDieReusing = {must: true, reuse: true};
 export const IsDashed = {/** @param {Token} tok */ has: tok => tok.type === '--'};
-/** For these tokens stream.match() will return a UVAR unless the next token is a direct match */
-const UVAR_PROXY = [PCT, ...TT.mediaValue, ...TT.identString]
-  .reduce((res, id) => (res[id] = true) && res, []);
 // Sticky `y` flag must be used in expressions for StringSource's readMatch
 // Groups must be non-capturing (?:foo) unless explicitly necessary
 const rxCommentUso = /(\*)\[\[[-\w]+]]\*\/|\*(?:[^*]+|\*(?!\/))*(?:\*\/|$)/y;
@@ -74,20 +52,6 @@ const isIdentStart = (a, b) => a >= CC`a` && a <= CC`z` || a >= CC`A` && a <= CC
     : a === CC`\\` && b != null && b !== CC`\n`);
 const isSpace = c => c === CC`\t` || c === CC`\n` || c === CC` `;
 const unescapeNoLF = (m, code, char) => char || String.fromCodePoint(parseInt(code, 16));
-
-/**
- * @property {boolean} isUvp
- * @typedef {true[]} TokenMap - index is a token id
- */
-TT.nestSel = [...TT.selectorStart, ...TT.combinator];
-TT.nestSelBlock = [...TT.nestSel, LBRACE];
-for (const k in TT) {
-  TT[k] = TT[k].reduce((res, id) => {
-    if (UVAR_PROXY[id]) res.isUvp = 1;
-    res[id] = true;
-    return res;
-  }, []);
-}
 
 /**
  * @property {()=>Token|false} grab - gets the next token skipping WS and UVAR
