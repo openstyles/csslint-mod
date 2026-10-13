@@ -1,4 +1,4 @@
-import {B} from './bucket';
+import * as B from './bucket';
 import {TokenFunc} from './token';
 import {OrDie, OrDieReusing, TT} from './token-stream';
 import {TokenIdByCode} from './tokens';

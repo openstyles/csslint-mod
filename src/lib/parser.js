@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import {B} from './bucket';
+import * as B from './bucket';
 import Combinators from './combinators';
 import ATS, {ATS_GLOBAL, ATS_TDO} from './parser-ats';
 import * as parserCache from './parser-cache';

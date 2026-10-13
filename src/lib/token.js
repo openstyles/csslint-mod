@@ -1,4 +1,4 @@
-import {B} from './bucket.js';
+import * as B from './bucket';
 import {assign, define, isOwn, parseString, PDESC, toLowAscii} from './util';
 
 /**

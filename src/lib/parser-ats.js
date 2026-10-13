@@ -1,4 +1,4 @@
-import Bucket, {B} from './bucket';
+import * as B from './bucket';
 import {TokenFunc, TokenValue} from './token';
 import {IsDashed, OrDie, OrDieReusing, TT} from './token-stream';
 import {documentFuncs, pick} from './util';
@@ -149,7 +149,7 @@ const ATS = {
     this._block(stream, start, {
       decl: true,
       ats: fontFeatureSyms ||=
-        new Bucket('annotation character-variant ornaments styleset stylistic swash'),
+        new B.Bucket('annotation character-variant ornaments styleset stylistic swash'),
       event: ['fontfeaturevalues', {name}],
     });
   },
@@ -278,7 +278,7 @@ const ATS = {
     this._block(stream, start, {
       decl: true,
       event: ['page', {id, pseudo}],
-      ats: marginSyms ||= new Bucket('bottom-center bottom-left-corner bottom-left bottom-right-corner bottom-right left-bottom left-middle left-top right-bottom right-middle right-top top-center top-left-corner top-left top-right-corner top-right'), // eslint-disable-line max-len
+      ats: marginSyms ||= new B.Bucket('bottom-center bottom-left-corner bottom-left bottom-right-corner bottom-right left-bottom left-middle left-top right-bottom right-middle right-top top-center top-left-corner top-left top-right-corner top-right'), // eslint-disable-line max-len
       scoped: true,
     });
   },
