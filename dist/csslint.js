@@ -219,7 +219,6 @@ var ruleBoxModel = [{
   const rx = /^(?:(border)|padding)(?:-(?:left|right|(top|bottom)|(?:inline|(block)(?:-(?:start|end))?)))?$/;
   const sizeProps = {width: false, height: true};
   const stack = [];
-  const {B} = parserUtil;
   let props, inRule;
   registerRuleEvents(parser, {
     start() {
@@ -236,7 +235,7 @@ var ruleBoxModel = [{
       const m = rx.exec(name);
       let v;
       if (m) {
-        if (!((v = value.parts[0]).number === 0 || m[1] && B.none.has(v))) {
+        if (!((v = value.parts[0]).number === 0 || m[1] && v.type === 'none')) {
           (props ??= new Map()).set(name, {
             line: p.line,
             col: p.col,
