@@ -342,26 +342,18 @@ class StringsMatcher extends Matcher {
   /** @type {Bucket} */
   bu;
   /**
-   * @param {string} str
-   */
-  constructor(str) {
-    super();
-    this.str = str;
-  }
-
-  /**
    * @param {?} expr
    * @param {Token} p
    * @return {!boolean}
    */
   test(expr, p) {
-    const bu = this.bu ??= (expr = this.str, this.str = '', new Bucket(expr, rxAltSep));
+    const bu = this.bu ||= new Bucket(this._string, rxAltSep);
     return bu.has(p) // the bucket may have -vendor-prefixed-text too
       || p.vendor && bu.has(p, undefined, p.vendor >> 16) || false;
   }
 
   toString(prec) {
-    return prec > ALT && (this.bu ? this.bu.map.size > 1 : rxAltSep.test(this.str))
+    return prec > ALT && (this.bu ? this.bu.map.size > 1 : rxAltSep.test(this._string))
       ? `[ ${this._string} ]`
       : this._string;
   }
@@ -420,7 +412,7 @@ const parseAlt = src => {
       let single;
       if (ors.length === 1 && (single = ors[0]) && single instanceof StringsMatcher) {
         literals ??= (litIndex = alts.length, []);
-        literals.push((/**@type{StringsMatcher}*/single).str);
+        literals.push(single._string);
       } else {
         alts.push(single || new ManyMatcher(false, ors));
       }
@@ -508,7 +500,7 @@ export const singleTerm = Matcher.term = str => {
   let m = cache[str = str.toLowerCase()];
   if (m) return m;
   if (str.charCodeAt(0) !== CC`<`) {
-    m = new StringsMatcher(str);
+    m = new StringsMatcher();
     m._string = origStr;
   } else if (str.startsWith('<fn:')) {
     m = new FuncMatcher(VTFunctions[origStr.slice(4, -1)]);
